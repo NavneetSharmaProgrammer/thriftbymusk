@@ -1,0 +1,84 @@
+
+========================================
+Thrift by Musk - Website User Manual
+========================================
+
+Welcome! This document is your all-in-one guide to managing, updating, and deploying your Thrift by Musk website.
+
+---
+### 1. Website Map & Architecture
+---
+This section explains how your website is built. Think of it like a blueprint.
+
+-   **Build Tool:** The project uses **Vite**, a modern and extremely fast build tool for web applications.
+-   **`src/constants.ts`:** The most important file for store management. Here you control your Product Sheet link, brand logo, Instagram handle, and drop countdown timer.
+-   **Google Sheets & `src/services/productService.ts`:** Your product catalog is managed in a Google Sheet. The website fetches this data and, if an API key is provided, uses the Gemini AI to automatically generate beautiful product descriptions from your keywords.
+-   **Context Providers (`src/*Context.tsx`):** These special components manage the website's state (data that can change), like the items in the shopping cart, the current theme, and the drop timer.
+-   **Pages (`src/components/*.tsx`):** These are the main sections of your site, like the Homepage, Shop Page, and Product Detail Page.
+
+---
+### 2. Deployment Guide (GitHub & Vercel)
+---
+Follow these steps to get your website live on the internet for free.
+
+#### **Part 1: Initial Local Setup**
+You only need to do this once.
+1.  **Install Node.js:** If you don't have it, download and install the LTS version from [nodejs.org](https://nodejs.org/). This also installs `npm`.
+2.  **Download the Code:** Unzip the project folder on your computer.
+3.  **Open a Terminal:** Navigate into the project folder using your computer's terminal (like Terminal on Mac or Command Prompt/PowerShell on Windows).
+4.  **Install Dependencies:** Run the following command. This will download all the necessary packages (React, Vite, etc.) defined in `package.json`.
+    ```bash
+    npm install
+    ```
+5.  **Test Locally (Optional):** To see the website on your local machine, run:
+    ```bash
+    npm run dev
+    ```
+    This will start a local server, and you can view the site in your browser.
+
+#### **Part 2: Pushing the Code to GitHub**
+1.  **Create a GitHub Account:** If you don't have one, sign up at [github.com](https://github.com/).
+2.  **Create a New Repository:** On your GitHub dashboard, click "New" to create a new repository. Give it a name (e.g., `thrift-by-musk-store`) and keep it public. Do *not* initialize it with a README.
+3.  **Initialize Git:** In your project folder in the terminal, run:
+    ```bash
+    git init -b main
+    git add .
+    git commit -m "Initial commit"
+    ```
+4.  **Link and Push:** GitHub will show you commands to "push an existing repository". Copy and run those two lines. They will look like this:
+    ```bash
+    git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git
+    git push -u origin main
+    ```
+    Your code is now on GitHub!
+
+#### **Part 3: Deploying on Vercel**
+1.  **Create a Vercel Account:** Sign up at [vercel.com](https://vercel.com/) using your GitHub account. It's the easiest way.
+2.  **Import Project:** From your Vercel dashboard, click "Add New..." -> "Project". Find your GitHub repository and click "Import".
+3.  **Configure Project:**
+    -   Vercel will automatically detect that you're using **Vite**. You shouldn't need to change any build settings.
+    -   **CRITICAL STEP: Environment Variables.** Expand this section.
+        -   **Name:** `VITE_GEMINI_API_KEY`
+        -   **Value:** Paste your actual Gemini API key here.
+        -   Click **Add**.
+        -   *This is required for the AI product descriptions to work on the live site.*
+4.  **Deploy:** Click the "Deploy" button. Vercel will now build and deploy your website. In about a minute, you'll have a live URL!
+
+**Future Updates:** Now, whenever you push a change to your GitHub repository's `main` branch, Vercel will automatically re-deploy your site with the latest changes.
+
+---
+### 3. Content Management
+---
+How to perform day-to-day updates on your store.
+
+-   **Managing Products (with AI!):** Open your Google Sheet. To use the AI, type short keywords in the `description` column. For full descriptions, just write them out normally.
+-   **Receiving Orders:** Customers will fill out their shipping details on your site and then choose to send you the complete order via WhatsApp or Instagram DM. You will receive a pre-filled message with all order and customer information.
+-   **Managing Site Assets (Logo, etc.):** Upload your image to Google Drive, get the "Anyone with the link" shareable link, and update the URL in `src/constants.ts`. Push the change to GitHub, and Vercel will auto-deploy.
+
+---
+### 4. Troubleshooting
+---
+-   **Product not showing up?** → In your Google Sheet, check that `sold` is `FALSE` and `isUpcoming` is `FALSE`.
+-   **Images not visible?** → Ensure Google Drive links are shared as **“Anyone with the link”**.
+-   **AI descriptions not working on live site?** → Check that the `VITE_GEMINI_API_KEY` environment variable is set correctly in your Vercel project settings.
+-   **The countdown timer is wrong?** → The `launchDate` in `src/constants.ts` is in UTC time. Ensure you've converted your local time correctly.
