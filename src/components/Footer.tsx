@@ -64,12 +64,7 @@ const Footer: React.FC = () => {
                     <span className="text-sm">@beinggauravbisht</span>
                 </a>
               </div>
-              <div className="flex justify-center md:justify-start space-x-4">
-                 <a href="https://www.instagram.com/priyanka_bisht72200/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-[var(--color-text-inverted)] hover:text-[var(--color-text-secondary)] transition-colors">
-                    <UserIcon className="h-5 w-5" />
-                    <span className="text-sm">@priyanka_bisht72200</span>
-                </a>
-              </div>
+              
             </div>
           </div>
         </div>
