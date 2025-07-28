@@ -17,10 +17,10 @@ const Footer: React.FC = () => {
           
           {/* Column 1: Brand Information */}
           <div className="flex flex-col items-center md:items-start">
-            <Link to="/" className="flex items-center gap-3 mb-3 group">
-              <img src={formatGoogleDriveLink(LOGO_URL, 'image', { width: 32 })} alt="Thrift by Musk Logo" className="h-8 w-auto rounded-md" />
+            <div className="flex items-center gap-3 mb-3">
+              <img src={formatGoogleDriveLink(LOGO_URL, 'image', { height: 96 })} alt="Thrift by Musk Logo" className="h-8 w-auto rounded-md" />
               <span className="text-xl font-serif font-bold">Thrift by Musk</span>
-            </Link>
+            </div>
             <p className="text-[var(--color-text-muted)] text-center md:text-left">Handpicked luxe pieces. Timeless style, guilt-free fashion.</p>
           </div>
           
@@ -64,7 +64,12 @@ const Footer: React.FC = () => {
                     <span className="text-sm">@beinggauravbisht</span>
                 </a>
               </div>
-              
+              <div className="flex justify-center md:justify-start space-x-4">
+                 <a href="https://www.instagram.com/priyanka_bisht72200/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-[var(--color-text-inverted)] hover:text-[var(--color-text-secondary)] transition-colors">
+                    <UserIcon className="h-5 w-5" />
+                    <span className="text-sm">@priyanka_bisht72200</span>
+                </a>
+              </div>
             </div>
           </div>
         </div>
