@@ -30,7 +30,7 @@ export const GOOGLE_SHEET_CSV_URL: string = 'https://docs.google.com/spreadsheet
  * 2.  Right-click the file > Share > "Anyone with the link" > Copy link.
  * 3.  Paste the link below.
  */
-export const LOGO_URL = 'https://drive.google.com/file/d/1wE7L2p5N_N-HwXyJ2K8qY7tQ8jZ9k5F4/view?usp=drive_link'; // <-- PASTE YOUR LOGO URL HERE (This is an example link)
+export const LOGO_URL = 'https://drive.google.com/file/d/1njKrc8YCw2OLgFXGt2voJgf_JrDoDzSi/view?usp=drive_link'; // <-- PASTE YOUR LOGO URL HERE (This is an example link)
 
 /**
  * 3. INSTAGRAM HANDLE
