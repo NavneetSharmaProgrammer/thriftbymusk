@@ -21,10 +21,10 @@ const getGoogleDriveFileId = (url: string): string | null => {
  *
  * @param url The original Google Drive shareable link.
  * @param type Specifies whether the link is for an 'image' or a 'video', as they require different formats.
- * @param options An optional object for extra parameters, like image width for optimization.
+ * @param options An optional object for extra parameters, like image width or height for optimization.
  * @returns The formatted URL for embedding. If the original URL is not a valid Google Drive link, it is returned unchanged.
  */
-export const formatGoogleDriveLink = (url:string, type: 'image' | 'video', options?: { width?: number }): string => {
+export const formatGoogleDriveLink = (url:string, type: 'image' | 'video', options?: { width?: number, height?: number }): string => {
   // If the URL is empty or not a Google Drive link, return it as is.
   if (!url || !url.includes('drive.google.com')) {
     return url;
@@ -38,8 +38,13 @@ export const formatGoogleDriveLink = (url:string, type: 'image' | 'video', optio
   
   if (type === 'image') {
     // This format provides a direct link to the image content.
-    // Appending `=w{width}` tells Google to serve a resized version of the image, which is great for performance.
-    const sizeParam = options?.width ? `=w${options.width}` : '';
+    // Appending `=w{width}` or `=h{height}` tells Google to serve a resized version of the image.
+    let sizeParam = '';
+    if (options?.width) {
+      sizeParam = `=w${options.width}`;
+    } else if (options?.height) {
+        sizeParam = `=h${options.height}`;
+    }
     return `https://lh3.googleusercontent.com/d/${fileId}${sizeParam}`;
   }
 
