@@ -2,8 +2,12 @@ import { Product } from '../types.ts';
 import { GOOGLE_SHEET_CSV_URL } from '../constants.ts';
 import { GoogleGenAI } from "@google/genai";
 
+// Safely access the API key from the environment to prevent build errors in browser-only contexts.
+// The build environment (e.g., Vercel) is expected to replace `process.env.API_KEY`.
+const apiKey = (typeof process !== 'undefined' && process.env) ? process.env.API_KEY : undefined;
+
 // Initialize the Google GenAI client, only if an API key is provided.
-const ai = process.env.API_KEY ? new GoogleGenAI({ apiKey: process.env.API_KEY }) : null;
+const ai = apiKey ? new GoogleGenAI({ apiKey }) : null;
 
 /**
  * A simple, lightweight CSV parser function.
@@ -141,7 +145,7 @@ export const fetchProducts = async (): Promise<Product[]> => {
     if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
         throw new Error('Could not fetch product data. This might be a network issue. Please check your internet connection.');
     }
-    if (!ai && process.env.API_KEY === undefined) {
+    if (!ai && apiKey === undefined) {
       console.warn("AI features disabled: API_KEY environment variable is not set.");
     }
     throw error;
