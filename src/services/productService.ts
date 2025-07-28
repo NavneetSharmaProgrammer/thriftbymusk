@@ -1,24 +1,5 @@
 import { Product } from '../types.ts';
 import { GOOGLE_SHEET_CSV_URL } from '../constants.ts';
-import { GoogleGenAI } from "@google/genai";
-
-// This function safely gets the API key. It's written to bypass build errors
-// from bundlers that disallow direct `process.env` access in client-side code.
-// We access `process` indirectly through `globalThis` using bracket notation to
-// prevent the static analyzer from throwing an error.
-const getApiKey = (): string | undefined => {
-  const g = (typeof globalThis !== 'undefined' ? globalThis : {}) as any;
-  const p = g['process'];
-  if (p && p.env) {
-    return p.env.API_KEY;
-  }
-  return undefined;
-};
-
-const apiKey = getApiKey();
-
-// Initialize the Google GenAI client, only if an API key is provided.
-const ai = apiKey ? new GoogleGenAI({ apiKey }) : null;
 
 /**
  * A simple, lightweight CSV parser function.
@@ -68,7 +49,6 @@ const mapRowToProduct = (row: Record<string, string>): Product | null => {
       id: row.id,
       name: row.name,
       description: row.description,
-      originalDescription: row.description, // Store original for AI check
       price: price,
       imageUrls: row.imageUrls.split(',').map(url => url.trim()).filter(Boolean),
       videoUrl: row.videoUrl || undefined,
@@ -87,40 +67,8 @@ const mapRowToProduct = (row: Record<string, string>): Product | null => {
 };
 
 /**
- * Generates a product description using the Gemini API if the provided description is just keywords.
- * @param product The product object.
- * @returns The same product, with an AI-enhanced description if applicable.
- */
-const generateDescriptionIfNeeded = async (product: Product): Promise<Product> => {
-  // Only generate if AI is enabled and the description is short (likely keywords).
-  if (!ai || !product.originalDescription || product.originalDescription.length > 60) {
-    return product;
-  }
-
-  try {
-    const prompt = `You are a creative copywriter for "Thrift by Musk," a chic online vintage store. Your tone is stylish, warm, and highlights sustainability. Write an enticing product description (approx. 30-45 words) based on these details: Product Name: "${product.name}", Brand: "${product.brand}", Category: "${product.category}", Condition: "${product.condition}", and these keywords: "${product.originalDescription}". Do not repeat the product name.`;
-    
-    const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
-        contents: prompt,
-    });
-    
-    const generatedText = response.text;
-
-    if (generatedText) {
-      return { ...product, description: generatedText.trim() };
-    }
-  } catch (error) {
-    console.error(`Gemini API failed for product ${product.id}. Using original description.`, error);
-  }
-  
-  // Return original product if AI fails or doesn't return text
-  return product;
-};
-
-/**
- * The main service function to fetch, process, and enhance product data.
- * It fetches the CSV, parses it, and then uses AI to generate descriptions where needed.
+ * The main service function to fetch and process product data.
+ * It fetches the CSV from the configured Google Sheet URL and parses it.
  *
  * @returns A Promise that resolves to an array of `Product` objects.
  */
@@ -133,7 +81,6 @@ export const fetchProducts = async (): Promise<Product[]> => {
   }
   
   try {
-    // The 'allorigins.win' proxy is removed for a more direct and reliable fetch.
     // Google Sheets published as CSV are directly accessible via fetch.
     const response = await fetch(csvUrl);
     
@@ -145,19 +92,13 @@ export const fetchProducts = async (): Promise<Product[]> => {
         return [];
     }
     const parsedData = parseCSV(csvText);
-    const initialProducts = parsedData.map(mapRowToProduct).filter((p): p is Product => p !== null);
-
-    // Enhance products with AI descriptions in parallel
-    const enhancedProducts = await Promise.all(initialProducts.map(generateDescriptionIfNeeded));
+    const products = parsedData.map(mapRowToProduct).filter((p): p is Product => p !== null);
     
-    return enhancedProducts;
+    return products;
   } catch (error) {
     console.error("Error fetching or processing product data:", error);
     if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
         throw new Error('Could not fetch product data. This might be a network issue. Please check your internet connection.');
-    }
-    if (!ai && apiKey === undefined) {
-      console.warn("AI features disabled: API_KEY environment variable is not set.");
     }
     throw error;
   }
