@@ -3,7 +3,6 @@ import { useCart } from '../CartContext.tsx';
 import { CloseIcon, ShoppingBagIcon, CheckCircleIcon, WhatsAppIcon, InstagramIcon, LoadingIcon, ArrowLeftIcon } from './Icons.tsx';
 import { formatGoogleDriveLink } from '../utils.ts';
 import { CustomerDetails } from '../types.ts';
-import { GOOGLE_APPS_SCRIPT_URL } from '../constants.ts';
 
 /**
  * A modal component that displays the shopping cart.
@@ -16,15 +15,12 @@ const CartModal: React.FC = () => {
         getWhatsAppMessage, getInstagramMessage
     } = useCart();
     
-    // State to manage the view within the modal ('cart', 'form', 'confirmation', 'success')
-    const [view, setView] = useState<'cart' | 'form' | 'confirmation' | 'success'>('cart');
+    // State to manage the view within the modal ('cart', 'form', 'confirmation')
+    const [view, setView] = useState('cart');
     // State for the customer details form
     const [customerDetails, setCustomerDetails] = useState<CustomerDetails>({
         name: '', phone: '', address: '', city: '', state: '', pincode: ''
     });
-    // State for handling the automated order submission
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [submitError, setSubmitError] = useState<string | null>(null);
 
     const modalRef = useRef<HTMLDivElement>(null);
 
@@ -32,7 +28,6 @@ const CartModal: React.FC = () => {
     useEffect(() => {
         if (isCartOpen) {
             setView('cart');
-            setSubmitError(null);
         }
     }, [isCartOpen]);
 
@@ -53,9 +48,9 @@ const CartModal: React.FC = () => {
             if (event.key === 'Escape') toggleCart();
             if (event.key === 'Tab') {
                 if (event.shiftKey) { 
-                    if (document.activeElement === firstElement) { lastElement?.focus(); event.preventDefault(); }
+                    if (document.activeElement === firstElement) { lastElement.focus(); event.preventDefault(); }
                 } else { 
-                    if (document.activeElement === lastElement) { firstElement?.focus(); event.preventDefault(); }
+                    if (document.activeElement === lastElement) { firstElement.focus(); event.preventDefault(); }
                 }
             }
         };
@@ -80,46 +75,6 @@ const CartModal: React.FC = () => {
         e.preventDefault();
         setView('confirmation');
     };
-    
-    const handlePlaceOrder = async () => {
-        if (!GOOGLE_APPS_SCRIPT_URL) {
-            setSubmitError("Online ordering is currently not configured. Please use an alternative method.");
-            return;
-        }
-
-        setIsSubmitting(true);
-        setSubmitError(null);
-
-        try {
-            const payload = {
-                customerDetails,
-                cartItems,
-                total
-            };
-
-            const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify(payload),
-                redirect: 'follow',
-            });
-            
-            // We can't reliably read the body from a cross-origin Apps Script response
-            // without more complex CORS setup. We will trust a 200 OK response means success.
-            if (!response.ok) {
-                 throw new Error(`Network response was not ok, status: ${response.status}`);
-            }
-
-            setView('success');
-            clearCart();
-
-        } catch (error) {
-            console.error("Failed to submit order:", error);
-            setSubmitError("There was an issue placing your order. Please try one of the other methods or contact us directly.");
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
 
     const handleWhatsAppConfirm = () => {
         const message = getWhatsAppMessage(customerDetails);
@@ -130,8 +85,12 @@ const CartModal: React.FC = () => {
     
     const handleInstagramConfirm = () => {
         const { link, body } = getInstagramMessage(customerDetails);
-        navigator.clipboard.writeText(body);
-        window.open(link, '_blank');
+        navigator.clipboard.writeText(body).then(() => {
+            alert("Order details copied to clipboard! Paste it in your Instagram DM.");
+            window.open(link, '_blank');
+        }, () => {
+            alert("Could not copy order to clipboard. Please copy it manually.");
+        });
         clearCart();
         toggleCart();
     };
@@ -225,32 +184,13 @@ const CartModal: React.FC = () => {
                     <ArrowLeftIcon className="w-4 h-4" /> Edit Details
                 </button>
                  <h3 className="text-xl font-semibold text-center">Final Step: Send Your Order</h3>
-                 <p className="text-[var(--color-text-secondary)] text-center">Place your order automatically, or use a manual option below.</p>
-                 
-                 <div className="pt-4 space-y-3">
-                    <button 
-                        onClick={handlePlaceOrder} 
-                        disabled={!GOOGLE_APPS_SCRIPT_URL || isSubmitting}
-                        className="btn btn-primary w-full flex items-center justify-center gap-3"
-                    >
-                        {isSubmitting && <LoadingIcon className="w-5 h-5"/>}
-                        Confirm & Place Order
-                    </button>
-                    {!GOOGLE_APPS_SCRIPT_URL && <p className="text-xs text-[var(--color-danger)] mt-2 text-center">Automated ordering is currently unavailable.</p>}
-                     {submitError && <p className="text-sm text-center text-[var(--color-danger)] bg-[var(--color-danger)]/10 p-3 rounded-md mt-3">{submitError}</p>}
-                 </div>
+                 <p className="text-[var(--color-text-secondary)] text-center">Please send us your complete order details using one of the options below to finalize your purchase.</p>
 
-                <div className="relative flex py-5 items-center">
-                    <div className="flex-grow border-t border-[var(--color-border)]"></div>
-                    <span className="flex-shrink mx-4 text-sm text-[var(--color-text-muted)]">Or contact us on</span>
-                    <div className="flex-grow border-t border-[var(--color-border)]"></div>
-                </div>
-
-                <div className="space-y-3">
-                    <button onClick={handleWhatsAppConfirm} className="btn btn-secondary w-full flex items-center justify-center gap-2">
+                <div className="pt-6 space-y-3">
+                    <button onClick={handleWhatsAppConfirm} className="btn w-full flex items-center justify-center gap-2" style={{backgroundColor: '#25D366', color: 'white', borderColor: '#25D366'}}>
                         <WhatsAppIcon className="w-5 h-5"/> Order via WhatsApp
                     </button>
-                    <button onClick={handleInstagramConfirm} className="btn btn-secondary w-full flex items-center justify-center gap-2">
+                    <button onClick={handleInstagramConfirm} className="btn w-full flex items-center justify-center gap-2" style={{background: 'linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%)', color: 'white', borderColor: 'transparent'}}>
                        <InstagramIcon className="w-5 h-5" /> Order via Instagram DM
                     </button>
                 </div>
@@ -259,27 +199,10 @@ const CartModal: React.FC = () => {
         </>
     );
 
-    const renderSuccessView = () => (
-        <>
-            <ModalHeader title="Order Placed!" />
-            <div className="flex-grow flex flex-col justify-center items-center text-center p-6 space-y-4 animate-fade-in">
-                <CheckCircleIcon className="w-20 h-20 text-[var(--color-success)]" />
-                <h3 className="text-2xl font-serif font-bold">Thank you for your order!</h3>
-                <p className="text-[var(--color-text-secondary)] max-w-sm">
-                    We have received your order and will contact you shortly to confirm payment and shipping details.
-                </p>
-                <button onClick={toggleCart} className="btn btn-primary mt-6">
-                    Continue Shopping
-                </button>
-            </div>
-        </>
-    )
-
     const renderContent = () => {
         switch (view) {
             case 'form': return renderFormView();
             case 'confirmation': return renderConfirmationView();
-            case 'success': return renderSuccessView();
             case 'cart':
             default:
                 return renderCartView();

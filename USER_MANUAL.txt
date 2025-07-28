@@ -1,167 +1,84 @@
+
 ========================================
 Thrift by Musk - Website User Manual
 ========================================
 
-Welcome! This document is your all-in-one guide to managing, updating, and understanding your Thrift by Musk website.
+Welcome! This document is your all-in-one guide to managing, updating, and deploying your Thrift by Musk website.
 
 ---
-### 1. Quick Setup Checklist
----
-For first-time setup or major configuration changes, follow this checklist.
-
-- [ ] **Product Sheet:** Created in Google Sheets with the correct headers.
-- [ ] **Publish Product Sheet:** Published to the web as a CSV file.
-- [ ] **Update `constants.ts`:**
-    - [ ] `GOOGLE_SHEET_CSV_URL` is filled with the published CSV link.
-    - [ ] **(Recommended)** `GOOGLE_APPS_SCRIPT_URL` is filled with your deployed web app link (see Section 4.3).
-    - [ ] `LOGO_URL` and other asset links are updated with your Google Drive links.
-    - [ ] `launchDate` is configured for your next product drop.
-- [ ] **(Optional) Configure AI:** Set up the `API_KEY` in your environment to enable AI-powered product descriptions.
-
----
-### 2. Website Map & Architecture
+### 1. Website Map & Architecture
 ---
 This section explains how your website is built. Think of it like a blueprint.
 
-#### The "Control Panel" (`constants.ts`)
-This is the most important file for store management. It's designed so you can change key parts of your site without touching complex code. Here you control:
--   Your Product Sheet link.
--   Your automated order submission URL.
--   Your brand logo, owner photos, and promotional images.
--   Your Instagram handle.
--   The countdown timer for new drops.
+-   **Build Tool:** The project uses **Vite**, a modern and extremely fast build tool for web applications.
+-   **`src/constants.ts`:** The most important file for store management. Here you control your Product Sheet link, brand logo, Instagram handle, and drop countdown timer.
+-   **Google Sheets & `src/services/productService.ts`:** Your product catalog is managed in a Google Sheet. The website fetches this data and, if an API key is provided, uses the Gemini AI to automatically generate beautiful product descriptions from your keywords.
+-   **Context Providers (`src/*Context.tsx`):** These special components manage the website's state (data that can change), like the items in the shopping cart, the current theme, and the drop timer.
+-   **Pages (`src/components/*.tsx`):** These are the main sections of your site, like the Homepage, Shop Page, and Product Detail Page.
 
-#### The "Data Engine" (Google Sheets & `productService.ts`)
--   **Products Sheet (CSV):** This is your master product database.
--   **`services/productService.ts`:** This is the code that fetches your CSV file from the `GOOGLE_SHEET_CSV_URL`. It's smart:
-    1.  It reads the data.
-    2.  If you've provided an API key, it checks for short descriptions (keywords).
-    3.  It sends these keywords to the Gemini AI to write beautiful, full descriptions.
-    4.  It delivers the final, enhanced product list to the website.
+---
+### 2. Deployment Guide (GitHub & Vercel)
+---
+Follow these steps to get your website live on the internet for free.
 
-#### The "Brain" (Context Providers)
-These are special components that hold and manage the website's state (data that can change).
--   **`ProductContext.tsx`:** Holds all the products after they've been fetched and processed.
--   **`CartContext.tsx`:** Manages everything related to the shopping cart (items, total price, etc.).
--   **`ThemeContext.tsx`:** Manages the Light/Dark/Sepia theme switching.
--   **`DropContext.tsx`:** Manages the countdown timer and knows when a drop is "live".
+#### **Part 1: Initial Local Setup**
+You only need to do this once.
+1.  **Install Node.js:** If you don't have it, download and install the LTS version from [nodejs.org](https://nodejs.org/). This also installs `npm`.
+2.  **Download the Code:** Unzip the project folder on your computer.
+3.  **Open a Terminal:** Navigate into the project folder using your computer's terminal (like Terminal on Mac or Command Prompt/PowerShell on Windows).
+4.  **Install Dependencies:** Run the following command. This will download all the necessary packages (React, Vite, etc.) defined in `package.json`.
+    ```bash
+    npm install
+    ```
+5.  **Test Locally (Optional):** To see the website on your local machine, run:
+    ```bash
+    npm run dev
+    ```
+    This will start a local server, and you can view the site in your browser.
 
-#### The "Pages" (Main Components)
--   **`HomePage.tsx`:** The landing page. It's built from smaller section components found in `components/home/`.
--   **`ShopPage.tsx`:** Displays all products with powerful search and filtering.
--   **`ProductDetailPage.tsx`:** Shows all details, images, and video for a single item. It also automatically displays a "You Might Also Like" section at the bottom to encourage further browsing.
--   **`GalleryPage.tsx`:** A simple, beautiful page to showcase your style photos.
+#### **Part 2: Pushing the Code to GitHub**
+1.  **Create a GitHub Account:** If you don't have one, sign up at [github.com](https://github.com/).
+2.  **Create a New Repository:** On your GitHub dashboard, click "New" to create a new repository. Give it a name (e.g., `thrift-by-musk-store`) and keep it public. Do *not* initialize it with a README.
+3.  **Initialize Git:** In your project folder in the terminal, run:
+    ```bash
+    git init -b main
+    git add .
+    git commit -m "Initial commit"
+    ```
+4.  **Link and Push:** GitHub will show you commands to "push an existing repository". Copy and run those two lines. They will look like this:
+    ```bash
+    git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git
+    git push -u origin main
+    ```
+    Your code is now on GitHub!
+
+#### **Part 3: Deploying on Vercel**
+1.  **Create a Vercel Account:** Sign up at [vercel.com](https://vercel.com/) using your GitHub account. It's the easiest way.
+2.  **Import Project:** From your Vercel dashboard, click "Add New..." -> "Project". Find your GitHub repository and click "Import".
+3.  **Configure Project:**
+    -   Vercel will automatically detect that you're using **Vite**. You shouldn't need to change any build settings.
+    -   **CRITICAL STEP: Environment Variables.** Expand this section.
+        -   **Name:** `VITE_GEMINI_API_KEY`
+        -   **Value:** Paste your actual Gemini API key here.
+        -   Click **Add**.
+        -   *This is required for the AI product descriptions to work on the live site.*
+4.  **Deploy:** Click the "Deploy" button. Vercel will now build and deploy your website. In about a minute, you'll have a live URL!
+
+**Future Updates:** Now, whenever you push a change to your GitHub repository's `main` branch, Vercel will automatically re-deploy your site with the latest changes.
 
 ---
 ### 3. Content Management
 ---
 How to perform day-to-day updates on your store.
 
-#### 3.1 Managing Products (with AI!)
-1.  **Open your "Products" Google Sheet.**
-2.  To add a new item, add a new row and fill in the columns.
-3.  **To use the AI for descriptions:** In the `description` column, just type a few keywords (e.g., `bohemian vibe, summer top, cotton, puff sleeves`). The website will automatically generate a full description. If you write a long description yourself, the AI will not run for that item.
-4.  **To add images/video:** Upload them to Google Drive, get the "Anyone with the link" shareable link, and paste it into the `imageUrls` or `videoUrl` columns. For multiple images, separate URLs with a comma.
-5.  **Important:** The sheet is automatically re-fetched when a user visits the site. Your changes will appear live.
-
-#### 3.2 Receiving Orders
-There are three ways a customer can place an order.
-
-**Method 1: Automated Orders (Recommended)**
-If you have set up the Google Apps Script (see Section 4.3), this is the primary method.
-1.  A customer clicks "Confirm & Place Order".
-2.  The website sends the order details to your script.
-3.  A new row is **automatically added** to the "Orders" sheet in your Google Spreadsheet.
-4.  You can then review this sheet, see new orders, and contact the customer to arrange payment and shipping.
-
-**Method 2 & 3: Manual Orders (WhatsApp & Instagram)**
-These are fallback options for the customer.
-1.  The customer clicks "Order via WhatsApp" or "Order via Instagram DM".
-2.  This opens the respective app with a **pre-filled message** containing the customer's shipping details AND their full order summary.
-3.  The customer sends this message to you. You can then coordinate payment and shipping directly.
-
-**What You Receive (Manual Methods):**
-You will get a message on WhatsApp or Instagram that looks like this:
-
-> Hello Thrift by Musk! I'd like to place the following order:
->
-> *ORDER SUMMARY*
->
-> - Product: Vintage Cream Blouse
->   ID: vintage-cream-blouse
->   Size: M
->   Category: Tops
->   Price: ₹1,299
->
-> *SHIPPING DETAILS*
-> Name: Riya Sharma
-> Phone: 9876543210
-> Address: 123 Green Lane, Sector 15, Delhi, Delhi - 110001
->
-> *Total:* ₹1,299
-
-#### 3.3 Managing Site-Wide Assets (Logo, Banners, etc.)
-1.  **Upload your image** (e.g., new logo) to Google Drive.
-2.  Get the **"Anyone with the link"** shareable link.
-3.  Open `constants.ts` in the code, find the variable (e.g., `LOGO_URL`), and replace the old link with your new one.
+-   **Managing Products (with AI!):** Open your Google Sheet. To use the AI, type short keywords in the `description` column. For full descriptions, just write them out normally.
+-   **Receiving Orders:** Customers will fill out their shipping details on your site and then choose to send you the complete order via WhatsApp or Instagram DM. You will receive a pre-filled message with all order and customer information.
+-   **Managing Site Assets (Logo, etc.):** Upload your image to Google Drive, get the "Anyone with the link" shareable link, and update the URL in `src/constants.ts`. Push the change to GitHub, and Vercel will auto-deploy.
 
 ---
-### 4. Setup & Troubleshooting
+### 4. Troubleshooting
 ---
-
-#### 4.1. Common Problems
-
-*   **A product isn't showing up?**
-    *   → In your Product Sheet, check that `sold` is `FALSE` and `isUpcoming` is `FALSE`. Also ensure it has a unique `id` and a valid `price`.
-
-*   **Images, logo, or other assets are not visible?**
-    *   → The Google Drive share link is likely incorrect. Make sure it's set to **"Anyone with the link"**.
-
-*   **The countdown timer is wrong or has ended early?**
-    *   → The `launchDate` in `constants.ts` is in UTC time. Make sure you've converted your local time to UTC. For example, `5:30 PM IST` is `12:00 PM UTC`.
-
-*   **AI descriptions are not being generated?**
-    *   → This means the Gemini `API_KEY` is not configured in the project's environment. The site will fall back to using whatever text is in the description column.
-    *   → Make sure the text in the `description` column is short (under 60 characters) to trigger the AI.
-    
-*   **"Confirm & Place Order" button is missing or disabled?**
-    *   → This means you have not filled in the `GOOGLE_APPS_SCRIPT_URL` in `constants.ts`. Follow the setup guide below.
-
-*   **Customer says WhatsApp/Instagram button doesn't work?**
-    *   → This is expected on desktop browsers if the app isn't installed. The order message is automatically copied to their clipboard, so they can easily paste it into WhatsApp Web or the Instagram website.
-
-#### 4.2. Finding Your Google Sheet ID
-
-You need this ID for the Apps Script setup.
-1. Open your Products Google Sheet.
-2. Look at the URL in your browser's address bar. It will look like this:
-   `https://docs.google.com/spreadsheets/d/THIS_IS_YOUR_ID/edit`
-3. Copy the long string of letters and numbers between `/d/` and `/edit`. That is your Sheet ID.
-
-#### 4.3. Setting Up Automated Orders (Google Apps Script)
-
-Follow these steps carefully to enable automated order logging.
-
-1.  **Go to your Products Google Sheet.**
-2.  In the top menu, click **Extensions > Apps Script**. A new browser tab will open with the script editor.
-3.  In the script editor, delete all the code in the `Code.gs` file.
-4.  Open the `ORDER_APPS_SCRIPT.js` file from your website project code. Copy its entire content.
-5.  Paste this content into the empty `Code.gs` file in the Apps Script editor.
-6.  **IMPORTANT:** Near the top of the script, find the line `var SPREADSHEET_ID = "YOUR_GOOGLE_SHEET_ID_HERE";` and replace `YOUR_GOOGLE_SHEET_ID_HERE` with your actual Google Sheet ID (see section 4.2).
-7.  Click the **Save project** icon (looks like a floppy disk).
-8.  Click the blue **Deploy** button in the top-right, then select **New deployment**.
-9.  Click the gear icon next to "Select type" and choose **Web app**.
-10. Fill out the deployment configuration:
-    *   **Description:** `Thrift by Musk Order Handler` (or similar)
-    *   **Execute as:** `Me (your-email@gmail.com)`
-    *   **Who has access:** `Anyone` (This is critical for the website to be able to send data to it).
-11. Click **Deploy**.
-12. **Authorize Access:** A new window will pop up asking for permission.
-    *   Click **Authorize access**.
-    *   Choose your Google account.
-    *   You will likely see a warning screen saying "Google hasn't verified this app". This is normal. Click **Advanced**, then click **Go to [Your Project Name] (unsafe)**.
-    *   Click **Allow** on the final screen.
-13. After authorization, you will see a "Deployment successfully updated" message with a **Web app URL**. Click the **Copy** button to copy this URL.
-14. **Final Step:** Open `constants.ts` in your website code. Paste the copied URL into the `GOOGLE_APPS_SCRIPT_URL` variable.
-
-That's it! Your website is now connected to your Google Sheet for automated orders. A new sheet named "Orders" will be created automatically when the first order is placed.
+-   **Product not showing up?** → In your Google Sheet, check that `sold` is `FALSE` and `isUpcoming` is `FALSE`.
+-   **Images not visible?** → Ensure Google Drive links are shared as **“Anyone with the link”**.
+-   **AI descriptions not working on live site?** → Check that the `VITE_GEMINI_API_KEY` environment variable is set correctly in your Vercel project settings.
+-   **The countdown timer is wrong?** → The `launchDate` in `src/constants.ts` is in UTC time. Ensure you've converted your local time correctly.

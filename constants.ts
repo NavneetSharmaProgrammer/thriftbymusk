@@ -22,16 +22,7 @@ export const GOOGLE_SHEET_CSV_URL: string = 'https://docs.google.com/spreadsheet
 
 
 /**
- * 2. GOOGLE APPS SCRIPT FOR ORDERS (Optional, but Recommended)
- * -----------------------------------------------------------
- * URL for your deployed Google Apps Script to handle automated order submissions.
- * Instructions for setup are in USER_MANUAL.txt and in the ORDER_APPS_SCRIPT.js file.
- * If left empty, this checkout method will be disabled.
- */
-export const GOOGLE_APPS_SCRIPT_URL: string = ''; // <-- PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE
-
-/**
- * 3. BRAND LOGO
+ * 2. BRAND LOGO
  * -------------
  * The main logo for your website.
  * HOW TO SET UP:
@@ -42,7 +33,7 @@ export const GOOGLE_APPS_SCRIPT_URL: string = ''; // <-- PASTE YOUR GOOGLE APPS 
 export const LOGO_URL = 'https://drive.google.com/file/d/1wE7L2p5N_N-HwXyJ2K8qY7tQ8jZ9k5F4/view?usp=drive_link'; // <-- PASTE YOUR LOGO URL HERE (This is an example link)
 
 /**
- * 4. INSTAGRAM HANDLE
+ * 3. INSTAGRAM HANDLE
  * -------------------
  * Your store's Instagram handle, used for "Order via DM" links.
  * Do not include the '@' symbol.
@@ -50,7 +41,7 @@ export const LOGO_URL = 'https://drive.google.com/file/d/1wE7L2p5N_N-HwXyJ2K8qY7
 export const INSTAGRAM_HANDLE = 'thriftbymusk';
 
 /**
- * 5. NEXT DROP LAUNCH DATE
+ * 4. NEXT DROP LAUNCH DATE
  * ------------------------
  * Set the target date and time for your next product drop countdown timer.
  * FORMAT: 'YYYY-MM-DDTHH:MM:SSZ' (ISO 8601 format). 'Z' denotes UTC time.
