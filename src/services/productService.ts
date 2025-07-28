@@ -2,9 +2,8 @@ import { Product } from '../types.ts';
 import { GOOGLE_SHEET_CSV_URL } from '../constants.ts';
 import { GoogleGenAI } from "@google/genai";
 
-// Initialize the Google GenAI client, only if an API key is provided via environment variables.
-const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-const ai = apiKey ? new GoogleGenAI({ apiKey }) : null;
+// Initialize the Google GenAI client, only if an API key is provided.
+const ai = process.env.API_KEY ? new GoogleGenAI({ apiKey: process.env.API_KEY }) : null;
 
 /**
  * A simple, lightweight CSV parser function.
@@ -48,22 +47,22 @@ const parseCSV = (csv: string): Record<string, string>[] => {
 const mapRowToProduct = (row: Record<string, string>): Product | null => {
   try {
     const price = parseInt(row.price, 10);
-    if (isNaN(price) || !row.id) return null;
+    if (isNaN(price)) return null;
 
     return {
       id: row.id,
-      name: row.name || 'Untitled Product',
-      description: row.description || '',
-      originalDescription: row.description || '', // Store original for AI check
+      name: row.name,
+      description: row.description,
+      originalDescription: row.description, // Store original for AI check
       price: price,
-      imageUrls: row.imageUrls ? row.imageUrls.split(',').map(url => url.trim()).filter(Boolean) : [],
+      imageUrls: row.imageUrls.split(',').map(url => url.trim()).filter(Boolean),
       videoUrl: row.videoUrl || undefined,
-      category: row.category || 'Uncategorized',
-      brand: row.brand || 'Unknown Brand',
-      size: row.size || 'N/A',
-      measurements: { bust: row.bust || 'N/A', length: row.length || 'N/A' },
-      condition: row.condition || 'Good',
-      sold: row.sold ? row.sold.toUpperCase() === 'TRUE' : false,
+      category: row.category,
+      brand: row.brand,
+      size: row.size,
+      measurements: { bust: row.bust, length: row.length },
+      condition: row.condition,
+      sold: row.sold.toUpperCase() === 'TRUE',
       isUpcoming: row.isUpcoming ? row.isUpcoming.toUpperCase() === 'TRUE' : false,
     };
   } catch (error) {
@@ -119,10 +118,12 @@ export const fetchProducts = async (): Promise<Product[]> => {
   }
   
   try {
-    const response = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(csvUrl)}`);
+    // The 'allorigins.win' proxy is removed for a more direct and reliable fetch.
+    // Google Sheets published as CSV are directly accessible via fetch.
+    const response = await fetch(csvUrl);
     
     if (!response.ok) {
-      throw new Error(`Failed to fetch Google Sheet: ${response.status} ${response.statusText}`);
+      throw new Error(`Failed to fetch Google Sheet: ${response.status} ${response.statusText}. Please ensure the sheet is published to the web and the link is correct.`);
     }
     const csvText = await response.text();
     if (!csvText) {
@@ -131,15 +132,18 @@ export const fetchProducts = async (): Promise<Product[]> => {
     const parsedData = parseCSV(csvText);
     const initialProducts = parsedData.map(mapRowToProduct).filter((p): p is Product => p !== null);
 
-    if (!ai) {
-        console.warn("AI features disabled: VITE_GEMINI_API_KEY environment variable is not set.");
-    }
     // Enhance products with AI descriptions in parallel
     const enhancedProducts = await Promise.all(initialProducts.map(generateDescriptionIfNeeded));
     
     return enhancedProducts;
   } catch (error) {
     console.error("Error fetching or processing product data:", error);
+    if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+        throw new Error('Could not fetch product data. This might be a network issue. Please check your internet connection.');
+    }
+    if (!ai && process.env.API_KEY === undefined) {
+      console.warn("AI features disabled: API_KEY environment variable is not set.");
+    }
     throw error;
   }
 };
