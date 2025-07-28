@@ -16,7 +16,6 @@ For first-time setup or major configuration changes, follow this checklist.
     - [ ] **(Recommended)** `GOOGLE_APPS_SCRIPT_URL` is filled with your deployed web app link (see Section 4.3).
     - [ ] `LOGO_URL` and other asset links are updated with your Google Drive links.
     - [ ] `launchDate` is configured for your next product drop.
-- [ ] **(Optional) Configure AI:** Set up the `API_KEY` in your environment to enable AI-powered product descriptions.
 
 ---
 ### 2. Website Map & Architecture
@@ -33,11 +32,7 @@ This is the most important file for store management. It's designed so you can c
 
 #### The "Data Engine" (Google Sheets & `productService.ts`)
 -   **Products Sheet (CSV):** This is your master product database.
--   **`services/productService.ts`:** This is the code that fetches your CSV file from the `GOOGLE_SHEET_CSV_URL`. It's smart:
-    1.  It reads the data.
-    2.  If you've provided an API key, it checks for short descriptions (keywords).
-    3.  It sends these keywords to the Gemini AI to write beautiful, full descriptions.
-    4.  It delivers the final, enhanced product list to the website.
+-   **`services/productService.ts`:** This is the code that fetches your CSV file from the `GOOGLE_SHEET_CSV_URL`. It reads and parses the data, delivering the final product list to the website.
 
 #### The "Brain" (Context Providers)
 These are special components that hold and manage the website's state (data that can change).
@@ -57,12 +52,11 @@ These are special components that hold and manage the website's state (data that
 ---
 How to perform day-to-day updates on your store.
 
-#### 3.1 Managing Products (with AI!)
+#### 3.1 Managing Products
 1.  **Open your "Products" Google Sheet.**
-2.  To add a new item, add a new row and fill in the columns.
-3.  **To use the AI for descriptions:** In the `description` column, just type a few keywords (e.g., `bohemian vibe, summer top, cotton, puff sleeves`). The website will automatically generate a full description. If you write a long description yourself, the AI will not run for that item.
-4.  **To add images/video:** Upload them to Google Drive, get the "Anyone with the link" shareable link, and paste it into the `imageUrls` or `videoUrl` columns. For multiple images, separate URLs with a comma.
-5.  **Important:** The sheet is automatically re-fetched when a user visits the site. Your changes will appear live.
+2.  To add a new item, add a new row and fill in all the columns, including a full `description`.
+3.  **To add images/video:** Upload them to Google Drive, get the "Anyone with the link" shareable link, and paste it into the `imageUrls` or `videoUrl` columns. For multiple images, separate URLs with a comma.
+4.  **Important:** The sheet is automatically re-fetched when a user visits the site. Your changes will appear live.
 
 #### 3.2 Receiving Orders
 There are three ways a customer can place an order.
@@ -119,10 +113,6 @@ You will get a message on WhatsApp or Instagram that looks like this:
 
 *   **The countdown timer is wrong or has ended early?**
     *   → The `launchDate` in `constants.ts` is in UTC time. Make sure you've converted your local time to UTC. For example, `5:30 PM IST` is `12:00 PM UTC`.
-
-*   **AI descriptions are not being generated?**
-    *   → This means the Gemini `API_KEY` is not configured in the project's environment. The site will fall back to using whatever text is in the description column.
-    *   → Make sure the text in the `description` column is short (under 60 characters) to trigger the AI.
     
 *   **"Confirm & Place Order" button is missing or disabled?**
     *   → This means you have not filled in the `GOOGLE_APPS_SCRIPT_URL` in `constants.ts`. Follow the setup guide below.
