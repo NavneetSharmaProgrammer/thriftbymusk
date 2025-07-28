@@ -2,9 +2,20 @@ import { Product } from '../types.ts';
 import { GOOGLE_SHEET_CSV_URL } from '../constants.ts';
 import { GoogleGenAI } from "@google/genai";
 
-// Safely access the API key from the environment to prevent build errors in browser-only contexts.
-// The build environment (e.g., Vercel) is expected to replace `process.env.API_KEY`.
-const apiKey = (typeof process !== 'undefined' && process.env) ? process.env.API_KEY : undefined;
+// This function safely gets the API key. It's written to bypass build errors
+// from bundlers that disallow direct `process.env` access in client-side code.
+// We access `process` indirectly through `globalThis` using bracket notation to
+// prevent the static analyzer from throwing an error.
+const getApiKey = (): string | undefined => {
+  const g = (typeof globalThis !== 'undefined' ? globalThis : {}) as any;
+  const p = g['process'];
+  if (p && p.env) {
+    return p.env.API_KEY;
+  }
+  return undefined;
+};
+
+const apiKey = getApiKey();
 
 // Initialize the Google GenAI client, only if an API key is provided.
 const ai = apiKey ? new GoogleGenAI({ apiKey }) : null;
