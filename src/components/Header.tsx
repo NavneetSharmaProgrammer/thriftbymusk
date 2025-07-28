@@ -101,7 +101,7 @@ const Header: React.FC = () => {
           <div className="flex justify-between items-center">
             <Link to="/" className="flex items-center gap-3 group">
               <img 
-                src={formatGoogleDriveLink(https://drive.google.com/file/d/1njKrc8YCw2OLgFXGt2voJgf_JrDoDzSi/view?usp=drive_link, 'image', { width: 40 })} 
+                src={formatGoogleDriveLink(LOGO_URL, 'image', { width: 40 })} 
                 alt="Thrift by Musk Logo" 
                 className="h-10 w-auto transition-transform duration-300 group-hover:scale-105" 
               />
