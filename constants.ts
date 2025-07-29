@@ -28,7 +28,7 @@ export const GOOGLE_SHEET_CSV_URL: string = 'https://docs.google.com/spreadsheet
  * Instructions for setup are in USER_MANUAL.txt and in the ORDER_APPS_SCRIPT.js file.
  * If left empty, this checkout method will be disabled.
  */
-export const GOOGLE_APPS_SCRIPT_URL: string = ''; // <-- PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE
+export const GOOGLE_APPS_SCRIPT_URL: string = 'https://script.google.com/macros/s/AKfycbyw4Zo2smXQhSlbSG1tl1hNUXnpBcKFTgWAi-qLVRae5rRVV-MKwBnvNrmKsuRm7gqg/exec'; // <-- PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE
 
 /**
  * 3. BRAND LOGO
