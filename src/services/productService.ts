@@ -68,7 +68,7 @@ const mapRowToProduct = (row: Record<string, string>): Product | null => {
 
 /**
  * The main service function to fetch and process product data.
- * It fetches the CSV from the configured Google Sheet URL and parses it.
+ * It fetches the CSV from the configured Google Sheet URL via a CORS proxy.
  *
  * @returns A Promise that resolves to an array of `Product` objects.
  */
@@ -80,12 +80,20 @@ export const fetchProducts = async (): Promise<Product[]> => {
     throw new Error("Google Sheet CSV URL is not configured.");
   }
   
+  // Using a CORS proxy to bypass browser security restrictions on cross-origin requests.
+  // The Google Sheet is on 'docs.google.com', while the app is on a different domain.
+  const proxyUrl = `https://proxy.cors.sh/${csvUrl}`;
+
   try {
-    // Google Sheets published as CSV are directly accessible via fetch.
-    const response = await fetch(csvUrl);
+    const response = await fetch(proxyUrl, {
+      headers: {
+        // A temporary public API key for the proxy service is required.
+        'x-cors-api-key': 'temp_e008d5385d31542f7041a86b97036a1b',
+      },
+    });
     
     if (!response.ok) {
-      throw new Error(`Failed to fetch Google Sheet: ${response.status} ${response.statusText}. Please ensure the sheet is published to the web and the link is correct.`);
+      throw new Error(`Failed to fetch Google Sheet: ${response.status} ${response.statusText}. The CORS proxy might be down or the Sheet URL is incorrect.`);
     }
     const csvText = await response.text();
     if (!csvText) {
@@ -98,8 +106,9 @@ export const fetchProducts = async (): Promise<Product[]> => {
   } catch (error) {
     console.error("Error fetching or processing product data:", error);
     if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-        throw new Error('Could not fetch product data. This might be a network issue. Please check your internet connection.');
+        // This specific error often points to a network failure or the proxy itself being unreachable.
+        throw new Error('Could not fetch product data. This is likely a network issue or a problem with the CORS proxy service. Please check your internet connection and try again.');
     }
-    throw error;
+    throw error; // Re-throw other errors
   }
 };
