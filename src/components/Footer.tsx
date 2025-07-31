@@ -18,7 +18,7 @@ const Footer: React.FC = () => {
           {/* Column 1: Brand Information */}
           <div className="flex flex-col items-center md:items-start">
             <div className="flex items-center gap-3 mb-3">
-              <img src={formatGoogleDriveLink(LOGO_URL, 'image', { height: 96 })} alt="Thrift by Musk Logo" className="h-8 w-auto rounded-md" />
+              <img src={formatGoogleDriveLink(LOGO_URL, 'image', { width: 32 })} alt="Thrift by Musk Logo" className="h-8 w-auto rounded-md no-theme-filter" />
               <span className="text-xl font-serif font-bold">Thrift by Musk</span>
             </div>
             <p className="text-[var(--color-text-muted)] text-center md:text-left">Handpicked luxe pieces. Timeless style, guilt-free fashion.</p>
