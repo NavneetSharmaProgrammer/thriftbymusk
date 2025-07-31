@@ -82,7 +82,7 @@ const fetchAndProcessProducts = async (): Promise<Product[]> => {
         throw new Error("Google Sheet CSV URL is not configured.");
     }
 
-    const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(csvUrl)}`;
+    const proxyUrl = `https://cors.eu.org/${csvUrl}`;
     const response = await fetch(proxyUrl);
     
     if (!response.ok) {
