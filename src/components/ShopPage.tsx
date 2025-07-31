@@ -1,7 +1,10 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import ProductCard from './ProductCard.tsx';
-import { SearchIcon, FilterIcon, CloseIcon } from './Icons.tsx';
+import { 
+    SearchIcon, FilterIcon, CloseIcon, ChevronDownIcon, TagIcon, SparklesIcon,
+    RulerIcon, ShieldCheckIcon, PriceTagIcon, ArrowsUpDownIcon, CheckCircleIcon
+} from './Icons.tsx';
 import { useDrop } from '../DropContext.tsx';
 import { useProducts } from '../ProductContext.tsx';
 
@@ -23,6 +26,7 @@ const ShopPage: React.FC = () => {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [priceFilter, setPriceFilter] = useState('All');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [sortOption, setSortOption] = useState('Featured');
 
   const visibleProducts = useMemo(() => {
     return (products || []).filter(p => !p.isUpcoming || isDropLive);
@@ -88,6 +92,7 @@ const ShopPage: React.FC = () => {
     setSelectedConditions([]);
     setSelectedCategories([]);
     setPriceFilter('All');
+    setSortOption('Featured');
   };
 
   const filteredProducts = useMemo(() => {
@@ -108,53 +113,148 @@ const ShopPage: React.FC = () => {
     });
   }, [searchQuery, statusFilter, selectedBrands, selectedSizes, selectedConditions, selectedCategories, priceFilter, visibleProducts, products]);
 
-  const CheckboxFilterGroup: React.FC<{title: string, options: string[], selected: string[], onChange: (value: string) => void}> = ({ title, options, selected, onChange }) => (
-    <div className="py-4 border-b border-[var(--color-border)]">
-      <h3 className="font-semibold mb-3">{title}</h3>
-      <div className="space-y-3 max-h-48 overflow-y-auto pr-2">
-        {options.map(option => (
-          <label key={option} className="flex items-center space-x-3 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={selected.includes(option)}
-              onChange={() => onChange(option)}
-              className="custom-checkbox"
-            />
-            <span className="text-sm text-[var(--color-text-secondary)]">{option}</span>
-          </label>
-        ))}
-      </div>
-    </div>
-  );
+  const sortedProducts = useMemo(() => {
+    const sorted = [...filteredProducts];
+    switch (sortOption) {
+        case 'Newest':
+            // Assuming products from the sheet are in chronological order (oldest first)
+            return sorted.reverse();
+        case 'Price: Low to High':
+            return sorted.sort((a, b) => a.price - b.price);
+        case 'Price: High to Low':
+            return sorted.sort((a, b) => b.price - a.price);
+        case 'Name: A-Z':
+            return sorted.sort((a, b) => a.name.localeCompare(b.name));
+        case 'Featured':
+        default:
+            return filteredProducts;
+    }
+  }, [filteredProducts, sortOption]);
 
-  const FilterSidebarContent = () => (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-bold font-serif">Filters</h2>
-        <button onClick={clearAllFilters} className="text-sm text-[var(--color-primary)] hover:underline">Clear All</button>
-      </div>
-      <div className="relative">
-          <input type="text" placeholder="Search..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full pl-10 pr-4 py-2 border border-[var(--color-border)] rounded-lg focus:ring-1 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] transition bg-[var(--color-surface)]" />
-          <div className="absolute left-3 top-1/2 -translate-y-1/2"><SearchIcon className="w-5 h-5 text-[var(--color-text-muted)]" /></div>
-      </div>
-      <div className="border-b border-[var(--color-border)] py-4">
-        <h3 className="font-semibold mb-3">Availability</h3>
-        <div className="flex flex-wrap gap-2">
-          {statusFilters.map(filter => (<button key={filter} onClick={() => setStatusFilter(filter)} className={`px-3 py-1 rounded-full text-sm font-medium transition-colors duration-200 ${statusFilter === filter ? 'bg-[var(--color-text-primary)] text-[var(--color-background)]' : 'bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-alt)] border border-[var(--color-border)]'}`}>{filter}</button>))}
+  const FilterSidebarContent = () => {
+    const [openSections, setOpenSections] = useState<string[]>(['Category', 'Brand']);
+
+    const toggleSection = (section: string) => {
+        setOpenSections(prev => 
+            prev.includes(section) ? prev.filter(s => s !== section) : [...prev, section]
+        );
+    };
+
+    const AccordionItem: React.FC<{
+        title: string;
+        icon: React.ReactNode;
+        children: React.ReactNode;
+        defaultOpen?: boolean;
+    }> = ({ title, icon, children }) => {
+        const isOpen = openSections.includes(title);
+        return (
+            <div className="filter-accordion border-b border-[var(--color-border)]">
+                <button
+                    onClick={() => toggleSection(title)}
+                    className="filter-accordion-header"
+                    aria-expanded={isOpen}
+                    aria-controls={`accordion-content-${title}`}
+                >
+                    <span className="flex items-center gap-3 font-semibold text-[var(--color-text-primary)]">
+                        {icon}
+                        {title}
+                    </span>
+                    <ChevronDownIcon className={`w-5 h-5 text-[var(--color-text-secondary)] filter-accordion-icon transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
+                </button>
+                <div
+                  id={`accordion-content-${title}`}
+                  className="filter-accordion-content overflow-hidden transition-all duration-300 ease-in-out"
+                  style={{ maxHeight: isOpen ? '1000px' : '0px' }}
+                >
+                  <div className="pt-2 pb-4 px-1">{children}</div>
+                </div>
+            </div>
+        );
+    };
+
+    const CheckboxFilterGroup: React.FC<{options: string[], selected: string[], onChange: (value: string) => void}> = ({ options, selected, onChange }) => (
+        <div className="space-y-3 max-h-48 overflow-y-auto pr-2">
+            {options.map(option => (
+                <label key={option} className="flex items-center space-x-3 cursor-pointer">
+                    <input
+                        type="checkbox"
+                        checked={selected.includes(option)}
+                        onChange={() => onChange(option)}
+                        className="custom-checkbox"
+                    />
+                    <span className="text-sm text-[var(--color-text-secondary)]">{option}</span>
+                </label>
+            ))}
         </div>
+    );
+    
+    return (
+      <div className="space-y-2">
+        <div className="flex justify-between items-center p-2">
+          <h2 className="text-xl font-bold font-serif">Filters</h2>
+          {activeFilterCount > 0 && (
+            <button onClick={clearAllFilters} className="text-sm text-[var(--color-primary)] hover:underline">Clear All</button>
+          )}
+        </div>
+  
+        <div className="relative p-2">
+            <input type="text" placeholder="Search..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full pl-10 pr-4 py-2 border border-[var(--color-border)] rounded-lg focus:ring-1 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] transition bg-[var(--color-surface)]" />
+            <div className="absolute left-5 top-1/2 -translate-y-1/2"><SearchIcon className="w-5 h-5 text-[var(--color-text-muted)]" /></div>
+        </div>
+  
+        <AccordionItem title="Sort By" icon={<ArrowsUpDownIcon className="w-5 h-5 text-[var(--color-text-secondary)]" />}>
+            <select value={sortOption} onChange={(e) => setSortOption(e.target.value)} className="w-full custom-select">
+                <option value="Featured">Featured</option>
+                <option value="Newest">Newest</option>
+                <option value="Price: Low to High">Price: Low to High</option>
+                <option value="Price: High to Low">Price: High to Low</option>
+                <option value="Name: A-Z">Name: A-Z</option>
+            </select>
+        </AccordionItem>
+        
+        <AccordionItem title="Availability" icon={<CheckCircleIcon className="w-5 h-5 text-[var(--color-text-secondary)]" />}>
+          <div className="segmented-control">
+              {statusFilters.map(filter => (
+                  <button key={filter} onClick={() => setStatusFilter(filter)} className={`segmented-control-button ${statusFilter === filter ? 'active' : ''}`}>
+                      {filter}
+                  </button>
+              ))}
+          </div>
+        </AccordionItem>
+
+        <AccordionItem title="Price" icon={<PriceTagIcon className="w-5 h-5 text-[var(--color-text-secondary)]" />}>
+          <div className="price-filter-button-group">
+            {Object.keys(priceRanges).map(range => (
+                <button key={range} onClick={() => setPriceFilter(range)} className={`price-filter-button ${priceFilter === range ? 'active' : ''}`}>
+                    {range}
+                </button>
+            ))}
+          </div>
+        </AccordionItem>
+
+        {categories.length > 0 && (
+            <AccordionItem title="Category" icon={<TagIcon className="w-5 h-5 text-[var(--color-text-secondary)]" />}>
+                <CheckboxFilterGroup options={categories} selected={selectedCategories} onChange={(val) => handleCheckboxChange(setSelectedCategories, val)} />
+            </AccordionItem>
+        )}
+        {brands.length > 0 && (
+            <AccordionItem title="Brand" icon={<SparklesIcon className="w-5 h-5 text-[var(--color-text-secondary)]" />}>
+                <CheckboxFilterGroup options={brands} selected={selectedBrands} onChange={(val) => handleCheckboxChange(setSelectedBrands, val)} />
+            </AccordionItem>
+        )}
+        {sizes.length > 0 && (
+            <AccordionItem title="Size" icon={<RulerIcon className="w-5 h-5 text-[var(--color-text-secondary)]" />}>
+                <CheckboxFilterGroup options={sizes} selected={selectedSizes} onChange={(val) => handleCheckboxChange(setSelectedSizes, val)} />
+            </AccordionItem>
+        )}
+        {conditions.length > 0 && (
+            <AccordionItem title="Condition" icon={<ShieldCheckIcon className="w-5 h-5 text-[var(--color-text-secondary)]" />}>
+                <CheckboxFilterGroup options={conditions} selected={selectedConditions} onChange={(val) => handleCheckboxChange(setSelectedConditions, val)} />
+            </AccordionItem>
+        )}
       </div>
-      <CheckboxFilterGroup title="Category" options={categories} selected={selectedCategories} onChange={(val) => handleCheckboxChange(setSelectedCategories, val)} />
-      <CheckboxFilterGroup title="Brand" options={brands} selected={selectedBrands} onChange={(val) => handleCheckboxChange(setSelectedBrands, val)} />
-      <CheckboxFilterGroup title="Size" options={sizes} selected={selectedSizes} onChange={(val) => handleCheckboxChange(setSelectedSizes, val)} />
-      <CheckboxFilterGroup title="Condition" options={conditions} selected={selectedConditions} onChange={(val) => handleCheckboxChange(setSelectedConditions, val)} />
-      <div>
-        <h3 className="font-semibold mb-2">Price</h3>
-        <select value={priceFilter} onChange={(e) => setPriceFilter(e.target.value)} className="w-full p-2 border border-[var(--color-border)] rounded-lg focus:ring-1 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] transition bg-[var(--color-surface)]">
-            {Object.keys(priceRanges).map(opt => <option key={opt} value={opt}>{opt}</option>)}
-        </select>
-      </div>
-    </div>
-  );
+    );
+  };
 
   const ProductGridSkeleton: React.FC = () => (
     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-8">
@@ -180,16 +280,9 @@ const ShopPage: React.FC = () => {
                 <h1 className="text-4xl md:text-5xl font-serif font-bold">All Finds</h1>
                 <p className="text-lg text-[var(--color-text-secondary)] mt-2">Our curated collection of vintage and pre-loved treasures.</p>
             </div>
-            <div className="lg:hidden mb-6">
-                <button onClick={() => setIsFilterOpen(true)} className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg shadow-sm text-[var(--color-text-primary)] font-semibold">
-                    <FilterIcon className="w-5 h-5" />
-                    Filters
-                    {activeFilterCount > 0 && <span className="filter-badge">{activeFilterCount}</span>}
-                </button>
-            </div>
-
+            
             <div className="grid grid-cols-1 lg:grid-cols-4 lg:gap-12">
-              <aside className="hidden lg:block lg:col-span-1 lg:sticky lg:top-24 h-fit bg-[var(--color-surface-alt)]/70 p-6 rounded-lg border border-[var(--color-border)]">
+              <aside className="hidden lg:block lg:col-span-1 lg:sticky lg:top-24 h-fit bg-[var(--color-surface)]/60 backdrop-blur-sm p-6 rounded-lg border border-[var(--color-border)]">
                 <FilterSidebarContent />
               </aside>
 
@@ -205,6 +298,16 @@ const ShopPage: React.FC = () => {
               )}
 
               <main className="lg:col-span-3">
+                 <div className="flex justify-between items-center mb-6">
+                    <p className="text-sm text-[var(--color-text-secondary)]">
+                        Showing {sortedProducts.length} of {visibleProducts.length} products
+                    </p>
+                     <button onClick={() => setIsFilterOpen(true)} className="lg:hidden flex items-center justify-center gap-2 px-4 py-2 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg shadow-sm text-[var(--color-text-primary)] font-medium text-sm">
+                        <FilterIcon className="w-4 h-4" />
+                        Filters
+                        {activeFilterCount > 0 && <span className="filter-badge">{activeFilterCount}</span>}
+                    </button>
+                </div>
                 {isLoading ? (
                   <ProductGridSkeleton />
                 ) : error ? (
@@ -215,9 +318,9 @@ const ShopPage: React.FC = () => {
                         Try Again
                       </button>
                    </div>
-                ) : filteredProducts.length > 0 ? (
+                ) : sortedProducts.length > 0 ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-8">
-                    {filteredProducts.map(product => (
+                    {sortedProducts.map(product => (
                         <ProductCard key={product.id} product={product} />
                     ))}
                     </div>
