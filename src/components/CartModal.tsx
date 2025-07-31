@@ -1,9 +1,12 @@
+
 import React, { useEffect, useRef, useState, FormEvent } from 'react';
 import { useCart } from '../CartContext.tsx';
 import { CloseIcon, ShoppingBagIcon, CheckCircleIcon, WhatsAppIcon, InstagramIcon, LoadingIcon, ArrowLeftIcon } from './Icons.tsx';
 import { formatGoogleDriveLink } from '../utils.ts';
 import { CustomerDetails } from '../types.ts';
 import { GOOGLE_APPS_SCRIPT_URL } from '../constants.ts';
+
+type SubmissionStatus = 'idle' | 'submitting' | 'success' | 'error';
 
 /**
  * A modal component that displays the shopping cart.
@@ -16,23 +19,24 @@ const CartModal: React.FC = () => {
         getWhatsAppMessage, getInstagramMessage
     } = useCart();
     
-    // State to manage the view within the modal ('cart', 'form', 'confirmation', 'success')
-    const [view, setView] = useState<'cart' | 'form' | 'confirmation' | 'success'>('cart');
+    // State to manage the view within the modal ('cart', 'form', 'confirmation')
+    const [view, setView] = useState('cart');
     // State for the customer details form
     const [customerDetails, setCustomerDetails] = useState<CustomerDetails>({
         name: '', phone: '', address: '', city: '', state: '', pincode: ''
     });
-    // State for handling the automated order submission
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [submitError, setSubmitError] = useState<string | null>(null);
+    // State to manage the automated form submission process.
+    const [submissionStatus, setSubmissionStatus] = useState<SubmissionStatus>('idle');
+    const [submissionError, setSubmissionError] = useState<string | null>(null);
 
     const modalRef = useRef<HTMLDivElement>(null);
 
-    // Reset view to 'cart' whenever the modal is opened
+    // Reset view and submission status whenever the modal is opened
     useEffect(() => {
         if (isCartOpen) {
             setView('cart');
-            setSubmitError(null);
+            setSubmissionStatus('idle');
+            setSubmissionError(null);
         }
     }, [isCartOpen]);
 
@@ -53,9 +57,9 @@ const CartModal: React.FC = () => {
             if (event.key === 'Escape') toggleCart();
             if (event.key === 'Tab') {
                 if (event.shiftKey) { 
-                    if (document.activeElement === firstElement) { lastElement?.focus(); event.preventDefault(); }
+                    if (document.activeElement === firstElement) { lastElement.focus(); event.preventDefault(); }
                 } else { 
-                    if (document.activeElement === lastElement) { firstElement?.focus(); event.preventDefault(); }
+                    if (document.activeElement === lastElement) { firstElement.focus(); event.preventDefault(); }
                 }
             }
         };
@@ -65,59 +69,61 @@ const CartModal: React.FC = () => {
             modalNode.removeEventListener('keydown', handleKeyDown);
             previouslyFocusedElement?.focus();
         };
-    }, [isCartOpen, toggleCart, view]);
+    }, [isCartOpen, toggleCart, view, submissionStatus]);
 
     if (!isCartOpen) return null;
 
     const total = cartItems.reduce((acc, item) => acc + item.price, 0);
     const formattedTotal = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0 }).format(total);
+    const FREE_SHIPPING_THRESHOLD = 999;
+    const amountNeeded = FREE_SHIPPING_THRESHOLD - total;
+
 
     const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setCustomerDetails({ ...customerDetails, [e.target.name]: e.target.value });
     };
 
-    const handleFormSubmit = (e: FormEvent) => {
+    const handleFormSubmit = async (e: FormEvent) => {
         e.preventDefault();
-        setView('confirmation');
-    };
-    
-    const handlePlaceOrder = async () => {
+        
+        // If no script URL is provided, go to the manual confirmation flow.
         if (!GOOGLE_APPS_SCRIPT_URL) {
-            setSubmitError("Online ordering is currently not configured. Please use an alternative method.");
+            setView('confirmation');
             return;
         }
 
-        setIsSubmitting(true);
-        setSubmitError(null);
+        // Otherwise, attempt automated submission.
+        setSubmissionStatus('submitting');
+        setSubmissionError(null);
 
         try {
-            const payload = {
-                customerDetails,
-                cartItems,
-                total
-            };
-
             const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
                 method: 'POST',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify(payload),
-                redirect: 'follow',
+                mode: 'cors',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ cartItems, customerDetails }),
             });
             
-            // We can't reliably read the body from a cross-origin Apps Script response
-            // without more complex CORS setup. We will trust a 200 OK response means success.
-            if (!response.ok) {
-                 throw new Error(`Network response was not ok, status: ${response.status}`);
+            // Apps Script can redirect on POST, so we check for ok status.
+            if (response.ok) {
+                 const result = await response.json();
+                 if(result.result === 'success'){
+                     setSubmissionStatus('success');
+                     clearCart();
+                     setTimeout(() => toggleCart(), 3000); // Close modal after 3s on success
+                 } else {
+                     throw new Error(result.error || 'The script returned an unknown error.');
+                 }
+            } else {
+                throw new Error(`Network response was not ok. Status: ${response.status}`);
             }
-
-            setView('success');
-            clearCart();
-
         } catch (error) {
-            console.error("Failed to submit order:", error);
-            setSubmitError("There was an issue placing your order. Please try one of the other methods or contact us directly.");
-        } finally {
-            setIsSubmitting(false);
+            console.error('Order submission failed:', error);
+            const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
+            setSubmissionError(`There was an issue submitting your order automatically. Please try the manual options below. Error: ${errorMessage}`);
+            setSubmissionStatus('error');
         }
     };
 
@@ -175,6 +181,17 @@ const CartModal: React.FC = () => {
             )}
             {cartItems.length > 0 && (
                 <div className="p-6 border-t border-[var(--color-border)] bg-[var(--color-surface-alt)]">
+                    {total > 0 && total < FREE_SHIPPING_THRESHOLD && (
+                        <div className="text-center text-sm text-[var(--color-text-secondary)] mb-4 p-3 bg-[var(--color-surface)] rounded-md">
+                            You're just <span className="font-bold text-[var(--color-primary)]">{new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0 }).format(amountNeeded)}</span> away from free shipping!
+                        </div>
+                    )}
+                    {total >= FREE_SHIPPING_THRESHOLD && (
+                        <div className="text-center text-sm font-semibold text-[var(--color-success)] mb-4 p-3 bg-green-100/50 rounded-md flex items-center justify-center gap-2">
+                            <CheckCircleIcon className="w-5 h-5"/>
+                            Congratulations! You've qualified for free shipping.
+                        </div>
+                    )}
                     <div className="flex justify-between items-center mb-4">
                         <span className="text-lg font-semibold">Total</span>
                         <span className="text-2xl font-serif text-[var(--color-primary)]">{formattedTotal}</span>
@@ -210,7 +227,13 @@ const CartModal: React.FC = () => {
                         <span className="text-lg font-semibold">Order Total</span>
                         <span className="text-2xl font-serif text-[var(--color-primary)]">{formattedTotal}</span>
                     </div>
-                    <button type="submit" className="btn btn-primary w-full">Continue to Final Step</button>
+                    <button type="submit" className="btn btn-primary w-full" disabled={submissionStatus === 'submitting'}>
+                        {submissionStatus === 'submitting' ? (
+                            <span className="flex items-center justify-center gap-2"><LoadingIcon className="w-5 h-5"/> Submitting...</span>
+                        ) : (
+                            GOOGLE_APPS_SCRIPT_URL ? 'Submit Order' : 'Continue to Final Step'
+                        )}
+                    </button>
                     <p className="text-xs text-[var(--color-text-muted)] mt-3 text-center">Shipping calculated upon confirmation. Payment via UPI/Bank Transfer.</p>
                 </div>
             </form>
@@ -225,32 +248,13 @@ const CartModal: React.FC = () => {
                     <ArrowLeftIcon className="w-4 h-4" /> Edit Details
                 </button>
                  <h3 className="text-xl font-semibold text-center">Final Step: Send Your Order</h3>
-                 <p className="text-[var(--color-text-secondary)] text-center">Place your order automatically, or use a manual option below.</p>
-                 
-                 <div className="pt-4 space-y-3">
-                    <button 
-                        onClick={handlePlaceOrder} 
-                        disabled={!GOOGLE_APPS_SCRIPT_URL || isSubmitting}
-                        className="btn btn-primary w-full flex items-center justify-center gap-3"
-                    >
-                        {isSubmitting && <LoadingIcon className="w-5 h-5"/>}
-                        Confirm & Place Order
-                    </button>
-                    {!GOOGLE_APPS_SCRIPT_URL && <p className="text-xs text-[var(--color-danger)] mt-2 text-center">Automated ordering is currently unavailable.</p>}
-                     {submitError && <p className="text-sm text-center text-[var(--color-danger)] bg-[var(--color-danger)]/10 p-3 rounded-md mt-3">{submitError}</p>}
-                 </div>
+                 <p className="text-[var(--color-text-secondary)] text-center">Please send us your complete order details using one of the options below to finalize your purchase.</p>
 
-                <div className="relative flex py-5 items-center">
-                    <div className="flex-grow border-t border-[var(--color-border)]"></div>
-                    <span className="flex-shrink mx-4 text-sm text-[var(--color-text-muted)]">Or contact us on</span>
-                    <div className="flex-grow border-t border-[var(--color-border)]"></div>
-                </div>
-
-                <div className="space-y-3">
-                    <button onClick={handleWhatsAppConfirm} className="btn btn-secondary w-full flex items-center justify-center gap-2">
+                <div className="pt-6 space-y-3">
+                    <button onClick={handleWhatsAppConfirm} className="btn w-full flex items-center justify-center gap-2" style={{backgroundColor: '#25D366', color: 'white', borderColor: '#25D366'}}>
                         <WhatsAppIcon className="w-5 h-5"/> Order via WhatsApp
                     </button>
-                    <button onClick={handleInstagramConfirm} className="btn btn-secondary w-full flex items-center justify-center gap-2">
+                    <button onClick={handleInstagramConfirm} className="btn w-full flex items-center justify-center gap-2" style={{background: 'linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%)', color: 'white', borderColor: 'transparent'}}>
                        <InstagramIcon className="w-5 h-5" /> Order via Instagram DM
                     </button>
                 </div>
@@ -258,28 +262,51 @@ const CartModal: React.FC = () => {
             </div>
         </>
     );
-
-    const renderSuccessView = () => (
-        <>
-            <ModalHeader title="Order Placed!" />
-            <div className="flex-grow flex flex-col justify-center items-center text-center p-6 space-y-4 animate-fade-in">
-                <CheckCircleIcon className="w-20 h-20 text-[var(--color-success)]" />
-                <h3 className="text-2xl font-serif font-bold">Thank you for your order!</h3>
-                <p className="text-[var(--color-text-secondary)] max-w-sm">
-                    We have received your order and will contact you shortly to confirm payment and shipping details.
-                </p>
-                <button onClick={toggleCart} className="btn btn-primary mt-6">
-                    Continue Shopping
-                </button>
+    
+    const renderSubmissionStatus = () => {
+        if (submissionStatus === 'success') {
+            return (
+                <div className="flex flex-col items-center justify-center text-center p-6 h-full animate-fade-in">
+                    <CheckCircleIcon className="w-20 h-20 text-[var(--color-success)] mb-4"/>
+                    <h3 className="text-2xl font-serif font-bold">Order Placed!</h3>
+                    <p className="text-[var(--color-text-secondary)] mt-2">Thank you! We've received your order and will contact you shortly to confirm payment and shipping.</p>
+                </div>
+            );
+        }
+        if (submissionStatus === 'error') {
+            return (
+                <div className="flex flex-col items-center justify-center text-center p-6 h-full animate-fade-in">
+                     <h3 className="text-2xl font-serif font-bold text-[var(--color-danger)] mb-4">Order Submission Failed</h3>
+                     <p className="text-[var(--color-text-secondary)] mt-2 mb-6">{submissionError}</p>
+                     <div className="space-y-3 w-full max-w-xs">
+                        <button onClick={handleFormSubmit} className="btn btn-primary w-full">Try Again</button>
+                        <button onClick={() => setView('confirmation')} className="btn btn-secondary w-full">Order Manually Instead</button>
+                     </div>
+                </div>
+            );
+        }
+        // While submitting
+        return (
+            <div className="flex flex-col items-center justify-center text-center p-6 h-full animate-fade-in">
+                <LoadingIcon className="w-16 h-16 text-[var(--color-primary)] mb-4" />
+                <h3 className="text-xl font-semibold">Submitting Your Order...</h3>
+                <p className="text-[var(--color-text-secondary)]">Please wait a moment.</p>
             </div>
-        </>
-    )
+        );
+    }
 
     const renderContent = () => {
+        if (submissionStatus === 'submitting' || submissionStatus === 'success' || submissionStatus === 'error') {
+            return (
+                <>
+                    <ModalHeader title={submissionStatus === 'success' ? 'Confirmed' : submissionStatus === 'error' ? 'Error' : 'Processing'} />
+                    {renderSubmissionStatus()}
+                </>
+            );
+        }
         switch (view) {
             case 'form': return renderFormView();
             case 'confirmation': return renderConfirmationView();
-            case 'success': return renderSuccessView();
             case 'cart':
             default:
                 return renderCartView();
