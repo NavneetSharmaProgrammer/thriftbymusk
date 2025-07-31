@@ -1,96 +1,99 @@
+
 /**
  * =================================================================================
- *  Thrift by Musk - Google Apps Script for Order Management
+ *  Thrift by Musk - Google Apps Script for Automated Order Management
  * =================================================================================
- * 
- * This script handles order submissions from the website and logs them into a
- * Google Sheet.
+ *
+ * This script is designed to be deployed as a Google Apps Script Web App.
+ * It listens for POST requests from the website's checkout form, parses the
+ * order data, and logs it into a designated Google Sheet.
  *
  * --- SETUP INSTRUCTIONS ---
- * 1.  Open the Google Sheet that you use for your products.
- * 2.  In the menu, go to Extensions > Apps Script.
- * 3.  Delete any code in the `Code.gs` file and paste this entire script.
- * 4.  **IMPORTANT:** At the top of the script, replace 'YOUR_GOOGLE_SHEET_ID_HERE'
- *     with your actual Google Sheet ID. You can find this in your sheet's URL
- *     (it's the long string of characters between "/d/" and "/edit").
+ * 1.  Open your Google Sheet that contains your products.
+ * 2.  Go to Extensions > Apps Script.
+ * 3.  Delete any existing code in the `Code.gs` file.
+ * 4.  Copy this entire file's content and paste it into the editor.
  * 5.  Save the project (File > Save or Ctrl+S).
- * 6.  Deploy the script as a Web App:
- *     a. Click the "Deploy" button > "New deployment".
- *     b. For "Select type", choose "Web app".
- *     c. In the configuration:
- *        - Description: "Thrift by Musk Order Handler"
- *        - Execute as: "Me (your.email@gmail.com)"
- *        - Who has access: "Anyone"
- *     d. Click "Deploy".
- *     e. Authorize the script when prompted. You may see a "Google hasn't verified this app"
- *        warning. Click "Advanced" and then "Go to (unsafe)". This is normal for
- *        your own scripts.
- * 7.  After deployment, copy the "Web app URL" provided.
- * 8.  Paste this URL into the `GOOGLE_APPS_SCRIPT_URL` variable in your website's
- *     `constants.ts` file.
+ * 6.  Click "Deploy" > "New deployment".
+ * 7.  Click the gear icon and select "Web app".
+ * 8.  Configure the deployment:
+ *     - Description: "Thrift by Musk Order Form"
+ *     - Execute as: "Me"
+ *     - Who has access: "Anyone" (This is crucial for the website to be able to send data).
+ * 9.  Click "Deploy".
+ * 10. Authorize the script when prompted. You may need to go to "Advanced" and "Go to... (unsafe)".
+ * 11. Copy the "Web app URL" provided after deployment.
+ * 12. Paste this URL into the `GOOGLE_APPS_SCRIPT_URL` variable in your website's `constants.ts` file.
+ *
+ * =================================================================================
  */
 
-// !!! IMPORTANT: REPLACE WITH YOUR GOOGLE SHEET ID !!!
-var SPREADSHEET_ID = "YOUR_GOOGLE_SHEET_ID_HERE";
-var ORDERS_SHEET_NAME = "Orders";
-
-/**
- * Handles HTTP POST requests from the website's checkout form.
- * @param {Object} e The event parameter for a POST request.
- * @return {ContentService.TextOutput} A JSON response indicating success or failure.
- */
+// The main function that handles incoming POST requests from the website.
 function doPost(e) {
-  try {
-    // Open the spreadsheet and the specific sheet for orders.
-    var spreadsheet = SpreadsheetApp.openById(SPREADSHEET_ID);
-    var sheet = spreadsheet.getSheetByName(ORDERS_SHEET_NAME);
+  var lock = LockService.getScriptLock();
+  lock.waitLock(30000); // Wait up to 30 seconds for other processes to finish.
 
-    // If the "Orders" sheet doesn't exist, create it and add headers.
+  try {
+    // Open the spreadsheet that this script is bound to.
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Orders');
+
+    // If the "Orders" sheet doesn't exist, create it and set up headers.
     if (!sheet) {
-      sheet = spreadsheet.insertSheet(ORDERS_SHEET_NAME);
-      sheet.appendRow([
-        "Timestamp", "Status", "Customer Name", "Phone", "Address", "Total", "Items"
-      ]);
-      // Make headers bold
-      sheet.getRange("A1:G1").setFontWeight("bold");
+      sheet = SpreadsheetApp.getActiveSpreadsheet().insertSheet('Orders');
+      var headers = [
+        'Timestamp', 'Customer Name', 'Phone', 'Address', 'City', 'State', 'Pincode',
+        'Items (ID)', 'Items (Name)', 'Items (Size)', 'Items (Price)', 'Total Amount'
+      ];
+      sheet.appendRow(headers);
+      sheet.getRange(1, 1, 1, headers.length).setFontWeight('bold');
     }
 
-    // Parse the JSON data from the request body.
+    // Parse the JSON data sent from the website's checkout form.
     var orderData = JSON.parse(e.postData.contents);
     var customer = orderData.customerDetails;
     var items = orderData.cartItems;
-    var total = orderData.total;
 
-    // Format the items for display in a single cell.
-    var itemsString = items.map(function(item) {
-      return item.name + " (ID: " + item.id + ", Size: " + item.size + ", Price: ₹" + item.price + ")";
-    }).join("\n");
+    // Format the order items into strings for logging in the sheet.
+    var itemIds = items.map(function(item) { return item.id; }).join(',\n');
+    var itemNames = items.map(function(item) { return item.name; }).join(',\n');
+    var itemSizes = items.map(function(item) { return item.size; }).join(',\n');
+    var itemPrices = items.map(function(item) { return item.price; }).join(',\n');
     
-    var address = customer.address + ", " + customer.city + ", " + customer.state + " - " + customer.pincode;
+    // Calculate the total price of the order.
+    var total = items.reduce(function(sum, item) { return sum + item.price; }, 0);
 
-    // Append the new order as a row in the sheet.
-    sheet.appendRow([
-      new Date(),       // Timestamp
-      "New",            // Status
-      customer.name,    // Customer Name
-      customer.phone,   // Phone
-      address,          // Full Address
-      total,            // Total
-      itemsString       // Items
-    ]);
+    // Create the new row to be appended to the sheet.
+    var newRow = [
+      new Date(),
+      customer.name,
+      customer.phone,
+      customer.address,
+      customer.city,
+      customer.state,
+      customer.pincode,
+      itemIds,
+      itemNames,
+      itemSizes,
+      itemPrices,
+      total
+    ];
     
-    // Return a success response.
+    // Append the new row to the "Orders" sheet.
+    sheet.appendRow(newRow);
+
+    // Return a success response to the website.
     return ContentService
-      .createTextOutput(JSON.stringify({ status: 'success', message: 'Order placed successfully.' }))
+      .createTextOutput(JSON.stringify({ 'result': 'success', 'data': JSON.stringify(orderData) }))
       .setMimeType(ContentService.MimeType.JSON);
 
   } catch (error) {
-    // Log the error for debugging.
-    Logger.log(error.toString());
-
-    // Return an error response.
+    // If an error occurs, log it and return an error response to the website.
     return ContentService
-      .createTextOutput(JSON.stringify({ status: 'error', message: 'Failed to place order: ' + error.toString() }))
+      .createTextOutput(JSON.stringify({ 'result': 'error', 'error': error.toString() }))
       .setMimeType(ContentService.MimeType.JSON);
+      
+  } finally {
+    // Always release the lock to allow other processes to run.
+    lock.releaseLock();
   }
 }
