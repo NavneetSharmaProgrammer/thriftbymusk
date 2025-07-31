@@ -5,8 +5,7 @@
 export interface Product {
   id: string; // Unique identifier for the product (e.g., 'vintage-cream-blouse')
   name: string; // The display name of the product
-  description: string; // A detailed description of the product, can be AI-generated
-  originalDescription?: string; // The original keywords from the sheet, if AI was used
+  description: string; // A detailed description of the product
   price: number; // The price of the product in the base currency (e.g., INR)
   imageUrls: string[]; // An array of Google Drive links to product images
   videoUrl?: string; // An optional Google Drive link to a product video
