@@ -1,5 +1,15 @@
+
+
 import { Product } from '../types.ts';
 import { GOOGLE_SHEET_CSV_URL } from '../constants.ts';
+import { GoogleGenAI } from "@google/genai";
+
+// Initialize the Google GenAI client, only if an API key is provided.
+const ai = process.env.API_KEY ? new GoogleGenAI({ apiKey: process.env.API_KEY }) : null;
+
+const CACHE_KEY = 'productDataCache';
+// Cache data for 15 minutes
+const CACHE_DURATION_MS = 15 * 60 * 1000;
 
 /**
  * A simple, lightweight CSV parser function.
@@ -49,6 +59,7 @@ const mapRowToProduct = (row: Record<string, string>): Product | null => {
       id: row.id,
       name: row.name,
       description: row.description,
+      originalDescription: row.description, // Store original for AI check
       price: price,
       imageUrls: row.imageUrls.split(',').map(url => url.trim()).filter(Boolean),
       videoUrl: row.videoUrl || undefined,
@@ -67,48 +78,124 @@ const mapRowToProduct = (row: Record<string, string>): Product | null => {
 };
 
 /**
- * The main service function to fetch and process product data.
- * It fetches the CSV from the configured Google Sheet URL via a CORS proxy.
- *
- * @returns A Promise that resolves to an array of `Product` objects.
+ * Generates a product description using the Gemini API if the provided description is just keywords.
+ * @param product The product object.
+ * @returns The same product, with an AI-enhanced description if applicable.
  */
-export const fetchProducts = async (): Promise<Product[]> => {
-  const urlParams = new URLSearchParams(window.location.search);
-  const csvUrl = urlParams.get('csv_url') || GOOGLE_SHEET_CSV_URL;
-
-  if (!csvUrl) {
-    throw new Error("Google Sheet CSV URL is not configured.");
+const generateDescriptionIfNeeded = async (product: Product): Promise<Product> => {
+  // Only generate if AI is enabled and the description is short (likely keywords).
+  if (!ai || !product.originalDescription || product.originalDescription.length > 60) {
+    return product;
   }
-  
-  // Using a CORS proxy to bypass browser security restrictions on cross-origin requests.
-  // The Google Sheet is on 'docs.google.com', while the app is on a different domain.
-  const proxyUrl = `https://proxy.cors.sh/${csvUrl}`;
 
   try {
-    const response = await fetch(proxyUrl, {
-      headers: {
-        // A temporary public API key for the proxy service is required.
-        'x-cors-api-key': 'temp_e008d5385d31542f7041a86b97036a1b',
-      },
+    const prompt = `You are a creative copywriter for "Thrift by Musk," a chic online vintage store. Your tone is stylish, warm, and highlights sustainability. Write an enticing product description (approx. 30-45 words) based on these details: Product Name: "${product.name}", Brand: "${product.brand}", Category: "${product.category}", Condition: "${product.condition}", and these keywords: "${product.originalDescription}". Do not repeat the product name.`;
+    
+    const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: prompt,
     });
     
+    const generatedText = response.text;
+
+    if (generatedText) {
+      return { ...product, description: generatedText.trim() };
+    }
+  } catch (error) {
+    console.error(`Gemini API failed for product ${product.id}. Using original description.`, error);
+  }
+  
+  // Return original product if AI fails or doesn't return text
+  return product;
+};
+
+/**
+ * The internal fetching and processing logic.
+ * @returns A Promise that resolves to an array of enhanced `Product` objects.
+ */
+const fetchAndProcessProducts = async (): Promise<Product[]> => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const csvUrl = urlParams.get('csv_url') || GOOGLE_SHEET_CSV_URL;
+
+    if (!csvUrl) {
+        throw new Error("Google Sheet CSV URL is not configured.");
+    }
+
+    const proxyUrl = `https://api.codetabs.com/v1/proxy?quest=${csvUrl}`;
+    const response = await fetch(proxyUrl);
+    
     if (!response.ok) {
-      throw new Error(`Failed to fetch Google Sheet: ${response.status} ${response.statusText}. The CORS proxy might be down or the Sheet URL is incorrect.`);
+        throw new Error(`Failed to fetch Google Sheet: ${response.status} ${response.statusText}`);
     }
     const csvText = await response.text();
     if (!csvText) {
         return [];
     }
     const parsedData = parseCSV(csvText);
-    const products = parsedData.map(mapRowToProduct).filter((p): p is Product => p !== null);
+    const initialProducts = parsedData.map(mapRowToProduct).filter((p): p is Product => p !== null);
+
+    // Enhance products with AI descriptions in parallel
+    const enhancedProducts = await Promise.all(initialProducts.map(generateDescriptionIfNeeded));
     
-    return products;
-  } catch (error) {
-    console.error("Error fetching or processing product data:", error);
-    if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-        // This specific error often points to a network failure or the proxy itself being unreachable.
-        throw new Error('Could not fetch product data. This is likely a network issue or a problem with the CORS proxy service. Please check your internet connection and try again.');
+    return enhancedProducts;
+};
+
+
+/**
+ * The main service function to fetch, process, and enhance product data.
+ * It uses a caching layer to improve performance and resilience.
+ *
+ * @returns A Promise that resolves to an array of `Product` objects.
+ */
+export const fetchProducts = async (): Promise<Product[]> => {
+    // 1. Check cache first
+    try {
+        const cachedItem = localStorage.getItem(CACHE_KEY);
+        if (cachedItem) {
+            const { timestamp, products } = JSON.parse(cachedItem);
+            // If cache is fresh, return it immediately
+            if (Date.now() - timestamp < CACHE_DURATION_MS) {
+                console.log("Serving products from fresh cache.");
+                return products;
+            }
+        }
+    } catch (e) {
+        console.error("Failed to read from cache", e);
     }
-    throw error; // Re-throw other errors
-  }
+    
+    // 2. If cache is stale or missing, fetch from network
+    try {
+        console.log("Fetching products from network...");
+        const networkProducts = await fetchAndProcessProducts();
+        
+        // Save fresh data to cache
+        try {
+            localStorage.setItem(CACHE_KEY, JSON.stringify({ timestamp: Date.now(), products: networkProducts }));
+            console.log("Product cache updated.");
+        } catch (e) {
+            console.error("Failed to write to cache", e);
+        }
+        
+        return networkProducts;
+    } catch (error) {
+        console.error("Error fetching or processing product data:", error);
+        if (!ai && process.env.API_KEY === undefined) {
+          console.warn("AI features disabled: API_KEY environment variable is not set.");
+        }
+        
+        // 3. On network error, try to serve stale cache as a fallback
+        try {
+            const cachedItem = localStorage.getItem(CACHE_KEY);
+            if (cachedItem) {
+                const { products } = JSON.parse(cachedItem);
+                console.warn("Serving stale products from cache due to network error.");
+                return products;
+            }
+        } catch (e) {
+            console.error("Failed to read stale cache on network error", e);
+        }
+
+        // 4. If network fails and no cache exists, re-throw the error
+        throw error;
+    }
 };
