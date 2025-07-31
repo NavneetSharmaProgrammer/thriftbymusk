@@ -9,7 +9,6 @@ import Footer from './components/Footer.tsx';
 import CartModal from './components/CartModal.tsx';
 import Notification from './components/Notification.tsx';
 import PageLoader from './components/PageLoader.tsx';
-import SaleBanner from './components/SaleBanner.tsx';
 
 // Statically import page components to ensure reliable module resolution.
 import HomePage from './components/HomePage.tsx';
@@ -96,7 +95,6 @@ const App: React.FC = () => {
                 <ScrollToTop />
                 <div className="flex flex-col min-h-screen text-[var(--color-text-primary)] selection:bg-[var(--color-primary)]/30">
                   <Header />
-                  <SaleBanner />
                   <main className="flex-grow">
                     {/* 4. Suspense can be used for other async operations within pages. */}
                     <Suspense fallback={<PageLoader />}>
