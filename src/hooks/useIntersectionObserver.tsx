@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from 'react';
 
 // Define the type for the hook's options, extending the native IntersectionObserverInit
