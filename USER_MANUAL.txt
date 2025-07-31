@@ -155,3 +155,138 @@ Follow these steps carefully to enable automated order logging.
 14. **Final Step:** Open `constants.ts` in your website code. Paste the copied URL into the `GOOGLE_APPS_SCRIPT_URL` variable.
 
 That's it! Your website is now connected to your Google Sheet for automated orders. A new sheet named "Orders" will be created automatically when the first order is placed.
+
+
+
+
+
+
+
+
+
+
+
+
+========================================
+Thrift by Musk - Website User Manual
+========================================
+
+Welcome! This document is your all-in-one guide to managing, updating, and understanding your Thrift by Musk website.
+
+---
+### 1. Quick Setup Checklist
+---
+For first-time setup or major configuration changes, follow this checklist.
+
+- [ ] **Product Sheet:** Created in Google Sheets with the correct headers.
+- [ ] **Publish Product Sheet:** Published to the web as a CSV file.
+- [ ] **Update `constants.ts`:**
+    - [ ] `GOOGLE_SHEET_CSV_URL` is filled with the published CSV link.
+    - [ ] `LOGO_URL` and other asset links are updated with your Google Drive links.
+    - [ ] `launchDate` is configured for your next product drop.
+- [ ] **(Optional) Configure AI:** Set up the `API_KEY` in your environment to enable AI-powered product descriptions.
+- [ ] **(Optional) Set up Automated Orders:** Follow Section 3.2 to deploy the Google Apps Script and add the URL to `constants.ts`.
+
+---
+### 2. Website Map & Architecture
+---
+This section explains how your website is built. Think of it like a blueprint.
+
+#### The "Control Panel" (`constants.ts`)
+This is the most important file for store management. It's designed so you can change key parts of your site without touching complex code. Here you control:
+-   Your Product Sheet link.
+-   Your Google Apps Script URL for automated orders.
+-   Your brand logo, owner photos, and promotional images.
+-   Your Instagram handle.
+-   The countdown timer for new drops.
+
+#### The "Data Engine" (Google Sheets & `productService.ts`)
+-   **Products Sheet (CSV):** This is your master product database.
+-   **`services/productService.ts`:** This is the code that fetches your CSV file from the `GOOGLE_SHEET_CSV_URL`. It's smart:
+    1.  It reads the data.
+    2.  If you've provided an API key, it checks for short descriptions (keywords).
+    3.  It sends these keywords to the Gemini AI to write beautiful, full descriptions.
+    4.  It delivers the final, enhanced product list to the website.
+
+#### The "Brain" (Context Providers)
+These are special components that hold and manage the website's state (data that can change).
+-   **`ProductContext.tsx`:** Holds all the products after they've been fetched and processed.
+-   **`CartContext.tsx`:** Manages everything related to the shopping cart (items, total price, etc.).
+-   **`ThemeContext.tsx`:** Manages the Light/Dark/Sepia theme switching.
+-   **`DropContext.tsx`:** Manages the countdown timer and knows when a drop is "live".
+
+---
+### 3. Content Management
+---
+How to perform day-to-day updates on your store.
+
+#### 3.1 Managing Products (with AI!)
+1.  **Open your "Products" Google Sheet.**
+2.  To add a new item, add a new row and fill in the columns.
+3.  **To use the AI for descriptions:** In the `description` column, just type a few keywords (e.g., `bohemian vibe, summer top, cotton, puff sleeves`). The website will automatically generate a full description. If you write a long description yourself, the AI will not run for that item.
+4.  **To add images/video:** Upload them to Google Drive, get the "Anyone with the link" shareable link, and paste it into the `imageUrls` or `videoUrl` columns. For multiple images, separate URLs with a comma.
+5.  **Important:** The sheet is automatically re-fetched when a user visits the site. Your changes will appear live.
+
+#### 3.2 Receiving Orders (Two Methods)
+
+You can choose between a fully automated order system or a manual one.
+
+**Method A: Automated Orders via Google Sheets (Recommended)**
+
+This method automatically logs every order into a separate "Orders" Google Sheet.
+
+**SETUP:**
+1.  Go to `script.google.com` and create a **New project**.
+2.  Delete any existing code in the `Code.gs` file.
+3.  Open the `ORDER_APPS_SCRIPT.js` file from your website code. Copy its entire content.
+4.  Paste this content into the Google Apps Script editor.
+5.  Click the **Save project** icon.
+6.  Click the blue **Deploy** button > **New deployment**.
+7.  Click the gear icon next to "Select type" and choose **Web app**.
+8.  In the configuration:
+    -   Description: `Thrift by Musk Orders`
+    -   Execute as: **Me**
+    -   Who has access: **Anyone**
+9.  Click **Deploy**.
+10. Google will ask for authorization. Click **Authorize access**, choose your Google account, click "Advanced", then "Go to ... (unsafe)", and finally "Allow".
+11. A "Deployment successfully updated" popup will appear. **Copy the Web app URL**. It will look like `https://script.google.com/macros/s/.../exec`.
+12. Open `constants.ts` in your website code. Paste the copied URL into the `GOOGLE_APPS_SCRIPT_URL` variable.
+
+Now, when a customer checks out, their order will be automatically added to a new "Orders" tab in the same Google Sheet your script is in.
+
+**Method B: Manual Orders via WhatsApp & Instagram**
+
+If you leave the `GOOGLE_APPS_SCRIPT_URL` empty in `constants.ts`, the website will fall back to this manual method.
+
+**THE FLOW:**
+1.  The customer adds items to their bag and fills in their shipping details.
+2.  They are prompted to "Order via WhatsApp" or "Order via Instagram DM".
+3.  Clicking a button opens the respective app with a **pre-filled message** containing the full order and shipping details.
+4.  The customer sends this message to you to finalize the purchase.
+
+**FAIL-SAFE:** If the automated order submission (Method A) ever fails, the customer will be shown the manual order buttons as a backup. You will never lose an order.
+
+#### 3.3 Managing Site-Wide Assets (Logo, Banners, etc.)
+1.  **Upload your image** (e.g., new logo) to Google Drive.
+2.  Get the **"Anyone with the link"** shareable link.
+3.  Open `constants.ts` in the code, find the variable (e.g., `LOGO_URL`), and replace the old link with your new one.
+
+---
+### 4. Troubleshooting
+---
+Solutions for common problems.
+
+*   **Automated orders are not appearing in my Google Sheet?**
+    *   → Double-check that you have correctly deployed the Google Apps Script and pasted the **Web app URL** (not the project URL) into `constants.ts`.
+    *   → Make sure you gave the script permission to "Anyone" during deployment.
+    *   → Check the "Executions" log in your Apps Script project for any errors.
+
+*   **A product isn't showing up?**
+    *   → In your Product Sheet, check that `sold` is `FALSE` and `isUpcoming` is `FALSE`. Also ensure it has a unique `id` and a valid `price`.
+
+*   **Images, logo, or other assets are not visible?**
+    *   → The Google Drive share link is likely incorrect. Make sure it's set to **"Anyone with the link"**.
+
+*   **AI descriptions are not being generated?**
+    *   → This means the Gemini `API_KEY` is not configured in the project's environment. The site will fall back to using whatever text is in the description column.
+    *   → Make sure the text in the `description` column is short (under 60 characters) to trigger the AI.
