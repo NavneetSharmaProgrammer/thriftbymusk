@@ -101,9 +101,9 @@ const Header: React.FC = () => {
           <div className="flex justify-between items-center">
             <Link to="/" className="flex items-center gap-3 group">
               <img 
-                src={formatGoogleDriveLink(LOGO_URL, 'image', { height: 120 })} 
+                src={formatGoogleDriveLink(LOGO_URL, 'image', { width: 40 })} 
                 alt="Thrift by Musk Logo" 
-                className="h-10 w-auto transition-transform duration-300 group-hover:scale-105" 
+                className="h-10 w-auto transition-transform duration-300 group-hover:scale-105 no-theme-filter" 
               />
               <span className="hidden sm:block text-2xl font-serif font-bold text-[var(--color-text-primary)]">Thrift by Musk</span>
             </Link>
@@ -162,9 +162,9 @@ const Header: React.FC = () => {
         <div className="container mx-auto px-6 py-4 flex justify-between items-center">
           <Link to="/" className="flex items-center gap-3" onClick={closeMenu}>
              <img 
-                src={formatGoogleDriveLink(LOGO_URL, 'image', { height: 120 })} 
+                src={formatGoogleDriveLink(LOGO_URL, 'image', { width: 40 })} 
                 alt="Thrift by Musk Logo" 
-                className="h-10 w-auto" 
+                className="h-10 w-auto no-theme-filter" 
               />
             <span className="text-2xl font-serif font-bold text-[var(--color-text-primary)]">Thrift by Musk</span>
           </Link>
