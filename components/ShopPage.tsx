@@ -9,129 +9,47 @@ import { useDrop } from '../DropContext.tsx';
 import { useProducts } from '../ProductContext.tsx';
 
 /**
- * The ShopPage component displays a grid of all available products.
- * It includes powerful filtering and searching capabilities and enhanced error handling.
- * All styles are now theme-aware.
+ * Props for the FilterSidebarContent component.
  */
-const ShopPage: React.FC = () => {
-  const { isDropLive } = useDrop();
-  const { products, isLoading, error, refetch } = useProducts();
-  const location = useLocation();
+interface FilterSidebarContentProps {
+  searchQuery: string;
+  setSearchQuery: (q: string) => void;
+  sortOption: string;
+  setSortOption: (o: string) => void;
+  statusFilter: string;
+  setStatusFilter: (s: string) => void;
+  priceFilter: string;
+  setPriceFilter: (p: string) => void;
+  selectedCategories: string[];
+  setSelectedCategories: React.Dispatch<React.SetStateAction<string[]>>;
+  selectedBrands: string[];
+  setSelectedBrands: React.Dispatch<React.SetStateAction<string[]>>;
+  selectedSizes: string[];
+  setSelectedSizes: React.Dispatch<React.SetStateAction<string[]>>;
+  selectedConditions: string[];
+  setSelectedConditions: React.Dispatch<React.SetStateAction<string[]>>;
+  activeFilterCount: number;
+  clearAllFilters: () => void;
+  categories: string[];
+  brands: string[];
+  sizes: string[];
+  conditions: string[];
+  statusFilters: string[];
+  priceRanges: Record<string, number[]>;
+}
+
+/**
+ * A standalone, memoized component for the filter sidebar content.
+ * Its state is preserved across re-renders of the parent ShopPage.
+ */
+const FilterSidebarContent = React.memo((props: FilterSidebarContentProps) => {
+    const {
+        searchQuery, setSearchQuery, sortOption, setSortOption, statusFilter, setStatusFilter,
+        priceFilter, setPriceFilter, selectedCategories, setSelectedCategories, selectedBrands,
+        setSelectedBrands, selectedSizes, setSelectedSizes, selectedConditions, setSelectedConditions,
+        activeFilterCount, clearAllFilters, categories, brands, sizes, conditions, statusFilters, priceRanges
+    } = props;
   
-  const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState('Available');
-  const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
-  const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
-  const [selectedConditions, setSelectedConditions] = useState<string[]>([]);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [priceFilter, setPriceFilter] = useState('All');
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [sortOption, setSortOption] = useState('Featured');
-
-  const visibleProducts = useMemo(() => {
-    return (products || []).filter(p => !p.isUpcoming || isDropLive);
-  }, [isDropLive, products]);
-  
-  const categories = useMemo(() => [...Array.from(new Set(visibleProducts.map(p => p.category)))].sort(), [visibleProducts]);
-
-  useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const category = params.get('category');
-    if (category && categories.includes(category)) {
-        setSelectedCategories([category]);
-    }
-  }, [location.search, categories]);
-
-  useEffect(() => {
-    if (isFilterOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [isFilterOpen]);
-  
-  const statusFilters = ['All', 'Available', 'Sold Out'];
-  const brands = useMemo(() => [...Array.from(new Set(visibleProducts.map(p => p.brand)))].sort(), [visibleProducts]);
-  const sizes = useMemo(() => ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL'].filter(size => visibleProducts.some(p => p.size === size)), [visibleProducts]);
-  const conditions = useMemo(() => [...Array.from(new Set(visibleProducts.map(p => p.condition)))].sort(), [visibleProducts]);
-  const priceRanges = {
-      'All': [0, Infinity],
-      'Under ₹1000': [0, 999],
-      '₹1000 - ₹1500': [1000, 1500],
-      'Over ₹1500': [1501, Infinity],
-  };
-
-  const handleCheckboxChange = (setter: React.Dispatch<React.SetStateAction<string[]>>, value: string) => {
-      setter(prev => 
-          prev.includes(value) 
-          ? prev.filter(item => item !== value)
-          : [...prev, value]
-      );
-  };
-
-  const activeFilterCount = useMemo(() => {
-    let count = 0;
-    if (searchQuery) count++;
-    if (statusFilter !== 'Available') count++;
-    if (priceFilter !== 'All') count++;
-    count += selectedBrands.length;
-    count += selectedSizes.length;
-    count += selectedConditions.length;
-    count += selectedCategories.length;
-    return count;
-  }, [searchQuery, statusFilter, priceFilter, selectedBrands, selectedSizes, selectedConditions, selectedCategories]);
-
-  const clearAllFilters = () => {
-    setSearchQuery('');
-    setStatusFilter('Available');
-    setSelectedBrands([]);
-    setSelectedSizes([]);
-    setSelectedConditions([]);
-    setSelectedCategories([]);
-    setPriceFilter('All');
-    setSortOption('Featured');
-  };
-
-  const filteredProducts = useMemo(() => {
-    if (!products) return [];
-    const priceRange = priceRanges[priceFilter as keyof typeof priceRanges];
-
-    return visibleProducts.filter(product => {
-      const matchesStatus = statusFilter === 'All' || (statusFilter === 'Available' && !product.sold) || (statusFilter === 'Sold Out' && product.sold);
-      const matchesBrand = selectedBrands.length === 0 || selectedBrands.includes(product.brand);
-      const matchesSize = selectedSizes.length === 0 || selectedSizes.includes(product.size);
-      const matchesCondition = selectedConditions.length === 0 || selectedConditions.includes(product.condition);
-      const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(product.category);
-      const matchesPrice = product.price >= priceRange[0] && product.price <= priceRange[1];
-      const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                             product.brand.toLowerCase().includes(searchQuery.toLowerCase());
-
-      return matchesStatus && matchesBrand && matchesSize && matchesCondition && matchesCategory && matchesPrice && matchesSearch;
-    });
-  }, [searchQuery, statusFilter, selectedBrands, selectedSizes, selectedConditions, selectedCategories, priceFilter, visibleProducts, products]);
-
-  const sortedProducts = useMemo(() => {
-    const sorted = [...filteredProducts];
-    switch (sortOption) {
-        case 'Newest':
-            // Assuming products from the sheet are in chronological order (oldest first)
-            return sorted.reverse();
-        case 'Price: Low to High':
-            return sorted.sort((a, b) => a.price - b.price);
-        case 'Price: High to Low':
-            return sorted.sort((a, b) => b.price - a.price);
-        case 'Name: A-Z':
-            return sorted.sort((a, b) => a.name.localeCompare(b.name));
-        case 'Featured':
-        default:
-            return filteredProducts;
-    }
-  }, [filteredProducts, sortOption]);
-
-  const FilterSidebarContent = () => {
     const [openSections, setOpenSections] = useState<string[]>(['Category', 'Brand']);
 
     const toggleSection = (section: string) => {
@@ -140,11 +58,18 @@ const ShopPage: React.FC = () => {
         );
     };
 
+    const handleCheckboxChange = (setter: React.Dispatch<React.SetStateAction<string[]>>, value: string) => {
+        setter(prev => 
+            prev.includes(value) 
+            ? prev.filter(item => item !== value)
+            : [...prev, value]
+        );
+    };
+
     const AccordionItem: React.FC<{
         title: string;
         icon: React.ReactNode;
         children: React.ReactNode;
-        defaultOpen?: boolean;
     }> = ({ title, icon, children }) => {
         const isOpen = openSections.includes(title);
         return (
@@ -254,7 +179,135 @@ const ShopPage: React.FC = () => {
         )}
       </div>
     );
+});
+
+
+/**
+ * The ShopPage component displays a grid of all available products.
+ * It includes powerful filtering and searching capabilities and enhanced error handling.
+ * It now uses a "Load More" button to handle large product catalogs gracefully.
+ */
+const ShopPage: React.FC = () => {
+  const { isDropLive } = useDrop();
+  const { products, isLoading, error, refetch } = useProducts();
+  const location = useLocation();
+  
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState('Available');
+  const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
+  const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
+  const [selectedConditions, setSelectedConditions] = useState<string[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [priceFilter, setPriceFilter] = useState('All');
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [sortOption, setSortOption] = useState('Featured');
+  
+  const ITEMS_PER_PAGE = 12;
+  const [visibleItemsCount, setVisibleItemsCount] = useState(ITEMS_PER_PAGE);
+
+  // This useEffect resets the pagination when filters or sort order change
+  useEffect(() => {
+    setVisibleItemsCount(ITEMS_PER_PAGE);
+  }, [searchQuery, statusFilter, selectedBrands, selectedSizes, selectedConditions, selectedCategories, priceFilter, sortOption]);
+
+  const visibleProducts = useMemo(() => {
+    return (products || []).filter(p => !p.isUpcoming || isDropLive);
+  }, [isDropLive, products]);
+  
+  const categories = useMemo(() => [...Array.from(new Set(visibleProducts.map(p => p.category)))].sort(), [visibleProducts]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const category = params.get('category');
+    if (category && categories.includes(category)) {
+        setSelectedCategories([category]);
+    }
+  }, [location.search, categories]);
+
+  useEffect(() => {
+    if (isFilterOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isFilterOpen]);
+  
+  const statusFilters = ['All', 'Available', 'Sold Out'];
+  const brands = useMemo(() => [...Array.from(new Set(visibleProducts.map(p => p.brand)))].sort(), [visibleProducts]);
+  const sizes = useMemo(() => ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL'].filter(size => visibleProducts.some(p => p.size === size)), [visibleProducts]);
+  const conditions = useMemo(() => [...Array.from(new Set(visibleProducts.map(p => p.condition)))].sort(), [visibleProducts]);
+  const priceRanges = {
+      'All': [0, Infinity],
+      'Under ₹1000': [0, 999],
+      '₹1000 - ₹1500': [1000, 1500],
+      'Over ₹1500': [1501, Infinity],
   };
+
+  const activeFilterCount = useMemo(() => {
+    let count = 0;
+    if (searchQuery) count++;
+    if (statusFilter !== 'Available') count++;
+    if (priceFilter !== 'All') count++;
+    count += selectedBrands.length;
+    count += selectedSizes.length;
+    count += selectedConditions.length;
+    count += selectedCategories.length;
+    return count;
+  }, [searchQuery, statusFilter, priceFilter, selectedBrands, selectedSizes, selectedConditions, selectedCategories]);
+
+  const clearAllFilters = () => {
+    setSearchQuery('');
+    setStatusFilter('Available');
+    setSelectedBrands([]);
+    setSelectedSizes([]);
+    setSelectedConditions([]);
+    setSelectedCategories([]);
+    setPriceFilter('All');
+    setSortOption('Featured');
+  };
+
+  const filteredProducts = useMemo(() => {
+    if (!products) return [];
+    const priceRange = priceRanges[priceFilter as keyof typeof priceRanges];
+
+    return visibleProducts.filter(product => {
+      const matchesStatus = statusFilter === 'All' || (statusFilter === 'Available' && !product.sold) || (statusFilter === 'Sold Out' && product.sold);
+      const matchesBrand = selectedBrands.length === 0 || selectedBrands.includes(product.brand);
+      const matchesSize = selectedSizes.length === 0 || selectedSizes.includes(product.size);
+      const matchesCondition = selectedConditions.length === 0 || selectedConditions.includes(product.condition);
+      const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(product.category);
+      const matchesPrice = product.price >= priceRange[0] && product.price <= priceRange[1];
+      const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                             product.brand.toLowerCase().includes(searchQuery.toLowerCase());
+
+      return matchesStatus && matchesBrand && matchesSize && matchesCondition && matchesCategory && matchesPrice && matchesSearch;
+    });
+  }, [searchQuery, statusFilter, selectedBrands, selectedSizes, selectedConditions, selectedCategories, priceFilter, visibleProducts, products]);
+
+  const sortedProducts = useMemo(() => {
+    const sorted = [...filteredProducts];
+    switch (sortOption) {
+        case 'Newest':
+            // Assuming products from the sheet are in chronological order (oldest first)
+            return sorted.reverse();
+        case 'Price: Low to High':
+            return sorted.sort((a, b) => a.price - b.price);
+        case 'Price: High to Low':
+            return sorted.sort((a, b) => b.price - a.price);
+        case 'Name: A-Z':
+            return sorted.sort((a, b) => a.name.localeCompare(b.name));
+        case 'Featured':
+        default:
+            return filteredProducts;
+    }
+  }, [filteredProducts, sortOption]);
+
+  const paginatedProducts = useMemo(() => {
+    return sortedProducts.slice(0, visibleItemsCount);
+  }, [sortedProducts, visibleItemsCount]);
 
   const ProductGridSkeleton: React.FC = () => (
     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-8">
@@ -272,6 +325,13 @@ const ShopPage: React.FC = () => {
       ))}
     </div>
   );
+  
+  const sidebarProps = {
+    searchQuery, setSearchQuery, sortOption, setSortOption, statusFilter, setStatusFilter, priceFilter,
+    setPriceFilter, selectedCategories, setSelectedCategories, selectedBrands, setSelectedBrands, selectedSizes,
+    setSelectedSizes, selectedConditions, setSelectedConditions, activeFilterCount, clearAllFilters, categories,
+    brands, sizes, conditions, statusFilters, priceRanges
+  };
 
   return (
     <div className="animate-fade-in">
@@ -283,7 +343,7 @@ const ShopPage: React.FC = () => {
             
             <div className="grid grid-cols-1 lg:grid-cols-4 lg:gap-12">
               <aside className="hidden lg:block lg:col-span-1 lg:sticky lg:top-24 h-fit bg-[var(--color-surface)]/60 backdrop-blur-sm p-6 rounded-lg border border-[var(--color-border)]">
-                <FilterSidebarContent />
+                <FilterSidebarContent {...sidebarProps} />
               </aside>
 
               {isFilterOpen && (
@@ -292,7 +352,7 @@ const ShopPage: React.FC = () => {
                     <button onClick={() => setIsFilterOpen(false)} className="absolute top-4 right-4 p-2">
                         <CloseIcon className="w-6 h-6 text-[var(--color-text-secondary)]" />
                     </button>
-                    <FilterSidebarContent />
+                    <FilterSidebarContent {...sidebarProps} />
                   </div>
                 </div>
               )}
@@ -300,7 +360,7 @@ const ShopPage: React.FC = () => {
               <main className="lg:col-span-3">
                  <div className="flex justify-between items-center mb-6">
                     <p className="text-sm text-[var(--color-text-secondary)]">
-                        Showing {sortedProducts.length} of {visibleProducts.length} products
+                        Showing {paginatedProducts.length} of {sortedProducts.length} products
                     </p>
                      <button onClick={() => setIsFilterOpen(true)} className="lg:hidden flex items-center justify-center gap-2 px-4 py-2 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg shadow-sm text-[var(--color-text-primary)] font-medium text-sm">
                         <FilterIcon className="w-4 h-4" />
@@ -319,11 +379,23 @@ const ShopPage: React.FC = () => {
                       </button>
                    </div>
                 ) : sortedProducts.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-8">
-                    {sortedProducts.map(product => (
-                        <ProductCard key={product.id} product={product} />
-                    ))}
-                    </div>
+                    <>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-8">
+                            {paginatedProducts.map(product => (
+                                <ProductCard key={product.id} product={product} />
+                            ))}
+                        </div>
+                        {visibleItemsCount < sortedProducts.length && (
+                            <div className="mt-12 text-center">
+                                <button
+                                    onClick={() => setVisibleItemsCount(prev => prev + ITEMS_PER_PAGE)}
+                                    className="btn btn-secondary"
+                                >
+                                    Load More
+                                </button>
+                            </div>
+                        )}
+                    </>
                 ) : (
                     <div className="text-center py-16 flex flex-col items-center justify-center h-full bg-[var(--color-surface)] rounded-lg border border-[var(--color-border)] p-6">
                         <h2 className="text-2xl font-serif text-[var(--color-text-secondary)]">No Treasures Found</h2>
