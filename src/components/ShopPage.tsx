@@ -11,7 +11,7 @@ import { useProducts } from '../ProductContext.tsx';
 /**
  * The ShopPage component displays a grid of all available products.
  * It includes powerful filtering and searching capabilities and enhanced error handling.
- * All styles are now theme-aware.
+ * It now uses a "Load More" button to handle large product catalogs gracefully.
  */
 const ShopPage: React.FC = () => {
   const { isDropLive } = useDrop();
@@ -27,6 +27,14 @@ const ShopPage: React.FC = () => {
   const [priceFilter, setPriceFilter] = useState('All');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [sortOption, setSortOption] = useState('Featured');
+  
+  const ITEMS_PER_PAGE = 12;
+  const [visibleItemsCount, setVisibleItemsCount] = useState(ITEMS_PER_PAGE);
+
+  // This useEffect resets the pagination when filters or sort order change
+  useEffect(() => {
+    setVisibleItemsCount(ITEMS_PER_PAGE);
+  }, [searchQuery, statusFilter, selectedBrands, selectedSizes, selectedConditions, selectedCategories, priceFilter, sortOption]);
 
   const visibleProducts = useMemo(() => {
     return (products || []).filter(p => !p.isUpcoming || isDropLive);
@@ -130,6 +138,10 @@ const ShopPage: React.FC = () => {
             return filteredProducts;
     }
   }, [filteredProducts, sortOption]);
+
+  const paginatedProducts = useMemo(() => {
+    return sortedProducts.slice(0, visibleItemsCount);
+  }, [sortedProducts, visibleItemsCount]);
 
   const FilterSidebarContent = () => {
     const [openSections, setOpenSections] = useState<string[]>(['Category', 'Brand']);
@@ -300,7 +312,7 @@ const ShopPage: React.FC = () => {
               <main className="lg:col-span-3">
                  <div className="flex justify-between items-center mb-6">
                     <p className="text-sm text-[var(--color-text-secondary)]">
-                        Showing {sortedProducts.length} of {visibleProducts.length} products
+                        Showing {paginatedProducts.length} of {sortedProducts.length} products
                     </p>
                      <button onClick={() => setIsFilterOpen(true)} className="lg:hidden flex items-center justify-center gap-2 px-4 py-2 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg shadow-sm text-[var(--color-text-primary)] font-medium text-sm">
                         <FilterIcon className="w-4 h-4" />
@@ -319,11 +331,23 @@ const ShopPage: React.FC = () => {
                       </button>
                    </div>
                 ) : sortedProducts.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-8">
-                    {sortedProducts.map(product => (
-                        <ProductCard key={product.id} product={product} />
-                    ))}
-                    </div>
+                    <>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-8">
+                            {paginatedProducts.map(product => (
+                                <ProductCard key={product.id} product={product} />
+                            ))}
+                        </div>
+                        {visibleItemsCount < sortedProducts.length && (
+                            <div className="mt-12 text-center">
+                                <button
+                                    onClick={() => setVisibleItemsCount(prev => prev + ITEMS_PER_PAGE)}
+                                    className="btn btn-secondary"
+                                >
+                                    Load More
+                                </button>
+                            </div>
+                        )}
+                    </>
                 ) : (
                     <div className="text-center py-16 flex flex-col items-center justify-center h-full bg-[var(--color-surface)] rounded-lg border border-[var(--color-border)] p-6">
                         <h2 className="text-2xl font-serif text-[var(--color-text-secondary)]">No Treasures Found</h2>
