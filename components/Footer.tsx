@@ -77,9 +77,7 @@ const Footer: React.FC = () => {
                 <a href="https://www.linkedin.com/in/navneet-sharma-590862241/" target="_blank" rel="noopener noreferrer" aria-label="Navneet Sharma on LinkedIn" className="hover:text-[var(--color-text-inverted)] transition-colors">
                     <LinkedInIcon className="w-5 h-5" />
                 </a>
-                <a href="https://github.com/NavneetSharmaProgrammer" target="_blank" rel="noopener noreferrer" aria-label="Navneet Sharma on GitHub" className="hover:text-[var(--color-text-inverted)] transition-colors">
-                    <GitHubIcon className="w-5 h-5" />
-                </a>
+                
                 <a href="http://www.youtube.com/@codingwithnavneet" target="_blank" rel="noopener noreferrer" aria-label="Navneet Sharma on YouTube" className="hover:text-[var(--color-text-inverted)] transition-colors">
                     <YouTubeIcon className="w-5 h-5" />
                 </a>
