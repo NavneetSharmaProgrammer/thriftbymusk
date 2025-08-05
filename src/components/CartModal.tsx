@@ -180,11 +180,11 @@ const CartModal: React.FC = () => {
             )}
             {cartItems.length > 0 && (
                 <div className="p-6 border-t border-[var(--color-border)] bg-[var(--color-surface-alt)]">
-                    {total > 0 && total < FREE_SHIPPING_THRESHOLD && (
+                    {/* {total > 0 && total < FREE_SHIPPING_THRESHOLD && (
                         <div className="text-center text-sm text-[var(--color-text-secondary)] mb-4 p-3 bg-[var(--color-surface)] rounded-md">
                             You're just <span className="font-bold text-[var(--color-primary)]">{new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0 }).format(amountNeeded)}</span> away from free shipping!
                         </div>
-                    )}
+                    )} */}
                     {total >= FREE_SHIPPING_THRESHOLD && (
                         <div className="text-center text-sm font-semibold text-[var(--color-success)] mb-4 p-3 bg-green-100/50 rounded-md flex items-center justify-center gap-2">
                             <CheckCircleIcon className="w-5 h-5"/>
