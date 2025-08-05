@@ -31,7 +31,7 @@ const SaleBanner: React.FC = () => {
     return (
         <div className="sale-banner">
             <Link to="/shop" className="sale-banner__content">
-                <p>FREE SHIPPING ON ORDERS OVER ₹999</p>
+                <p>FREE SHIPPING FOR ALL ORDERS</p>
             </Link>
             <button onClick={handleClose} className="sale-banner__close" aria-label="Dismiss this announcement">
                 <CloseIcon className="w-5 h-5" />
