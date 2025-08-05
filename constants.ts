@@ -117,6 +117,5 @@ export const INSTAGRAM_FEED_IMAGES = [
  */
 export const OWNERS = [
     { name: '@thatskinny.model', link: 'https://www.instagram.com/thatskinny.model/', image: 'https://drive.google.com/file/d/1DFdOO5mZ7P5DkQ6Bv8w6EwK7zLa7dl5M/view?usp=sharing' },
-    { name: '@beinggauravbisht', link: 'https://www.instagram.com/beinggauravbisht/', image: 'https://drive.google.com/file/d/1Lhf7i4_xso2U71b_8tBNPm-xbRX3lvP2/view?usp=drive_link' },
-    { name: '@priyanka_bisht72200', link: 'https://www.instagram.com/priyanka_bisht72200/', image: 'https://drive.google.com/file/d/1L155sUH6LUapn_-sW0yzP99pFrdVdfLr/view?usp=drive_link' },
+   
 ];
