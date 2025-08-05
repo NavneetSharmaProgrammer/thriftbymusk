@@ -57,7 +57,7 @@ export const INSTAGRAM_HANDLE = 'thriftbymusk';
  * Set the target date and time for your next product drop countdown timer.
  * FORMAT: 'YYYY-MM-DDTHH:MM:SSZ' (ISO 8601 format). 'Z' denotes UTC time.
  */
-export const launchDate = '2025-07-24T18:30:00.000Z';
+export const launchDate = '2025-08-06T11:30:00.000Z';
 
 
 /**
