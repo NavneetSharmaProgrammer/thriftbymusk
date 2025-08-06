@@ -1,3 +1,4 @@
+
 import React, { useMemo } from 'react';
 import AnimatedSection from '../AnimatedSection';
 import { useProducts } from '../../ProductContext';
