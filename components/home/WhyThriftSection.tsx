@@ -1,6 +1,7 @@
+
 import React from 'react';
-import AnimatedSection from '../AnimatedSection.tsx';
-import { PlanetIcon, RecycleIcon, StyleIcon } from '../Icons.tsx';
+import AnimatedSection from '../AnimatedSection';
+import { PlanetIcon, RecycleIcon, StyleIcon } from '../Icons';
 
 const WhyThriftSection: React.FC = () => {
     return (
