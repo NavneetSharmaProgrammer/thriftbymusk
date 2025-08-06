@@ -1,8 +1,10 @@
+
 import React from 'react';
-import { InstagramIcon, UserIcon, WhatsAppIcon, LinkedInIcon, YouTubeIcon } from './Icons.tsx';
+import { InstagramIcon, UserIcon, WhatsAppIcon, LinkedInIcon, YouTubeIcon } from './Icons';
 import { Link } from 'react-router-dom';
-import { LOGO_URL, OWNERS } from '../constants.ts';
-import { formatGoogleDriveLink } from '../utils.ts';
+import { LOGO_URL, OWNERS } from '../constants';
+import { formatGoogleDriveLink } from '../utils';
+import { Owner } from '../types';
 
 /**
  * The Footer component displayed at the bottom of every page.
@@ -54,7 +56,7 @@ const Footer: React.FC = () => {
               </div>
               {/* Links to founders' Instagram profiles are now dynamically rendered. */}
               <div className="flex flex-col items-center md:items-start space-y-2 pt-2">
-                {OWNERS.map((owner) => (
+                {OWNERS.map((owner: Owner) => (
                   <a key={owner.name} href={owner.link} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-[var(--color-text-inverted)] hover:text-[var(--color-text-secondary)] transition-colors">
                       <UserIcon className="h-5 w-5" />
                       <span className="text-sm">{owner.handle}</span>
