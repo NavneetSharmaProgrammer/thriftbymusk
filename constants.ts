@@ -1,5 +1,4 @@
 
-
 import { GalleryItem, Owner } from './types';
 
 /**
@@ -93,7 +92,7 @@ export const GALLERY_ITEMS: GalleryItem[] = [
  * Images for the "Follow Our Feed" section.
  * Update these with your own Google Drive image links and links to your Instagram posts.
  */
-export const INSTAGRAM_FEED_IMAGES = [
+export const INSTAGRAM_FEED_IMAGES: { imageUrl: string, link: string }[] = [
   // { imageUrl: 'https://drive.google.com/file/d/1_3l5t3i32NbZktptdaUp0vLiORM613-G/view?usp=drive_link', link: 'https://www.instagram.com/thriftbymusk/' },
   // { imageUrl: 'https://drive.google.com/file/d/18DcWbQ8E27vmsNRvxLtXBGEViGXVzIiX/view?usp=drive_link', link: 'https://www.instagram.com/thriftbymusk/' },
   // { imageUrl: 'https://drive.google.com/file/d/1VvoRYvHRvo9TDYzCvqo5xV-rvdnn9iQG/view?usp=sharing', link: 'https://www.instagram.com/thriftbymusk/' },
