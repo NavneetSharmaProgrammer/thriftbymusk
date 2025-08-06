@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useCart } from '../CartContext.tsx';
-import { MenuIcon, CloseIcon, ShoppingBagIcon } from './Icons.tsx';
+import { useSaved } from '../SavedContext.tsx';
+import { MenuIcon, CloseIcon, ShoppingBagIcon, HeartIcon } from './Icons.tsx';
 import ThemeSwitcher from './ThemeSwitcher.tsx';
 import { LOGO_URL } from '../constants.ts';
 import { formatGoogleDriveLink } from '../utils.ts';
@@ -16,6 +17,7 @@ const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   // Get cart-related state and functions from the CartContext.
   const { cartItems, toggleCart, isCartOpen } = useCart();
+  const { savedItems } = useSaved();
   // Hooks from react-router-dom to interact with the URL.
   const location = useLocation();
   const navigate = useNavigate();
@@ -117,10 +119,24 @@ const Header: React.FC = () => {
                {/* Theme Switcher */}
                <ThemeSwitcher />
             
+               {/* Saved Items Button */}
+                <Link 
+                  to="/saved"
+                  className="relative text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] transition-colors" 
+                  aria-label="View Saved Items"
+                >
+                  <HeartIcon className="h-6 w-6" />
+                  {savedItems.length > 0 && (
+                      <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-[var(--color-primary)] text-xs font-bold text-[var(--color-text-inverted)]">
+                          {savedItems.length}
+                      </span>
+                  )}
+                </Link>
+
                {/* Shopping Bag Button */}
                <button 
                   onClick={toggleCart} 
-                  className="relative text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors" 
+                  className="relative text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] transition-colors" 
                   aria-label="Open Shopping Bag"
                   aria-haspopup="dialog"
                   aria-expanded={isCartOpen}

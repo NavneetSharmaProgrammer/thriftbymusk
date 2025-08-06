@@ -1,12 +1,15 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import ProductCard from './ProductCard.tsx';
 import { 
     SearchIcon, FilterIcon, CloseIcon, ChevronDownIcon, TagIcon, SparklesIcon,
     RulerIcon, ShieldCheckIcon, PriceTagIcon, ArrowsUpDownIcon, CheckCircleIcon
 } from './Icons.tsx';
-import { useDrop } from '../DropContext.tsx';
 import { useProducts } from '../ProductContext.tsx';
+import { Product } from '../types.ts';
+import useDebounce from '../hooks/useDebounce.tsx';
+
+const ITEMS_PER_PAGE = 12;
 
 /**
  * The ShopPage component displays a grid of all available products.
@@ -14,25 +17,39 @@ import { useProducts } from '../ProductContext.tsx';
  * All styles are now theme-aware.
  */
 const ShopPage: React.FC = () => {
-  const { isDropLive } = useDrop();
   const { products, isLoading, error, refetch } = useProducts();
   const location = useLocation();
   
   const [searchQuery, setSearchQuery] = useState('');
+  const debouncedSearchQuery = useDebounce(searchQuery, 300); // 300ms delay for search
+  
   const [statusFilter, setStatusFilter] = useState('Available');
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   const [selectedConditions, setSelectedConditions] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [priceFilter, setPriceFilter] = useState('All');
+  
+  const [maxPossiblePrice, setMaxPossiblePrice] = useState(5000);
+  const [priceRange, setPriceRange] = useState([0, 5000]);
+
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [sortOption, setSortOption] = useState('Featured');
+  const [visibleItemsCount, setVisibleItemsCount] = useState(ITEMS_PER_PAGE);
 
-  const visibleProducts = useMemo(() => {
-    return (products || []).filter(p => !p.isUpcoming || isDropLive);
-  }, [isDropLive, products]);
-  
-  const categories = useMemo(() => [...Array.from(new Set(visibleProducts.map(p => p.category)))].sort(), [visibleProducts]);
+  const liveProducts = useMemo(() => {
+    const now = new Date();
+    return (products || []).filter(p => !p.dropDate || new Date(p.dropDate) <= now);
+  }, [products]);
+
+  useEffect(() => {
+    if (liveProducts.length > 0) {
+      const maxPrice = Math.max(...liveProducts.map(p => p.price));
+      setMaxPossiblePrice(maxPrice);
+      setPriceRange([0, maxPrice]);
+    }
+  }, [liveProducts]);
+
+  const categories = useMemo(() => [...Array.from(new Set(liveProducts.map(p => p.category)))].sort(), [liveProducts]);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -53,16 +70,9 @@ const ShopPage: React.FC = () => {
     };
   }, [isFilterOpen]);
   
-  const statusFilters = ['All', 'Available', 'Sold Out'];
-  const brands = useMemo(() => [...Array.from(new Set(visibleProducts.map(p => p.brand)))].sort(), [visibleProducts]);
-  const sizes = useMemo(() => ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL'].filter(size => visibleProducts.some(p => p.size === size)), [visibleProducts]);
-  const conditions = useMemo(() => [...Array.from(new Set(visibleProducts.map(p => p.condition)))].sort(), [visibleProducts]);
-  const priceRanges = {
-      'All': [0, Infinity],
-      'Under ₹1000': [0, 999],
-      '₹1000 - ₹1500': [1000, 1500],
-      'Over ₹1500': [1501, Infinity],
-  };
+  const brands = useMemo(() => [...Array.from(new Set(liveProducts.map(p => p.brand)))].sort(), [liveProducts]);
+  const sizes = useMemo(() => ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL'].filter(size => liveProducts.some(p => p.size === size)), [liveProducts]);
+  const conditions = useMemo(() => [...Array.from(new Set(liveProducts.map(p => p.condition)))].sort(), [liveProducts]);
 
   const handleCheckboxChange = (setter: React.Dispatch<React.SetStateAction<string[]>>, value: string) => {
       setter(prev => 
@@ -71,54 +81,84 @@ const ShopPage: React.FC = () => {
           : [...prev, value]
       );
   };
-
-  const activeFilterCount = useMemo(() => {
-    let count = 0;
-    if (searchQuery) count++;
-    if (statusFilter !== 'Available') count++;
-    if (priceFilter !== 'All') count++;
-    count += selectedBrands.length;
-    count += selectedSizes.length;
-    count += selectedConditions.length;
-    count += selectedCategories.length;
-    return count;
-  }, [searchQuery, statusFilter, priceFilter, selectedBrands, selectedSizes, selectedConditions, selectedCategories]);
-
-  const clearAllFilters = () => {
+  
+  const clearAllFilters = useCallback(() => {
     setSearchQuery('');
     setStatusFilter('Available');
     setSelectedBrands([]);
     setSelectedSizes([]);
     setSelectedConditions([]);
     setSelectedCategories([]);
-    setPriceFilter('All');
+    setPriceRange([0, maxPossiblePrice]);
     setSortOption('Featured');
-  };
+  }, [maxPossiblePrice]);
+
+  const activeFilterCount = useMemo(() => {
+    let count = 0;
+    if (searchQuery) count++;
+    if (statusFilter !== 'Available') count++;
+    if (priceRange[0] > 0 || priceRange[1] < maxPossiblePrice) count++;
+    count += selectedBrands.length;
+    count += selectedSizes.length;
+    count += selectedConditions.length;
+    count += selectedCategories.length;
+    return count;
+  }, [searchQuery, statusFilter, priceRange, selectedBrands, selectedSizes, selectedConditions, selectedCategories, maxPossiblePrice]);
+
 
   const filteredProducts = useMemo(() => {
-    if (!products) return [];
-    const priceRange = priceRanges[priceFilter as keyof typeof priceRanges];
-
-    return visibleProducts.filter(product => {
+    const lowercasedSearch = debouncedSearchQuery.toLowerCase().trim();
+    return liveProducts.filter(product => {
       const matchesStatus = statusFilter === 'All' || (statusFilter === 'Available' && !product.sold) || (statusFilter === 'Sold Out' && product.sold);
       const matchesBrand = selectedBrands.length === 0 || selectedBrands.includes(product.brand);
       const matchesSize = selectedSizes.length === 0 || selectedSizes.includes(product.size);
       const matchesCondition = selectedConditions.length === 0 || selectedConditions.includes(product.condition);
       const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(product.category);
       const matchesPrice = product.price >= priceRange[0] && product.price <= priceRange[1];
-      const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                             product.brand.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesSearch = !lowercasedSearch ||
+                             product.name.toLowerCase().includes(lowercasedSearch) ||
+                             product.brand.toLowerCase().includes(lowercasedSearch) ||
+                             product.category.toLowerCase().includes(lowercasedSearch) ||
+                             product.description.toLowerCase().includes(lowercasedSearch);
 
       return matchesStatus && matchesBrand && matchesSize && matchesCondition && matchesCategory && matchesPrice && matchesSearch;
     });
-  }, [searchQuery, statusFilter, selectedBrands, selectedSizes, selectedConditions, selectedCategories, priceFilter, visibleProducts, products]);
+  }, [debouncedSearchQuery, statusFilter, selectedBrands, selectedSizes, selectedConditions, selectedCategories, priceRange, liveProducts]);
 
-  const sortedProducts = useMemo(() => {
-    const sorted = [...filteredProducts];
+  useEffect(() => {
+    setVisibleItemsCount(ITEMS_PER_PAGE);
+  }, [filteredProducts]);
+
+  const { freshDropProducts, otherProducts } = useMemo(() => {
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    
+    const fresh: Product[] = [];
+    const others: Product[] = [];
+
+    for (const product of filteredProducts) {
+        const dropDate = product.dropDate ? new Date(product.dropDate) : new Date(product.createdAt);
+        if (dropDate >= sevenDaysAgo) {
+            fresh.push(product);
+        } else {
+            others.push(product);
+        }
+    }
+    
+    fresh.sort((a, b) => {
+        const dateA = a.dropDate ? new Date(a.dropDate) : new Date(a.createdAt);
+        const dateB = b.dropDate ? new Date(b.dropDate) : new Date(b.createdAt);
+        return dateB.getTime() - dateA.getTime();
+    });
+
+    return { freshDropProducts: fresh, otherProducts: others };
+  }, [filteredProducts]);
+
+  const sortedOtherProducts = useMemo(() => {
+    const sorted = [...otherProducts];
     switch (sortOption) {
         case 'Newest':
-            // Assuming products from the sheet are in chronological order (oldest first)
-            return sorted.reverse();
+            return sorted.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
         case 'Price: Low to High':
             return sorted.sort((a, b) => a.price - b.price);
         case 'Price: High to Low':
@@ -127,25 +167,54 @@ const ShopPage: React.FC = () => {
             return sorted.sort((a, b) => a.name.localeCompare(b.name));
         case 'Featured':
         default:
-            return filteredProducts;
+            return sorted;
     }
-  }, [filteredProducts, sortOption]);
+  }, [otherProducts, sortOption]);
+  
+  const paginatedOtherProducts = useMemo(() => {
+      return sortedOtherProducts.slice(0, visibleItemsCount);
+  }, [sortedOtherProducts, visibleItemsCount]);
 
   const FilterSidebarContent = () => {
-    const [openSections, setOpenSections] = useState<string[]>(['Category', 'Brand']);
+    const [openSections, setOpenSections] = useState<string[]>(['Category', 'Brand', 'Price']);
 
     const toggleSection = (section: string) => {
         setOpenSections(prev => 
             prev.includes(section) ? prev.filter(s => s !== section) : [...prev, section]
         );
     };
+    
+    const PriceSlider = () => {
+        const handleMinChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+            const value = Math.min(Number(e.target.value), priceRange[1] - 1);
+            setPriceRange([value, priceRange[1]]);
+        };
+        const handleMaxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+            const value = Math.max(Number(e.target.value), priceRange[0] + 1);
+            setPriceRange([priceRange[0], value]);
+        };
 
-    const AccordionItem: React.FC<{
-        title: string;
-        icon: React.ReactNode;
-        children: React.ReactNode;
-        defaultOpen?: boolean;
-    }> = ({ title, icon, children }) => {
+        const minPos = (priceRange[0] / maxPossiblePrice) * 100;
+        const maxPos = (priceRange[1] / maxPossiblePrice) * 100;
+
+        return (
+            <div className="pt-4 px-2">
+                 <div className="flex justify-between items-center text-sm mb-4">
+                    <span className="font-medium text-[var(--color-text-secondary)]">₹{priceRange[0]}</span>
+                    <span className="font-medium text-[var(--color-text-secondary)]">₹{priceRange[1]}</span>
+                 </div>
+                 <div className="price-slider-container">
+                    <div className="price-slider-track-container">
+                        <div className="price-slider-track-active" style={{ left: `${minPos}%`, right: `${100 - maxPos}%` }}></div>
+                    </div>
+                    <input type="range" min="0" max={maxPossiblePrice} value={priceRange[0]} onChange={handleMinChange} />
+                    <input type="range" min="0" max={maxPossiblePrice} value={priceRange[1]} onChange={handleMaxChange} />
+                 </div>
+            </div>
+        )
+    };
+
+    const AccordionItem: React.FC<{ title: string; icon: React.ReactNode; children: React.ReactNode; }> = ({ title, icon, children }) => {
         const isOpen = openSections.includes(title);
         return (
             <div className="filter-accordion border-b border-[var(--color-border)]">
@@ -188,6 +257,8 @@ const ShopPage: React.FC = () => {
         </div>
     );
     
+    const statusFilters = ['All', 'Available', 'Sold Out'];
+
     return (
       <div className="space-y-2">
         <div className="flex justify-between items-center p-2">
@@ -198,7 +269,7 @@ const ShopPage: React.FC = () => {
         </div>
   
         <div className="relative p-2">
-            <input type="text" placeholder="Search..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full pl-10 pr-4 py-2 border border-[var(--color-border)] rounded-lg focus:ring-1 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] transition bg-[var(--color-surface)]" />
+            <input type="text" placeholder="Search by name or brand..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full pl-10 pr-4 py-2 border border-[var(--color-border)] rounded-lg focus:ring-1 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] transition bg-[var(--color-surface)]" />
             <div className="absolute left-5 top-1/2 -translate-y-1/2"><SearchIcon className="w-5 h-5 text-[var(--color-text-muted)]" /></div>
         </div>
   
@@ -213,7 +284,7 @@ const ShopPage: React.FC = () => {
         </AccordionItem>
         
         <AccordionItem title="Availability" icon={<CheckCircleIcon className="w-5 h-5 text-[var(--color-text-secondary)]" />}>
-          <div className="segmented-control">
+          <div className="segmented-control p-2">
               {statusFilters.map(filter => (
                   <button key={filter} onClick={() => setStatusFilter(filter)} className={`segmented-control-button ${statusFilter === filter ? 'active' : ''}`}>
                       {filter}
@@ -223,13 +294,7 @@ const ShopPage: React.FC = () => {
         </AccordionItem>
 
         <AccordionItem title="Price" icon={<PriceTagIcon className="w-5 h-5 text-[var(--color-text-secondary)]" />}>
-          <div className="price-filter-button-group">
-            {Object.keys(priceRanges).map(range => (
-                <button key={range} onClick={() => setPriceFilter(range)} className={`price-filter-button ${priceFilter === range ? 'active' : ''}`}>
-                    {range}
-                </button>
-            ))}
-          </div>
+          <PriceSlider />
         </AccordionItem>
 
         {categories.length > 0 && (
@@ -257,11 +322,11 @@ const ShopPage: React.FC = () => {
   };
 
   const ProductGridSkeleton: React.FC = () => (
-    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-8">
+    <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8">
       {Array.from({ length: 8 }).map((_, index) => (
         <div key={index} className="bg-[var(--color-surface)] rounded-lg shadow-md overflow-hidden animate-pulse">
           <div className="product-card-image-container bg-[var(--color-surface-alt)]"></div>
-          <div className="p-6 text-center">
+          <div className="p-4 md:p-6 text-center">
             <div className="h-4 bg-[var(--color-surface-alt)] rounded w-1/2 mx-auto mb-3"></div>
             <div className="h-6 bg-[var(--color-surface-alt)] rounded w-3/4 mx-auto mb-3"></div>
             <div className="h-4 bg-[var(--color-surface-alt)] rounded w-1/3 mx-auto mb-4"></div>
@@ -275,14 +340,14 @@ const ShopPage: React.FC = () => {
 
   return (
     <div className="animate-fade-in">
-        <div className="container mx-auto px-6 py-12">
+        <div className="container mx-auto px-4 md:px-6 py-12">
             <div className="text-center mb-12">
                 <h1 className="text-4xl md:text-5xl font-serif font-bold">All Finds</h1>
                 <p className="text-lg text-[var(--color-text-secondary)] mt-2">Our curated collection of vintage and pre-loved treasures.</p>
             </div>
             
             <div className="grid grid-cols-1 lg:grid-cols-4 lg:gap-12">
-              <aside className="hidden lg:block lg:col-span-1 lg:sticky lg:top-24 h-fit bg-[var(--color-surface)]/60 backdrop-blur-sm p-6 rounded-lg border border-[var(--color-border)]">
+              <aside className="hidden lg:block lg:col-span-1 lg:sticky lg:top-24 h-fit bg-[var(--color-surface)]/60 backdrop-blur-sm p-4 rounded-lg border border-[var(--color-border)]">
                 <FilterSidebarContent />
               </aside>
 
@@ -300,7 +365,7 @@ const ShopPage: React.FC = () => {
               <main className="lg:col-span-3">
                  <div className="flex justify-between items-center mb-6">
                     <p className="text-sm text-[var(--color-text-secondary)]">
-                        Showing {sortedProducts.length} of {visibleProducts.length} products
+                        Showing {freshDropProducts.length + paginatedOtherProducts.length} of {liveProducts.length} products
                     </p>
                      <button onClick={() => setIsFilterOpen(true)} className="lg:hidden flex items-center justify-center gap-2 px-4 py-2 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg shadow-sm text-[var(--color-text-primary)] font-medium text-sm">
                         <FilterIcon className="w-4 h-4" />
@@ -318,12 +383,35 @@ const ShopPage: React.FC = () => {
                         Try Again
                       </button>
                    </div>
-                ) : sortedProducts.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-8">
-                    {sortedProducts.map(product => (
-                        <ProductCard key={product.id} product={product} />
-                    ))}
-                    </div>
+                ) : (freshDropProducts.length > 0 || paginatedOtherProducts.length > 0) ? (
+                    <>
+                        {freshDropProducts.length > 0 && (
+                            <div className="mb-12">
+                                <h2 className="text-2xl font-semibold font-serif my-4 text-center border-b border-t border-[var(--color-border)] py-3">— Fresh Drop —</h2>
+                                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8">
+                                    {freshDropProducts.map(product => (
+                                        <ProductCard key={product.id} product={product} isFreshDrop={true} />
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                        {paginatedOtherProducts.length > 0 && (
+                          <div className="space-y-8">
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8">
+                                {paginatedOtherProducts.map(product => (
+                                    <ProductCard key={product.id} product={product} isFreshDrop={false} />
+                                ))}
+                            </div>
+                            {sortedOtherProducts.length > visibleItemsCount && (
+                                <div className="text-center pt-4">
+                                    <button onClick={() => setVisibleItemsCount(c => c + ITEMS_PER_PAGE)} className="btn btn-secondary">
+                                        Load More Finds
+                                    </button>
+                                </div>
+                            )}
+                          </div>
+                        )}
+                    </>
                 ) : (
                     <div className="text-center py-16 flex flex-col items-center justify-center h-full bg-[var(--color-surface)] rounded-lg border border-[var(--color-border)] p-6">
                         <h2 className="text-2xl font-serif text-[var(--color-text-secondary)]">No Treasures Found</h2>
