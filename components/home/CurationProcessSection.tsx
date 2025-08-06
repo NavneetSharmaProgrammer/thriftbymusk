@@ -1,6 +1,7 @@
+
 import React from 'react';
-import AnimatedSection from '../AnimatedSection.tsx';
-import { SourcingIcon, CleaningIcon, PackagingIcon } from '../Icons.tsx';
+import AnimatedSection from '../AnimatedSection';
+import { SourcingIcon, CleaningIcon, PackagingIcon } from '../Icons';
 
 const CurationProcessSection: React.FC = () => {
     return (
