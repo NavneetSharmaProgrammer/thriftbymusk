@@ -1,6 +1,7 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
-import AnimatedSection from '../AnimatedSection.tsx';
+import AnimatedSection from '../AnimatedSection';
 
 const HeroSection: React.FC = () => {
   return (
