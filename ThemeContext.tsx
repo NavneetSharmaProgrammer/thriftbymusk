@@ -1,3 +1,4 @@
+
 import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 import { Theme, ThemeContextType } from './types';
 
@@ -43,7 +44,7 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
    * Cycles through the available themes: light -> dark -> sepia -> light.
    */
   const cycleTheme = () => {
-    setTheme(prevTheme => {
+    setTheme((prevTheme: Theme) => {
       if (prevTheme === 'light') return 'dark';
       if (prevTheme === 'dark') return 'sepia';
       return 'light';
