@@ -80,6 +80,16 @@ export interface GalleryItem {
 }
 
 /**
+ * Represents the data structure for an owner/founder.
+ */
+export interface Owner {
+  name: string;
+  handle: string;
+  link: string;
+  image: string;
+}
+
+/**
  * Defines the available theme names for the application.
  */
 export type Theme = 'light' | 'dark' | 'sepia';

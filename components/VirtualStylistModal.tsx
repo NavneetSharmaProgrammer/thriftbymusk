@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { GoogleGenAI } from "@google/genai";
-import { useStylist } from '../StylistContext.tsx';
-import { fileToBase64 } from '../utils.ts';
-import { CloseIcon, SparklesIcon, CameraIcon, ArrowUpTrayIcon, LoadingIcon, ArrowLeftIcon } from './Icons.tsx';
+import { useStylist } from '../StylistContext';
+import { fileToBase64 } from '../utils';
+import { CloseIcon, SparklesIcon, CameraIcon, ArrowUpTrayIcon, LoadingIcon, ArrowLeftIcon } from './Icons';
 
 const VirtualStylistModal: React.FC = () => {
   const { isStylistOpen, toggleStylist } = useStylist();

@@ -1,10 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Product } from '../types.ts';
-import { useCart } from '../CartContext.tsx';
-import { useSaved } from '../SavedContext.tsx';
-import { formatGoogleDriveLink } from '../utils.ts';
-import { HeartIcon } from './Icons.tsx';
+import { Product } from '../types';
+import { useCart } from '../CartContext';
+import { useSaved } from '../SavedContext';
+import { formatGoogleDriveLink } from '../utils';
+import { HeartIcon } from './Icons';
 
 interface ProductCardProps {
   product: Product;

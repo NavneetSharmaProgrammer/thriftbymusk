@@ -1,22 +1,22 @@
 import React, { Suspense } from 'react';
 import { HashRouter, Routes, Route, useLocation } from 'react-router-dom';
-import { CartProvider } from './CartContext.tsx';
-import { ProductProvider } from './ProductContext.tsx';
-import { ThemeProvider } from './ThemeContext.tsx';
-import { SavedProvider } from './SavedContext.tsx';
-import Header from './components/Header.tsx';
-import Footer from './components/Footer.tsx';
-import CartModal from './components/CartModal.tsx';
-import Notification from './components/Notification.tsx';
-import PageLoader from './components/PageLoader.tsx';
-import SaleBanner from './components/SaleBanner.tsx';
+import { CartProvider } from './CartContext';
+import { ProductProvider } from './ProductContext';
+import { ThemeProvider } from './ThemeContext';
+import { SavedProvider } from './SavedContext';
+import Header from './components/Header';
+import Footer from './components/Footer';
+import CartModal from './components/CartModal';
+import Notification from './components/Notification';
+import PageLoader from './components/PageLoader';
+import SaleBanner from './components/SaleBanner';
 
 // Statically import page components to ensure reliable module resolution.
-import HomePage from './components/HomePage.tsx';
-import ShopPage from './components/ShopPage.tsx';
-import GalleryPage from './components/GalleryPage.tsx';
-import ProductDetailPage from './components/ProductDetailPage.tsx';
-import SavedItemsPage from './components/SavedItemsPage.tsx';
+import HomePage from './components/HomePage';
+import ShopPage from './components/ShopPage';
+import GalleryPage from './components/GalleryPage';
+import ProductDetailPage from './components/ProductDetailPage';
+import SavedItemsPage from './components/SavedItemsPage';
 
 
 /**
@@ -34,7 +34,7 @@ class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { has
   }
 
   // This lifecycle method is triggered after an error has been thrown by a descendant component.
-  static getDerivedStateFromError(error: Error) {
+  static getDerivedStateFromError(_error: Error) {
     // Update state so the next render will show the fallback UI.
     return { hasError: true };
   }

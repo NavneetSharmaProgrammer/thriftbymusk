@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
-import AnimatedSection from '../AnimatedSection.tsx';
-import { useProducts } from '../../ProductContext.tsx';
+import AnimatedSection from '../AnimatedSection';
+import { useProducts } from '../../ProductContext';
 
 /**
  * A custom hook to manage countdown logic to a specific target date.

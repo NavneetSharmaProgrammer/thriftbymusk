@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import AnimatedSection from '../AnimatedSection.tsx';
-import { useProducts } from '../../ProductContext.tsx';
-import { formatGoogleDriveLink } from '../../utils.ts';
+import AnimatedSection from '../AnimatedSection';
+import { useProducts } from '../../ProductContext';
+import { formatGoogleDriveLink } from '../../utils';
 
 const CategoryCard: React.FC<{title: string, imageUrl: string, linkTo: string, isLoading?: boolean}> = ({ title, imageUrl, linkTo, isLoading }) => (
     <Link to={linkTo} className="group block relative rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden">

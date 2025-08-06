@@ -1,8 +1,8 @@
 import React from 'react';
-import { InstagramIcon, UserIcon, WhatsAppIcon, LinkedInIcon, YouTubeIcon } from './Icons.tsx';
+import { InstagramIcon, UserIcon, WhatsAppIcon, LinkedInIcon, YouTubeIcon } from './Icons';
 import { Link } from 'react-router-dom';
-import { LOGO_URL, OWNERS } from '../constants.ts';
-import { formatGoogleDriveLink } from '../utils.ts';
+import { LOGO_URL, OWNERS } from '../constants';
+import { formatGoogleDriveLink } from '../utils';
 
 /**
  * The Footer component displayed at the bottom of every page.

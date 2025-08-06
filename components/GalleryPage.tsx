@@ -1,8 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { GALLERY_ITEMS } from '../constants.ts';
-import { ArrowLeftIcon } from './Icons.tsx';
-import { formatGoogleDriveLink } from '../utils.ts';
+import { GALLERY_ITEMS } from '../constants';
+import { ArrowLeftIcon } from './Icons';
+import { formatGoogleDriveLink } from '../utils';
 
 /**
  * The Gallery Page component.

@@ -1,14 +1,15 @@
 
+
 import React from 'react';
-import HeroSection from './home/HeroSection.tsx';
-import ValuesSection from './home/ValuesSection.tsx';
-import ComingSoonSection from './home/ComingSoonSection.tsx';
-import FeaturedFindsSection from './home/FeaturedFindsSection.tsx';
-import InstagramFeedSection from './home/InstagramFeedSection.tsx';
-import CurationProcessSection from './home/CurationProcessSection.tsx';
-import WhyThriftSection from './home/WhyThriftSection.tsx';
-import QualityPromiseSection from './home/QualityPromiseSection.tsx';
-import AboutSection from './home/AboutSection.tsx';
+import HeroSection from './home/HeroSection';
+import ValuesSection from './home/ValuesSection';
+import ComingSoonSection from './home/ComingSoonSection';
+import FeaturedFindsSection from './home/FeaturedFindsSection';
+import InstagramFeedSection from './home/InstagramFeedSection';
+import CurationProcessSection from './home/CurationProcessSection';
+import WhyThriftSection from './home/WhyThriftSection';
+import QualityPromiseSection from './home/QualityPromiseSection';
+import AboutSection from './home/AboutSection';
 
 /**
  * The main component for the homepage. 

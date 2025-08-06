@@ -1,8 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { useSaved } from '../SavedContext.tsx';
-import ProductCard from './ProductCard.tsx';
-import { HeartIcon } from './Icons.tsx';
+import { useSaved } from '../SavedContext';
+import ProductCard from './ProductCard';
+import { HeartIcon } from './Icons';
 
 const SavedItemsPage: React.FC = () => {
   const { savedItems } = useSaved();

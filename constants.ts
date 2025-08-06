@@ -1,5 +1,6 @@
 
-import { GalleryItem } from './types.ts';
+
+import { GalleryItem, Owner } from './types';
 
 /**
  * =================================================================
@@ -29,7 +30,7 @@ export const GOOGLE_SHEET_CSV_URL: string = 'https://docs.google.com/spreadsheet
  * Instructions for setup are in USER_MANUAL.txt and in the ORDER_APPS_SCRIPT.js file.
  * If left empty, this checkout method will be disabled and will fall back to the manual DM flow.
  */
-export const GOOGLE_APPS_SCRIPT_URL: string = ''; // <-- PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE
+export const GOOGLE_APPS_SCRIPT_URL: string = 'https://script.google.com/macros/s/AKfycbxvS46MwG2CBsfF008_i5u4IqVlyeKcL7FIX83lvP2Qn04vSeHUmy3RzjuM_hJleH1ykA/exec'; // <-- PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE
 
 
 /**
@@ -50,14 +51,6 @@ export const LOGO_URL = 'https://drive.google.com/file/d/1OZ-4vlBjZOwNplGd8crOui
  * Do not include the '@' symbol.
  */
 export const INSTAGRAM_HANDLE = 'thriftbymusk';
-
-/**
- * 5. NEXT DROP LAUNCH DATE
- * ------------------------
- * Set the target date and time for your next product drop countdown timer.
- * FORMAT: 'YYYY-MM-DDTHH:MM:SSZ' (ISO 8601 format). 'Z' denotes UTC time.
- */
-export const launchDate = '2025-08-06T11:30:00.000Z';
 
 
 /**
@@ -115,7 +108,7 @@ export const INSTAGRAM_FEED_IMAGES = [
  * Details for the "About Us" section on the homepage.
  * Update with real names, Instagram links, and Google Drive image links.
  */
-export const OWNERS = [
-    { name: '@thatskinny.model', link: 'https://www.instagram.com/thatskinny.model/', image: 'https://drive.google.com/file/d/1DFdOO5mZ7P5DkQ6Bv8w6EwK7zLa7dl5M/view?usp=sharing' },
+export const OWNERS: Owner[] = [
+    { name: 'Muskaan Sharma', handle: '@thatskinny.model', link: 'https://www.instagram.com/thatskinny.model/', image: 'https://drive.google.com/file/d/1DFdOO5mZ7P5DkQ6Bv8w6EwK7zLa7dl5M/view?usp=sharing' },
    
 ];

@@ -1,7 +1,7 @@
 import React from 'react';
-import AnimatedSection from '../AnimatedSection.tsx';
-import { OWNERS } from '../../constants.ts';
-import { formatGoogleDriveLink } from '../../utils.ts';
+import AnimatedSection from '../AnimatedSection';
+import { OWNERS } from '../../constants';
+import { formatGoogleDriveLink } from '../../utils';
 
 const AboutSection: React.FC = () => {
   return (

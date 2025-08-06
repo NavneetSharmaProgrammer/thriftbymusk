@@ -1,6 +1,6 @@
 import React from 'react';
-import { useCart } from '../CartContext.tsx';
-import { CheckCircleIcon } from './Icons.tsx';
+import { useCart } from '../CartContext';
+import { CheckCircleIcon } from './Icons';
 
 /**
  * A "toast" style notification component that appears briefly at the bottom of the screen.

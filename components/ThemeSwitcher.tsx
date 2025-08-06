@@ -1,6 +1,6 @@
 import React from 'react';
-import { useTheme } from '../ThemeContext.tsx';
-import { SunIcon, MoonIcon, EyeIcon } from './Icons.tsx';
+import { useTheme } from '../ThemeContext';
+import { SunIcon, MoonIcon, EyeIcon } from './Icons';
 
 /**
  * A UI component that allows the user to cycle through the available themes.

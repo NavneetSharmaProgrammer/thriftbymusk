@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
-import { Product, SavedContextType } from './types.ts';
+import { Product, SavedContextType } from './types';
 
 const SavedContext = createContext<SavedContextType | undefined>(undefined);
 

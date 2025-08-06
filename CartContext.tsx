@@ -1,6 +1,6 @@
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
-import { Product, CartItem, CartContextType, CustomerDetails } from './types.ts';
-import { INSTAGRAM_HANDLE } from './constants.ts';
+import { Product, CartItem, CartContextType, CustomerDetails } from './types';
+import { INSTAGRAM_HANDLE } from './constants';
 
 // Create a React Context for the shopping cart.
 // This will allow any component within its provider to access cart state and functions.

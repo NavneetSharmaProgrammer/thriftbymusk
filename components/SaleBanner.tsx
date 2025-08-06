@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { CloseIcon } from './Icons.tsx';
+import { CloseIcon } from './Icons';
 
 /**
  * A dismissible, static sales banner that is displayed sitewide.
