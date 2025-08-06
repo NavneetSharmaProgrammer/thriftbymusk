@@ -1,6 +1,7 @@
+
 import React from 'react';
-import AnimatedSection from '../AnimatedSection.tsx';
-import { CheckCircleIcon } from '../Icons.tsx';
+import AnimatedSection from '../AnimatedSection';
+import { CheckCircleIcon } from '../Icons';
 
 const QualityPromiseSection: React.FC = () => {
     return (
