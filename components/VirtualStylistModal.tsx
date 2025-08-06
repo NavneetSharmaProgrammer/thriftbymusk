@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { GoogleGenAI } from "@google/genai";
 import { useStylist } from '../StylistContext';
@@ -75,7 +76,9 @@ const VirtualStylistModal: React.FC = () => {
       setError('Please provide an image and a question.');
       return;
     }
-    if (!process.env.API_KEY) {
+    
+    const apiKey = process.env.API_KEY;
+    if (!apiKey) {
       setError('API key is not configured. This feature is unavailable.');
       return;
     }
@@ -85,7 +88,7 @@ const VirtualStylistModal: React.FC = () => {
     setResponse('');
 
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      const ai = new GoogleGenAI({ apiKey });
       const base64Image = await fileToBase64(imageFile);
 
       const imagePart = {
