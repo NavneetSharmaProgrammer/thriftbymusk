@@ -1,3 +1,4 @@
+
 import React, { Suspense } from 'react';
 import { HashRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { CartProvider } from './CartContext';
@@ -16,7 +17,7 @@ import HomePage from './components/HomePage';
 import ShopPage from './components/ShopPage';
 import GalleryPage from './components/GalleryPage';
 import ProductDetailPage from './components/ProductDetailPage';
-import SavedItemsPage from './components/SavedItemsPage';
+
 
 
 /**
@@ -104,7 +105,7 @@ const App: React.FC = () => {
                       <Routes>
                         <Route path="/" element={<HomePage />} />
                         <Route path="/shop" element={<ShopPage />} />
-                        <Route path="/saved" element={<SavedItemsPage />} />
+                      
                         <Route path="/gallery" element={<GalleryPage />} />
                         <Route path="/product/:id" element={<ProductDetailPage />} />
                       </Routes>
