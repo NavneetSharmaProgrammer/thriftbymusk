@@ -1,5 +1,6 @@
 
-import React, { Suspense } from 'react';
+
+import React, { Suspense, lazy } from 'react';
 import { HashRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { CartProvider } from './CartContext';
 import { ProductProvider } from './ProductContext';
@@ -12,12 +13,12 @@ import Notification from './components/Notification';
 import PageLoader from './components/PageLoader';
 import SaleBanner from './components/SaleBanner';
 
-// Statically import page components to ensure reliable module resolution.
-import HomePage from './components/HomePage';
-import ShopPage from './components/ShopPage';
-import GalleryPage from './components/GalleryPage';
-import ProductDetailPage from './components/ProductDetailPage';
-
+// Lazily import page components for code-splitting and faster initial loads.
+const HomePage = lazy(() => import('./components/HomePage'));
+const ShopPage = lazy(() => import('./components/ShopPage'));
+const GalleryPage = lazy(() => import('./components/GalleryPage'));
+const ProductDetailPage = lazy(() => import('./components/ProductDetailPage'));
+const SavedItemsPage = lazy(() => import('./components/SavedItemsPage'));
 
 
 /**
@@ -100,12 +101,12 @@ const App: React.FC = () => {
                   <Header />
                   <SaleBanner />
                   <main className="flex-grow">
-                    {/* 4. Suspense can be used for other async operations within pages. */}
+                    {/* 4. Suspense handles the loading state for lazy-loaded components. */}
                     <Suspense fallback={<PageLoader />}>
                       <Routes>
                         <Route path="/" element={<HomePage />} />
                         <Route path="/shop" element={<ShopPage />} />
-                      
+                        <Route path="/saved" element={<SavedItemsPage />} />
                         <Route path="/gallery" element={<GalleryPage />} />
                         <Route path="/product/:id" element={<ProductDetailPage />} />
                       </Routes>

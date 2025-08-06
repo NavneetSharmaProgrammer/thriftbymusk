@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { GoogleGenAI } from "@google/genai";
 import { useStylist } from '../StylistContext';
@@ -77,6 +76,7 @@ const VirtualStylistModal: React.FC = () => {
       return;
     }
     
+    // API key is sourced from environment variables.
     const apiKey = process.env.API_KEY;
     if (!apiKey) {
       setError('API key is not configured. This feature is unavailable.');
