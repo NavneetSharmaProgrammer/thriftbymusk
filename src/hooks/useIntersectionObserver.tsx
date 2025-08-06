@@ -1,81 +1,38 @@
-
-import { useState, useEffect, useRef } from 'react';
-
-// Define the type for the hook's options, extending the native IntersectionObserverInit
-// and adding a custom option.
-type ObserverOptions = IntersectionObserverInit & {
-  triggerOnce?: boolean;
-};
+import { useState, useEffect } from 'react';
 
 /**
- * A custom React hook that uses the Intersection Observer API to detect
- * when an element enters the viewport.
+ * A custom hook to debounce a value.
+ * It will only update the returned value after the specified delay has passed
+ * without the input value changing. This is useful for performance optimization,
+ * for example, by preventing API calls on every keystroke in a search bar.
  *
- * This is highly performant for tasks like lazy-loading images or triggering
- * animations on scroll, as it avoids the need for scroll event listeners.
- *
- * @param options - Configuration object for the Intersection Observer.
- * @param options.threshold - A number or array of numbers indicating at what percentage
- *   of the target's visibility the observer's callback should be executed.
- * @param options.root - The element that is used as the viewport for checking visibility.
- *   Defaults to the browser viewport if not specified.
- * @param options.rootMargin - Margin around the root. Can be used to grow or shrink
- *   the area used for intersections.
- * @param options.triggerOnce - A custom boolean option. If true, the observer will
- *   disconnect after the element has become visible once.
- *
- * @returns A tuple `[ref, isIntersecting]`:
- * - `ref`: A React ref object to be attached to the DOM element you want to observe.
- * - `isIntersecting`: A boolean that is `true` if the element is currently intersecting
- *   the viewport, and `false` otherwise.
+ * @param value The value to be debounced (e.g., a search query string).
+ * @param delay The delay in milliseconds after which the debounced value is updated.
+ * @returns The debounced value.
  */
-const useIntersectionObserver = (options: ObserverOptions) => {
-  // State to hold the latest IntersectionObserverEntry. We only really need the `isIntersecting` boolean.
-  const [entry, setEntry] = useState<IntersectionObserverEntry | null>(null);
-  // Ref to hold the IntersectionObserver instance itself.
-  const observer = useRef<IntersectionObserver | null>(null);
-  // Ref to attach to the target DOM element.
-  const ref = useRef<HTMLElement>(null);
+function useDebounce<T>(value: T, delay: number): T {
+  // State to store the debounced value.
+  const [debouncedValue, setDebouncedValue] = useState<T>(value);
 
-  // Memoize options to prevent the useEffect from re-running on every render
-  // unless the options object has actually changed.
-  const memoizedOptions = JSON.stringify(options);
+  useEffect(
+    () => {
+      // Set up a timer to update the debounced value after the specified delay.
+      const handler = setTimeout(() => {
+        setDebouncedValue(value);
+      }, delay);
 
-  useEffect(() => {
-    const node = ref?.current; // The DOM element to observe.
-    if (!node) return;
+      // This is the cleanup function that React runs on every re-render BEFORE the new effect runs,
+      // or when the component unmounts. This is the key to debouncing: we clear the previous
+      // timer before setting a new one, ensuring the state is only updated after the user
+      // has stopped providing input for the specified delay.
+      return () => {
+        clearTimeout(handler);
+      };
+    },
+    [value, delay] // Only re-run the effect if the value or the delay changes.
+  );
 
-    const currentOptions = JSON.parse(memoizedOptions);
-    const { triggerOnce, ...observerOptions } = currentOptions;
+  return debouncedValue;
+}
 
-    // Disconnect any previous observer before creating a new one.
-    if (observer.current) {
-      observer.current.disconnect();
-    }
-
-    // Create the new IntersectionObserver instance.
-    observer.current = new IntersectionObserver(([entry]) => {
-      // When the element's intersection state changes, update our state.
-      setEntry(entry);
-      // If `triggerOnce` is true and the element is visible, unobserve it to save resources.
-      if (entry.isIntersecting && triggerOnce && observer.current) {
-        observer.current.unobserve(node);
-      }
-    }, observerOptions);
-
-    // Start observing the target element.
-    observer.current.observe(node);
-
-    // Cleanup function: Disconnect the observer when the component unmounts.
-    return () => {
-      if (observer.current) {
-        observer.current.disconnect();
-      }
-    };
-    // The effect depends on the memoized options string.
-  }, [memoizedOptions]);
-
-  return [ref, entry?.isIntersecting] as const;
-};
-
-export default useIntersectionObserver;
+export default useDebounce;

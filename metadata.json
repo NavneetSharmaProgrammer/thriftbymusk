@@ -1,6 +1,3 @@
 {
-  "name": "Thrift by Musk",
-  "description": "Shop curated vintage & pre-loved fashion from brands like Zara & Ralph Lauren at Thrift by Musk. Sustainable, timeless style with new drops. Website developed by Navneet Sharma.",
-  "requestFramePermissions": [],
-  "prompt": ""
+  "requestFramePermissions": []
 }

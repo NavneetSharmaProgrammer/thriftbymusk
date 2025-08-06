@@ -2,7 +2,6 @@ import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import AnimatedSection from '../AnimatedSection.tsx';
 import { useProducts } from '../../ProductContext.tsx';
-import { useDrop } from '../../DropContext.tsx';
 import { formatGoogleDriveLink } from '../../utils.ts';
 
 const CategoryCard: React.FC<{title: string, imageUrl: string, linkTo: string, isLoading?: boolean}> = ({ title, imageUrl, linkTo, isLoading }) => (
@@ -19,10 +18,13 @@ const CategoryCard: React.FC<{title: string, imageUrl: string, linkTo: string, i
 
 const FeaturedFindsSection: React.FC = () => {
     const { products, isLoading } = useProducts();
-    const { isDropLive } = useDrop();
 
     const { topImage, shirtImage } = useMemo(() => {
-        const availableProducts = products.filter(p => !p.sold && (!p.isUpcoming || isDropLive));
+        const now = new Date();
+        const availableProducts = products.filter(p => 
+            !p.sold && 
+            (!p.dropDate || new Date(p.dropDate) <= now)
+        );
         const topProduct = availableProducts.find(p => p.category === 'Tops');
         const shirtProduct = availableProducts.find(p => p.category === 'Shirts');
 
@@ -30,7 +32,7 @@ const FeaturedFindsSection: React.FC = () => {
           topImage: topProduct ? formatGoogleDriveLink(topProduct.imageUrls[0], 'image', { width: 500 }) : 'https://picsum.photos/seed/tops-category/500/625',
           shirtImage: shirtProduct ? formatGoogleDriveLink(shirtProduct.imageUrls[0], 'image', { width: 500 }) : 'https://picsum.photos/seed/shirts-category/500/625'
         };
-    }, [isDropLive, products]);
+    }, [products]);
 
     return (
         <AnimatedSection id="featured" className="py-16 md:py-0">

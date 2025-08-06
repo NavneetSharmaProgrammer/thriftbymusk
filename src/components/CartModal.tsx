@@ -3,7 +3,7 @@ import { useCart } from '../CartContext.tsx';
 import { CloseIcon, ShoppingBagIcon, CheckCircleIcon, WhatsAppIcon, InstagramIcon, LoadingIcon, ArrowLeftIcon } from './Icons.tsx';
 import { formatGoogleDriveLink } from '../utils.ts';
 import { CustomerDetails } from '../types.ts';
-import { GOOGLE_APPS_SCRIPT_URL } from '../constants.ts';
+import { GOOGLE_APPS_SCRIPT_URL, INSTAGRAM_HANDLE } from '../constants.ts';
 
 type SubmissionStatus = 'idle' | 'submitting' | 'success' | 'error';
 
@@ -29,6 +29,7 @@ const CartModal: React.FC = () => {
     const [submissionError, setSubmissionError] = useState<string | null>(null);
 
     const modalRef = useRef<HTMLDivElement>(null);
+    const formRef = useRef<HTMLFormElement>(null);
 
     // Reset view and submission status whenever the modal is opened
     useEffect(() => {
@@ -95,8 +96,11 @@ const CartModal: React.FC = () => {
         setSubmissionStatus('submitting');
         setSubmissionError(null);
 
+        // Use the same CORS proxy as the product fetch to prevent CORS errors.
+        const proxyUrl = `https://cors.eu.org/${GOOGLE_APPS_SCRIPT_URL}`;
+
         try {
-            const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+            const response = await fetch(proxyUrl, {
                 method: 'POST',
                 mode: 'cors',
                 headers: {
@@ -204,7 +208,7 @@ const CartModal: React.FC = () => {
     const renderFormView = () => (
         <>
             <ModalHeader title="Checkout" />
-            <form onSubmit={handleFormSubmit} className="flex-grow flex flex-col">
+            <form ref={formRef} onSubmit={handleFormSubmit} className="flex-grow flex flex-col">
                 <div className="overflow-y-auto p-6 space-y-4">
                     <button onClick={() => setView('cart')} type="button" className="flex items-center gap-2 text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] mb-4">
                         <ArrowLeftIcon className="w-4 h-4" /> Back to Cart
@@ -226,13 +230,32 @@ const CartModal: React.FC = () => {
                         <span className="text-lg font-semibold">Order Total</span>
                         <span className="text-2xl font-serif text-[var(--color-primary)]">{formattedTotal}</span>
                     </div>
-                    <button type="submit" className="btn btn-primary w-full" disabled={submissionStatus === 'submitting'}>
-                        {submissionStatus === 'submitting' ? (
-                            <span className="flex items-center justify-center gap-2"><LoadingIcon className="w-5 h-5"/> Submitting...</span>
-                        ) : (
-                            GOOGLE_APPS_SCRIPT_URL ? 'Submit Order' : 'Continue to Final Step'
-                        )}
-                    </button>
+                    
+                    {GOOGLE_APPS_SCRIPT_URL ? (
+                        <>
+                            <button type="submit" className="btn btn-primary w-full" disabled={submissionStatus === 'submitting'}>
+                                {submissionStatus === 'submitting' ? (
+                                    <span className="flex items-center justify-center gap-2"><LoadingIcon className="w-5 h-5"/> Submitting...</span>
+                                ) : 'Submit Order Automatically'}
+                            </button>
+                            <div className="text-center my-3 relative">
+                                <span className="text-xs px-2 bg-[var(--color-surface-alt)] text-[var(--color-text-muted)] z-10 relative">OR</span>
+                                <hr className="absolute left-0 right-0 top-1/2 -translate-y-1/2 border-[var(--color-border)] z-0" />
+                            </div>
+                        </>
+                    ) : (
+                        <p className="text-sm text-center text-[var(--color-text-secondary)] mb-4">Please use a manual order option below.</p>
+                    )}
+
+                    <div className="flex flex-col sm:flex-row gap-3">
+                        <button type="button" onClick={() => { if(formRef.current?.reportValidity()) handleWhatsAppConfirm() }} className="btn btn-manual-order w-full">
+                            <WhatsAppIcon className="w-5 h-5"/> Order on WhatsApp
+                        </button>
+                        <button type="button" onClick={() => { if(formRef.current?.reportValidity()) handleInstagramConfirm() }} className="btn btn-manual-order w-full">
+                           <InstagramIcon className="w-5 h-5" /> Order on Instagram
+                        </button>
+                    </div>
+
                     <p className="text-xs text-[var(--color-text-muted)] mt-3 text-center">Shipping calculated upon confirmation. Payment via UPI/Bank Transfer.</p>
                 </div>
             </form>

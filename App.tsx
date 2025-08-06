@@ -1,9 +1,9 @@
 import React, { Suspense } from 'react';
 import { HashRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { CartProvider } from './CartContext.tsx';
-import { DropProvider } from './DropContext.tsx';
 import { ProductProvider } from './ProductContext.tsx';
 import { ThemeProvider } from './ThemeContext.tsx';
+import { SavedProvider } from './SavedContext.tsx';
 import Header from './components/Header.tsx';
 import Footer from './components/Footer.tsx';
 import CartModal from './components/CartModal.tsx';
@@ -16,6 +16,7 @@ import HomePage from './components/HomePage.tsx';
 import ShopPage from './components/ShopPage.tsx';
 import GalleryPage from './components/GalleryPage.tsx';
 import ProductDetailPage from './components/ProductDetailPage.tsx';
+import SavedItemsPage from './components/SavedItemsPage.tsx';
 
 
 /**
@@ -89,7 +90,7 @@ const App: React.FC = () => {
       {/* 2. Context Providers wrap the application to provide global state. */}
       <ThemeProvider>
         <CartProvider>
-          <DropProvider>
+          <SavedProvider>
             <ProductProvider>
               {/* 3. HashRouter is used for client-side routing. */}
               <HashRouter>
@@ -103,6 +104,7 @@ const App: React.FC = () => {
                       <Routes>
                         <Route path="/" element={<HomePage />} />
                         <Route path="/shop" element={<ShopPage />} />
+                        <Route path="/saved" element={<SavedItemsPage />} />
                         <Route path="/gallery" element={<GalleryPage />} />
                         <Route path="/product/:id" element={<ProductDetailPage />} />
                       </Routes>
@@ -114,7 +116,7 @@ const App: React.FC = () => {
                 </div>
               </HashRouter>
             </ProductProvider>
-          </DropProvider>
+          </SavedProvider>
         </CartProvider>
       </ThemeProvider>
     </ErrorBoundary>

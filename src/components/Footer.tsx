@@ -1,7 +1,7 @@
 import React from 'react';
-import { InstagramIcon, UserIcon, WhatsAppIcon, LinkedInIcon, GitHubIcon, YouTubeIcon } from './Icons.tsx';
+import { InstagramIcon, UserIcon, WhatsAppIcon, LinkedInIcon, YouTubeIcon } from './Icons.tsx';
 import { Link } from 'react-router-dom';
-import { LOGO_URL } from '../constants.ts';
+import { LOGO_URL, OWNERS } from '../constants.ts';
 import { formatGoogleDriveLink } from '../utils.ts';
 
 /**
@@ -29,6 +29,7 @@ const Footer: React.FC = () => {
             <h4 className="font-semibold text-lg mb-3">Navigate</h4>
             <div className="space-y-2 text-[var(--color-text-secondary)]">
                 <Link to="/shop" className="block hover:text-[var(--color-text-inverted)] transition-colors">Shop</Link>
+                <Link to="/saved" className="block hover:text-[var(--color-text-inverted)] transition-colors">Saved Items</Link>
                 <Link to="/gallery" className="block hover:text-[var(--color-text-inverted)] transition-colors">Styling Gallery</Link>
                 {/* These links point to sections on the homepage. */}
                 <Link to="/#about" className="block hover:text-[var(--color-text-inverted)] transition-colors">About Us</Link>
@@ -51,12 +52,14 @@ const Footer: React.FC = () => {
                     <WhatsAppIcon className="h-6 w-6" />
                 </a>
               </div>
-              {/* Links to founders' Instagram profiles. */}
-              <div className="flex justify-center md:justify-start space-x-4 pt-2">
-                 <a href="https://www.instagram.com/thatskinny.model/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-[var(--color-text-inverted)] hover:text-[var(--color-text-secondary)] transition-colors">
-                    <UserIcon className="h-5 w-5" />
-                    <span className="text-sm">@thatskinny.model</span>
-                </a>
+              {/* Links to founders' Instagram profiles are now dynamically rendered. */}
+              <div className="flex flex-col items-center md:items-start space-y-2 pt-2">
+                {OWNERS.map((owner) => (
+                  <a key={owner.name} href={owner.link} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-[var(--color-text-inverted)] hover:text-[var(--color-text-secondary)] transition-colors">
+                      <UserIcon className="h-5 w-5" />
+                      <span className="text-sm">{owner.handle}</span>
+                  </a>
+                ))}
               </div>
               
             </div>

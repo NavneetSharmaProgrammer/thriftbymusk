@@ -290,3 +290,135 @@ Solutions for common problems.
 *   **AI descriptions are not being generated?**
     *   → This means the Gemini `API_KEY` is not configured in the project's environment. The site will fall back to using whatever text is in the description column.
     *   → Make sure the text in the `description` column is short (under 60 characters) to trigger the AI.
+
+
+========================================
+Thrift by Musk - Website User Manual
+========================================
+
+Welcome! This document is your all-in-one guide to managing, updating, and understanding your Thrift by Musk website.
+
+---
+### 1. Quick Setup Checklist
+---
+For first-time setup or major configuration changes, follow this checklist.
+
+- [ ] **Product Sheet:** Created in Google Sheets with the correct headers (see section 3.1).
+- [ ] **Publish Product Sheet:** Published to the web as a CSV file.
+- [ ] **Update `constants.ts`:**
+    - [ ] `GOOGLE_SHEET_CSV_URL` is filled with the published CSV link.
+    - [ ] **(Recommended)** `GOOGLE_APPS_SCRIPT_URL` is filled with your deployed web app link for automated orders (see Section 3.2).
+    - [ ] `LOGO_URL` and other asset links are updated with your Google Drive links.
+    - [ ] `INSTAGRAM_HANDLE` is set to your store's handle.
+
+---
+### 2. Website Map & Architecture
+---
+This section explains how your website is built. Think of it like a blueprint.
+
+#### The "Control Panel" (`constants.ts`)
+This is the most important file for store management. It's designed so you can change key parts of your site without touching complex code. Here you control:
+-   Your Product Sheet link.
+-   Your automated order submission URL.
+-   Your brand logo, owner photos, and promotional images.
+-   Your Instagram handle.
+
+#### The "Data Engine" (Google Sheets & `productService.ts`)
+-   **Products Sheet (CSV):** This is your master product database.
+-   **`services/productService.ts`:** This is the code that fetches your CSV file from the `GOOGLE_SHEET_CSV_URL`. It reads and parses the data, delivering the final product list to the website.
+
+#### The "Brain" (Context Providers)
+These are special components that hold and manage the website's state (data that can change).
+-   **`ProductContext.tsx`:** Holds all the products after they've been fetched and processed.
+-   **`CartContext.tsx`:** Manages everything related to the shopping cart (items, total price, etc.).
+-   **`ThemeContext.tsx`:** Manages the Light/Dark/Sepia theme switching.
+
+#### The "Pages" (Main Components)
+-   **`HomePage.tsx`:** The landing page. It's built from smaller section components found in `components/home/`.
+-   **`ShopPage.tsx`:** Displays all products with powerful search and filtering.
+-   **`ProductDetailPage.tsx`:** Shows all details, images, and video for a single item. It also automatically displays a "You Might Also Like" section.
+-   **`GalleryPage.tsx`:** A simple, beautiful page to showcase your style photos.
+
+---
+### 3. Content Management
+---
+How to perform day-to-day updates on your store.
+
+#### 3.1 Managing Products & Scheduled Drops
+Your products are managed entirely from a Google Sheet.
+
+**Sheet Columns (Headers must match exactly):**
+`id`, `name`, `description`, `price`, `imageUrls`, `videoUrl`, `category`, `brand`, `size`, `bust`, `length`, `condition`, `sold`, `isUpcoming`, `createdAt`, `dropDate`
+
+**How to Use Key Columns:**
+-   **`id`**: A unique, URL-friendly identifier (e.g., `blue-floral-top-1`). This cannot be changed after creation.
+-   **`imageUrls`**: Add one or more Google Drive image links, separated by a comma (`,`). The first image is the main one.
+-   **`sold`**: Set to `TRUE` to show the "Sold Out" banner. Otherwise, leave it as `FALSE`.
+-   **`isUpcoming`**: This controls product visibility.
+    -   `false`: The product is live and visible on the site.
+    -   `not`: The product is hidden from the website entirely (useful for drafts).
+-   **`createdAt`**: Date the item was added (e.g., `2024-08-15`). Used for sorting by "Newest".
+-   **`dropDate` (Optional & Powerful!):** To schedule a product to go live automatically, enter a date and time in this column.
+    -   **FORMAT:** `YYYY-MM-DDTHH:MM:SSZ` (e.g., `2025-09-01T11:30:00Z`). 'Z' means UTC time.
+    -   Any product with a future `dropDate` will be hidden until that time. The homepage countdown will automatically target the next upcoming `dropDate`.
+
+#### 3.2 Receiving Orders
+There are two ways a customer can place an order.
+
+**Method 1: Automated Orders (Recommended)**
+If you set up the Google Apps Script, a new row is **automatically added** to an "Orders" sheet in your Google Spreadsheet.
+
+**SETUP:**
+1.  **Go to your Products Google Sheet.**
+2.  In the top menu, click **Extensions > Apps Script**. A new browser tab will open with the script editor.
+3.  In the script editor, delete all the code in the `Code.gs` file.
+4.  Open the `ORDER_APPS_SCRIPT.js` file from your website project code. Copy its entire content.
+5.  Paste this content into the empty `Code.gs` file in the Apps Script editor.
+6.  Click the **Save project** icon (looks like a floppy disk).
+7.  Click the blue **Deploy** button in the top-right, then select **New deployment**.
+8.  Click the gear icon next to "Select type" and choose **Web app**.
+9.  Fill out the deployment configuration:
+    *   **Description:** `Thrift by Musk Order Handler` (or similar)
+    *   **Execute as:** `Me (your-email@gmail.com)`
+    *   **Who has access:** `Anyone` (This is critical for the website to be able to send data to it).
+10. Click **Deploy**.
+11. **Authorize Access:** A new window will pop up asking for permission.
+    *   Click **Authorize access**.
+    *   Choose your Google account.
+    *   You will likely see a warning screen saying "Google hasn't verified this app". This is normal. Click **Advanced**, then click **Go to [Your Project Name] (unsafe)**.
+    *   Click **Allow** on the final screen.
+12. After authorization, you will see a "Deployment successfully updated" message with a **Web app URL**. Click the **Copy** button to copy this URL.
+13. **Final Step:** Open `constants.ts` in your website code. Paste the copied URL into the `GOOGLE_APPS_SCRIPT_URL` variable.
+
+**Method 2 & 3: Manual Orders (WhatsApp & Instagram)**
+These are fallback options if the automated script is not configured or fails. The customer is prompted to send you a pre-filled message with their order and shipping details.
+
+#### 3.3 Managing Site-Wide Assets (Logo, Banners, etc.)
+1.  **Upload your image** (e.g., new logo) to Google Drive.
+2.  Get the **"Anyone with the link"** shareable link.
+3.  Open `constants.ts` in the code, find the variable (e.g., `LOGO_URL`), and replace the old link with your new one.
+
+---
+### 4. Setup & Troubleshooting
+---
+
+*   **A product isn't showing up?**
+    *   → Check its `isUpcoming` status in the sheet. It should be `false`. If it has a `dropDate`, ensure the date has passed.
+    *   → Make sure it has a unique `id` and a valid `price`.
+
+*   **Images, logo, or other assets are not visible?**
+    *   → The Google Drive share link is likely incorrect. Make sure it's set to **"Anyone with the link"**.
+
+*   **The countdown timer is wrong?**
+    *   → The `dropDate` in your sheet must be in UTC time. For example, `5:30 PM IST` is `12:00:00Z`.
+    *   → The timer automatically finds the soonest `dropDate` from all your products.
+
+*   **"Submit Order" button leads to manual options?**
+    *   → This means you have not filled in the `GOOGLE_APPS_SCRIPT_URL` in `constants.ts`. Follow the setup guide in section 3.2.
+
+*   **Customer says WhatsApp/Instagram button doesn't work?**
+    *   → This is expected on desktop browsers if the app isn't installed. The order message is automatically copied to their clipboard, so they can easily paste it into WhatsApp Web or the Instagram website.
+---
+End of Manual
+---
+

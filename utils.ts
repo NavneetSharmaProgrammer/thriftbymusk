@@ -1,4 +1,6 @@
 
+
+
 /**
  * Extracts the unique file ID from a standard Google Drive shareable link.
  * Google Drive links come in various formats, but the file ID is the crucial part.
@@ -57,3 +59,27 @@ export const formatGoogleDriveLink = (url:string, type: 'image' | 'video', optio
   // Fallback to the original URL if the type is unrecognized.
   return url;
 };
+
+/**
+ * Converts a File object into a base64 encoded string.
+ * This is useful for embedding image data directly into API requests.
+ * @param file The File object to convert.
+ * @returns A promise that resolves with the base64 encoded string (without the data URI prefix).
+ */
+export const fileToBase64 = (file: File): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => {
+      const result = reader.result as string;
+      // result is a data URL like "data:image/png;base64,iVBORw0KGgo..."
+      // We need to strip the "data:image/png;base64," part.
+      const base64String = result.split(',')[1];
+      if (base64String) {
+          resolve(base64String);
+      } else {
+          reject(new Error("Could not convert file to base64 string."));
+      }
+    };
+    reader.onerror = error => reject(error);
+  });
