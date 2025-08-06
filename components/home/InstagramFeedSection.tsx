@@ -1,8 +1,9 @@
+
 import React from 'react';
-import AnimatedSection from '../AnimatedSection.tsx';
-import { INSTAGRAM_FEED_IMAGES } from '../../constants.ts';
-import { InstagramIcon } from '../Icons.tsx';
-import { formatGoogleDriveLink } from '../../utils.ts';
+import AnimatedSection from '../AnimatedSection';
+import { INSTAGRAM_FEED_IMAGES } from '../../constants';
+import { InstagramIcon } from '../Icons';
+import { formatGoogleDriveLink } from '../../utils';
 
 const InstagramFeedSection: React.FC = () => {
   return (
@@ -13,7 +14,7 @@ const InstagramFeedSection: React.FC = () => {
           <p className="text-lg text-[var(--color-text-secondary)] mt-2">Get daily style inspiration and drop sneak peeks on our Instagram.</p>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 md:gap-4">
-          {INSTAGRAM_FEED_IMAGES.map((item, index) => (
+          {INSTAGRAM_FEED_IMAGES.map((item: { imageUrl: string, link: string }, index: number) => (
             <a key={index} href={item.link} target="_blank" rel="noopener noreferrer" className="group relative aspect-square block overflow-hidden rounded-lg shadow-sm bg-[var(--color-surface-alt)]">
               <img 
                 src={formatGoogleDriveLink(item.imageUrl, 'image', { width: 300 })} 
