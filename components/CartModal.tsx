@@ -1,9 +1,10 @@
+
 import React, { useEffect, useRef, useState, FormEvent } from 'react';
 import { useCart } from '../CartContext';
 import { CloseIcon, ShoppingBagIcon, CheckCircleIcon, WhatsAppIcon, InstagramIcon, LoadingIcon, ArrowLeftIcon } from './Icons';
 import { formatGoogleDriveLink } from '../utils';
-import { CustomerDetails } from '../types';
-import { GOOGLE_APPS_SCRIPT_URL, INSTAGRAM_HANDLE } from '../constants';
+import { CustomerDetails, CartItem } from '../types';
+import { GOOGLE_APPS_SCRIPT_URL } from '../constants';
 
 type SubmissionStatus = 'idle' | 'submitting' | 'success' | 'error';
 
@@ -73,7 +74,7 @@ const CartModal: React.FC = () => {
 
     if (!isCartOpen) return null;
 
-    const total = cartItems.reduce((acc, item) => acc + item.price, 0);
+    const total = cartItems.reduce((acc: number, item: CartItem) => acc + item.price, 0);
     const formattedTotal = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0 }).format(total);
     const FREE_SHIPPING_THRESHOLD = 999;
     const amountNeeded = FREE_SHIPPING_THRESHOLD - total;
