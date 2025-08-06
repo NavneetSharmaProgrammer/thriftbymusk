@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Product } from '../types';
@@ -187,7 +188,7 @@ const ProductDetailPage: React.FC = () => {
 
                   {(product.imageUrls.length > 1 || product.videoUrl) && (
                     <div className="grid grid-cols-5 gap-4">
-                      {product.imageUrls.map((img, index) => (
+                      {product.imageUrls.map((img: string, index: number) => (
                           <button 
                             key={`img-${index}`} 
                             onClick={() => setActiveMedia({ type: 'image', url: img })}
@@ -262,7 +263,7 @@ const ProductDetailPage: React.FC = () => {
             <div className="mt-16 md:mt-24 pt-16 border-t border-[var(--color-border)]">
                 <h2 className="text-3xl font-serif font-bold text-center mb-8">You Might Also Like</h2>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
-                    {relatedProducts.map(relatedProduct => (
+                    {relatedProducts.map((relatedProduct: Product) => (
                         <ProductCard key={relatedProduct.id} product={relatedProduct} />
                     ))}
                 </div>
