@@ -64,7 +64,7 @@ export interface CartContextType {
  */
 export interface SavedContextType {
   savedItems: Product[];
-  saveItem: (product: Product) => void;
+  saveItem: (productId: string) => void;
   unsaveItem: (productId: string) => void;
   isItemSaved: (productId: string) => boolean;
 }
