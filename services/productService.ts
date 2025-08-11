@@ -47,7 +47,13 @@ const parseCSV = (csv: string): Record<string, string>[] => {
 const mapRowToProduct = (row: Record<string, string>): Product | null => {
   try {
     const price = parseInt(row.price, 10);
-    if (isNaN(price)) return null;
+    if (isNaN(price) || !row.id) return null; // ID is mandatory
+
+    // The sheet might have 'TRUE', 'FALSE', 'NOT' in uppercase, or be empty. Default to 'false'.
+    const isUpcomingStatus = (row.isUpcoming || 'false').trim().toLowerCase();
+    
+    // Validate dropDate - should be a valid ISO string or undefined
+    const dropDate = row.dropDate && !isNaN(new Date(row.dropDate).getTime()) ? new Date(row.dropDate).toISOString() : undefined;
 
     return {
       id: row.id,
@@ -62,7 +68,9 @@ const mapRowToProduct = (row: Record<string, string>): Product | null => {
       measurements: { bust: row.bust, length: row.length },
       condition: row.condition,
       sold: row.sold.toUpperCase() === 'TRUE',
-      isUpcoming: row.isUpcoming ? row.isUpcoming.toUpperCase() === 'TRUE' : false,
+      isUpcoming: ['true', 'false', 'not'].includes(isUpcomingStatus) ? isUpcomingStatus : 'false',
+      createdAt: row.createdAt || new Date(0).toISOString(),
+      dropDate: dropDate,
     };
   } catch (error) {
     console.error('Failed to parse a product row. Skipping row.', { row, error });
@@ -95,7 +103,8 @@ const fetchAndProcessProducts = async (): Promise<Product[]> => {
     const parsedData = parseCSV(csvText);
     const products = parsedData.map(mapRowToProduct).filter((p): p is Product => p !== null);
     
-    return products;
+    // Exclude products marked as 'not' to keep them hidden from the site.
+    return products.filter(p => p.isUpcoming !== 'not');
 };
 
 
