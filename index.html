@@ -38,15 +38,15 @@
       
       /* 1. Light Theme (Default) */
       :root {
-        --color-primary: #8B5E34;
-        --color-primary-hover: #7a522d;
-        --color-background: #FDFCFB;
+        --color-primary: #f28e88; /* Soft Pink */
+        --color-primary-hover: #9f2d2c; /* Deep Red */
+        --color-background: #ffffff;
         --color-surface: #ffffff;
-        --color-surface-alt: #f5f5f4;
-        --color-border: #e5e7eb;
-        --color-text-primary: #3D3D3D;
-        --color-text-secondary: #4b5563;
-        --color-text-muted: #9ca3af;
+        --color-surface-alt: #ffebf0; /* Very Light Pink */
+        --color-border: #f0d8db;
+        --color-text-primary: #423f3e; /* Dark Grey */
+        --color-text-secondary: #6B7280;
+        --color-text-muted: #9CA3AF;
         --color-text-inverted: #ffffff;
         --color-danger: #dc2626;
         --color-success: #16a34a;
@@ -56,42 +56,40 @@
 
       /* 2. Dark Theme */
       .dark {
-        --color-primary: #c5a382;
-        --color-primary-hover: #d4b598;
-        --color-background: #121212;
-        --color-surface: #1e1e1e;
-        --color-surface-alt: #2a2a2a;
-        --color-border: #404040;
+        --color-primary: #f28e88; /* Soft Pink */
+        --color-primary-hover: #ffebf0; /* Light Pink for hover */
+        --color-background: #1a1818;
+        --color-surface: #2a2726;
+        --color-surface-alt: #423f3e; /* Dark Grey */
+        --color-border: #525252;
         --color-text-primary: #e5e5e5;
         --color-text-secondary: #a3a3a3;
         --color-text-muted: #737373;
-        --color-text-inverted: #1e1e1e;
+        --color-text-inverted: #1a1818;
         --color-danger: #f87171;
         --color-success: #4ade80;
       }
       
       /* 3. Sepia (Night Protection) Theme */
       .sepia {
-        --color-primary: #804a1b; /* Darkened for better contrast */
-        --color-primary-hover: #693d16; /* Darkened hover state */
-        --color-background: #f4e9db;
-        --color-surface: #fffaf0;
-        --color-surface-alt: #fdf5e6;
+        --color-primary: #9f2d2c; /* Deep Red */
+        --color-primary-hover: #f28e88; /* Soft Pink */
+        --color-background: #fbf5ef;
+        --color-surface: #ffebf0; /* Very Light Pink */
+        --color-surface-alt: #fde6e9;
         --color-border: #eaddc7;
-        --color-text-primary: #4d3b2b; /* Darkened for readability */
-        --color-text-secondary: #604f3f; /* Darkened for accessibility */
-        --color-text-muted: #7a624c; /* Darkened for better visibility */
+        --color-text-primary: #423f3e; /* Dark Grey */
+        --color-text-secondary: #604f3f;
+        --color-text-muted: #7a624c;
         --color-text-inverted: #ffffff;
         --color-danger: #c0392b;
         --color-success: #27ae60;
       }
 
-      /* Image filter for Sepia theme to enhance eye protection */
       .sepia img:not(.no-theme-filter) {
         filter: sepia(0.4) saturate(1.1) brightness(0.95) contrast(0.95);
         transition: filter 0.3s ease-in-out;
       }
-
 
       /* ==========================================================================
          Base & Global Styles
@@ -113,7 +111,10 @@
 
        /* Button Styles */
        .btn {
-            display: inline-block;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
             padding: 0.75rem 2rem;
             text-align: center;
             font-weight: 600;
@@ -135,7 +136,7 @@
             background-color: var(--color-primary-hover);
             border-color: var(--color-primary-hover);
             transform: scale(1.05);
-            box-shadow: 0 4px 15px rgba(139, 94, 52, 0.2);
+            box-shadow: 0 4px 15px rgba(159, 45, 44, 0.2);
         }
         .btn-primary:disabled {
             background-color: var(--color-text-muted);
@@ -154,6 +155,17 @@
             background-color: var(--color-primary);
             color: var(--color-text-inverted);
             transform: scale(1.05);
+        }
+        .btn-manual-order {
+            background-color: var(--color-surface);
+            border: 1px solid var(--color-border);
+            color: var(--color-text-secondary);
+            font-weight: 500;
+        }
+        .btn-manual-order:hover {
+            background-color: var(--color-surface-alt);
+            border-color: var(--color-primary);
+            color: var(--color-primary);
         }
 
         /* Skeleton Loader Animation */
@@ -189,7 +201,7 @@
         .product-card:hover .back {
             opacity: 1;
         }
-        .product-card:hover .product-card-image {
+        .product-card:hover .product-card-image:not(.back) {
             transform: scale(1.05);
         }
         @keyframes fade-in {
@@ -251,6 +263,7 @@
             border-radius: 40% 60% 60% 40% / 70% 30% 70% 30%;
             animation: float 12s ease-in-out infinite;
             z-index: 0;
+            background-color: var(--color-surface-alt);
         }
         
         /* Accessibility Focus Ring */
@@ -363,7 +376,6 @@
         /* Sale Banner Styles */
         .sale-banner {
           position: sticky;
-          /* The header is approx 72px tall (py-4 + h-10 logo) */
           top: 72px; 
           z-index: 39;
           background-color: var(--color-text-primary);
@@ -461,63 +473,54 @@
             transition: transform 0.3s ease;
         }
         
-        /* Segmented Control for Filters */
-        .segmented-control {
+        /* Price Range Slider */
+        .price-slider-container {
+            position: relative;
+            height: 2rem;
             display: flex;
+            align-items: center;
+        }
+        .price-slider-container input[type="range"] {
+            position: absolute;
+            left: 0;
             width: 100%;
-            background-color: var(--color-surface);
-            border-radius: 0.5rem;
-            padding: 0.25rem;
-            border: 1px solid var(--color-border);
-        }
-        .segmented-control-button {
-            flex: 1;
-            padding: 0.5rem;
-            border-radius: 0.375rem;
-            font-size: 0.875rem;
-            font-weight: 500;
-            text-align: center;
-            cursor: pointer;
-            border: none;
+            pointer-events: none;
+            -webkit-appearance: none;
             background-color: transparent;
-            color: var(--color-text-secondary);
-            transition: background-color 0.2s, color 0.2s, box-shadow 0.2s;
         }
-        .segmented-control-button.active {
+        .price-slider-container input[type="range"]::-webkit-slider-thumb {
+            pointer-events: all;
+            width: 1.25rem;
+            height: 1.25rem;
+            border-radius: 9999px;
+            border: 2px solid var(--color-white);
             background-color: var(--color-primary);
-            color: var(--color-text-inverted);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            cursor: pointer;
+            -webkit-appearance: none;
+            transition: transform 0.2s;
+        }
+        .price-slider-container input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+        }
+        .price-slider-container input[type="range"]::-webkit-slider-thumb:active {
+            transform: scale(0.95);
+        }
+        .price-slider-track-container {
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 0.25rem;
+            background-color: var(--color-border);
+            border-radius: 9999px;
+            overflow: hidden;
+        }
+        .price-slider-track-active {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            background-color: var(--color-primary);
         }
 
-        /* Price Filter Buttons */
-        .price-filter-button-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-        .price-filter-button {
-            width: 100%;
-            padding: 0.6rem 0.75rem;
-            border-radius: 0.5rem;
-            font-size: 0.875rem;
-            font-weight: 500;
-            text-align: left;
-            cursor: pointer;
-            border: 1px solid var(--color-border);
-            background-color: var(--color-surface);
-            color: var(--color-text-primary);
-            transition: background-color 0.2s, color 0.2s, border-color 0.2s, transform 0.2s;
-        }
-        .price-filter-button.active {
-            background-color: var(--color-primary);
-            color: var(--color-text-inverted);
-            border-color: var(--color-primary);
-        }
-        .price-filter-button:not(.active):hover {
-            background-color: var(--color-surface-alt);
-            border-color: var(--color-primary);
-            transform: translateX(2px);
-        }
     </style>
   <script type="importmap">
 {
@@ -525,7 +528,8 @@
     "react/": "https://esm.sh/react@^19.1.0/",
     "react": "https://esm.sh/react@^19.1.0",
     "react-dom/": "https://esm.sh/react-dom@^19.1.0/",
-    "react-router-dom": "https://esm.sh/react-router-dom@^7.7.0"
+    "react-router-dom": "https://esm.sh/react-router-dom@^7.7.0",
+    "@google/genai": "https://esm.sh/@google/genai@^1.12.0"
   }
 }
 </script>
