@@ -31,7 +31,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, isFreshDrop }) => {
   const handleSaveClick = (e: React.MouseEvent) => {
     e.preventDefault(); // Prevent navigating to product page
     e.stopPropagation(); // Stop event bubbling
-    isSaved ? unsaveItem(product.id) : saveItem(product);
+    isSaved ? unsaveItem(product.id) : saveItem(product.id);
   };
 
   return (
