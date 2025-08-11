@@ -5,8 +5,7 @@
 export interface Product {
   id: string; // Unique identifier for the product (e.g., 'vintage-cream-blouse')
   name: string; // The display name of the product
-  description: string; // A detailed description of the product, can be AI-generated
-  originalDescription?: string; // The original keywords from the sheet, if AI was used
+  description: string; // A detailed description of the product
   price: number; // The price of the product in the base currency (e.g., INR)
   imageUrls: string[]; // An array of Google Drive links to product images
   videoUrl?: string; // An optional Google Drive link to a product video
@@ -19,7 +18,9 @@ export interface Product {
   };
   condition: string; // The condition of the item (e.g., 'Gently Used', 'New with Tags')
   sold: boolean; // Flag indicating if the product has been sold
-  isUpcoming?: boolean; // Flag for products that are part of a future drop
+  isUpcoming: string; // 'true' for upcoming drop, 'false' for live, 'not' for hidden.
+  createdAt: string; // The date the product was added, for "Fresh Drop" sorting
+  dropDate?: string; // The specific date and time this product is scheduled to go live.
 }
 
 /**
@@ -55,7 +56,19 @@ export interface CartContextType {
   isProductInCart: (productId:string) => boolean; // Function to check if a product is already in the cart
   getWhatsAppMessage: (customerDetails: CustomerDetails) => string; // Generates a pre-filled WhatsApp message
   getInstagramMessage: (customerDetails: CustomerDetails) => { link: string; body: string; }; // Generates a pre-filled Instagram DM
+  showNotification: (message: string) => void; // Function to display a temporary notification
 }
+
+/**
+ * Defines the shape of the context for the "Save for Later" feature.
+ */
+export interface SavedContextType {
+  savedItems: Product[];
+  saveItem: (product: Product) => void;
+  unsaveItem: (productId: string) => void;
+  isItemSaved: (productId: string) => boolean;
+}
+
 
 /**
  * Represents a single image item in the styling gallery.
