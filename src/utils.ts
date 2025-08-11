@@ -1,4 +1,6 @@
 
+
+
 /**
  * Extracts the unique file ID from a standard Google Drive shareable link.
  * Google Drive links come in various formats, but the file ID is the crucial part.
@@ -21,10 +23,10 @@ const getGoogleDriveFileId = (url: string): string | null => {
  *
  * @param url The original Google Drive shareable link.
  * @param type Specifies whether the link is for an 'image' or a 'video', as they require different formats.
- * @param options An optional object for extra parameters, like image width for optimization.
+ * @param options An optional object for extra parameters, like image width or height for optimization.
  * @returns The formatted URL for embedding. If the original URL is not a valid Google Drive link, it is returned unchanged.
  */
-export const formatGoogleDriveLink = (url:string, type: 'image' | 'video', options?: { width?: number }): string => {
+export const formatGoogleDriveLink = (url:string, type: 'image' | 'video', options?: { width?: number, height?: number }): string => {
   // If the URL is empty or not a Google Drive link, return it as is.
   if (!url || !url.includes('drive.google.com')) {
     return url;
@@ -38,8 +40,13 @@ export const formatGoogleDriveLink = (url:string, type: 'image' | 'video', optio
   
   if (type === 'image') {
     // This format provides a direct link to the image content.
-    // Appending `=w{width}` tells Google to serve a resized version of the image, which is great for performance.
-    const sizeParam = options?.width ? `=w${options.width}` : '';
+    // Appending `=w{width}` or `=h{height}` tells Google to serve a resized version of the image.
+    let sizeParam = '';
+    if (options?.width) {
+      sizeParam = `=w${options.width}`;
+    } else if (options?.height) {
+        sizeParam = `=h${options.height}`;
+    }
     return `https://lh3.googleusercontent.com/d/${fileId}${sizeParam}`;
   }
 
@@ -52,3 +59,27 @@ export const formatGoogleDriveLink = (url:string, type: 'image' | 'video', optio
   // Fallback to the original URL if the type is unrecognized.
   return url;
 };
+
+/**
+ * Converts a File object into a base64 encoded string.
+ * This is useful for embedding image data directly into API requests.
+ * @param file The File object to convert.
+ * @returns A promise that resolves with the base64 encoded string (without the data URI prefix).
+ */
+export const fileToBase64 = (file: File): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => {
+      const result = reader.result as string;
+      // result is a data URL like "data:image/png;base64,iVBORw0KGgo..."
+      // We need to strip the "data:image/png;base64," part.
+      const base64String = result.split(',')[1];
+      if (base64String) {
+          resolve(base64String);
+      } else {
+          reject(new Error("Could not convert file to base64 string."));
+      }
+    };
+    reader.onerror = error => reject(error);
+  });
