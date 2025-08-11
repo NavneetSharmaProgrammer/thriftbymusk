@@ -2,25 +2,37 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Product } from '../types.ts';
 import { useCart } from '../CartContext.tsx';
+import { useSaved } from '../SavedContext.tsx';
 import { formatGoogleDriveLink } from '../utils.ts';
+import { HeartIcon } from './Icons.tsx';
 
 interface ProductCardProps {
   product: Product;
+  isFreshDrop?: boolean;
 }
 
 /**
  * A reusable component that displays a single product in a card format.
  * It now requests optimized images and uses theme variables for styling.
  */
-const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+const ProductCard: React.FC<ProductCardProps> = ({ product, isFreshDrop }) => {
   const { addToCart, isProductInCart } = useCart();
+  const { saveItem, unsaveItem, isItemSaved } = useSaved();
+
   const isInCart = isProductInCart(product.id);
+  const isSaved = isItemSaved(product.id);
 
   const formattedPrice = new Intl.NumberFormat('en-IN', {
     style: 'currency',
     currency: 'INR',
     minimumFractionDigits: 0,
   }).format(product.price);
+
+  const handleSaveClick = (e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent navigating to product page
+    e.stopPropagation(); // Stop event bubbling
+    isSaved ? unsaveItem(product.id) : saveItem(product);
+  };
 
   return (
     <div className="product-card bg-[var(--color-surface)] rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden group flex flex-col">
@@ -44,13 +56,23 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             />
           )}
         </div>
+
+        <button
+          onClick={handleSaveClick}
+          className="absolute top-3 right-3 z-10 p-3 bg-[var(--color-surface)]/80 rounded-full text-[var(--color-text-secondary)] hover:text-[var(--color-danger)] transition-all duration-200 hover:scale-110"
+          aria-label={isSaved ? 'Unsave item' : 'Save for later'}
+        >
+          <HeartIcon className={`w-5 h-5 ${isSaved ? 'text-[var(--color-danger)] fill-current' : 'fill-transparent'}`} />
+        </button>
         
         {product.sold ? (
           <div className="sold-out-ribbon">
             <span>Sold Out</span>
           </div>
+        ) : isFreshDrop ? (
+          <div className="absolute top-3 left-3 bg-[var(--color-primary)] text-[var(--color-text-inverted)] text-xs font-semibold px-3 py-1 rounded-full shadow-sm animate-fade-in">🆕 Fresh Drop</div>
         ) : (
-          !isInCart && <div className="absolute top-3 right-3 bg-[var(--color-surface)]/90 text-[var(--color-primary)] text-xs font-semibold px-3 py-1 rounded-full shadow-sm">Only 1 Available</div>
+          !isInCart && <div className="absolute top-3 left-3 bg-[var(--color-surface)]/90 text-[var(--color-primary)] text-xs font-semibold px-3 py-1 rounded-full shadow-sm">Only 1 Available</div>
         )}
       </Link>
       
