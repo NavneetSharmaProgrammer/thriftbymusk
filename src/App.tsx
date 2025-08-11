@@ -1,21 +1,22 @@
 import React, { Suspense } from 'react';
 import { HashRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { CartProvider } from './CartContext.tsx';
-import { DropProvider } from './DropContext.tsx';
 import { ProductProvider } from './ProductContext.tsx';
 import { ThemeProvider } from './ThemeContext.tsx';
-import Header from './components/Header.tsx';
-import Footer from './components/Footer.tsx';
-import CartModal from './components/CartModal.tsx';
-import Notification from './components/Notification.tsx';
-import PageLoader from './components/PageLoader.tsx';
-import SaleBanner from './components/SaleBanner.tsx';
+import { SavedProvider } from './SavedContext.tsx';
+import Header from './components/Header';
+import Footer from './components/Footer';
+import CartModal from './components/CartModal';
+import Notification from './components/Notification';
+import PageLoader from './components/PageLoader';
+import SaleBanner from './components/SaleBanner';
 
 // Statically import page components to ensure reliable module resolution.
-import HomePage from './components/HomePage.tsx';
-import ShopPage from './components/ShopPage.tsx';
-import GalleryPage from './components/GalleryPage.tsx';
-import ProductDetailPage from './components/ProductDetailPage.tsx';
+import HomePage from './components/HomePage';
+import ShopPage from './components/ShopPage';
+import GalleryPage from './components/GalleryPage';
+import ProductDetailPage from './components/ProductDetailPage';
+import SavedItemsPage from './components/SavedItemsPage';
 
 
 /**
@@ -33,7 +34,7 @@ class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { has
   }
 
   // This lifecycle method is triggered after an error has been thrown by a descendant component.
-  static getDerivedStateFromError(error: Error) {
+  static getDerivedStateFromError(_error: Error) {
     // Update state so the next render will show the fallback UI.
     return { hasError: true };
   }
@@ -89,7 +90,7 @@ const App: React.FC = () => {
       {/* 2. Context Providers wrap the application to provide global state. */}
       <ThemeProvider>
         <CartProvider>
-          <DropProvider>
+          <SavedProvider>
             <ProductProvider>
               {/* 3. HashRouter is used for client-side routing. */}
               <HashRouter>
@@ -103,6 +104,7 @@ const App: React.FC = () => {
                       <Routes>
                         <Route path="/" element={<HomePage />} />
                         <Route path="/shop" element={<ShopPage />} />
+                        <Route path="/saved" element={<SavedItemsPage />} />
                         <Route path="/gallery" element={<GalleryPage />} />
                         <Route path="/product/:id" element={<ProductDetailPage />} />
                       </Routes>
@@ -114,7 +116,7 @@ const App: React.FC = () => {
                 </div>
               </HashRouter>
             </ProductProvider>
-          </DropProvider>
+          </SavedProvider>
         </CartProvider>
       </ThemeProvider>
     </ErrorBoundary>
