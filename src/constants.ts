@@ -1,4 +1,3 @@
-
 import { GalleryItem } from './types.ts';
 
 /**
@@ -29,7 +28,7 @@ export const GOOGLE_SHEET_CSV_URL: string = 'https://docs.google.com/spreadsheet
  * Instructions for setup are in USER_MANUAL.txt and in the ORDER_APPS_SCRIPT.js file.
  * If left empty, this checkout method will be disabled and will fall back to the manual DM flow.
  */
-export const GOOGLE_APPS_SCRIPT_URL: string = ''; // <-- PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE
+export const GOOGLE_APPS_SCRIPT_URL: string = 'https://script.google.com/macros/s/AKfycbxvS46MwG2CBsfF008_i5u4IqVlyeKcL7FIX83lvP2Qn04vSeHUmy3RzjuM_hJleH1ykA/exec'; // <-- PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE
 
 
 /**
@@ -52,12 +51,18 @@ export const LOGO_URL = 'https://drive.google.com/file/d/1OZ-4vlBjZOwNplGd8crOui
 export const INSTAGRAM_HANDLE = 'thriftbymusk';
 
 /**
- * 5. NEXT DROP LAUNCH DATE
- * ------------------------
- * Set the target date and time for your next product drop countdown timer.
- * FORMAT: 'YYYY-MM-DDTHH:MM:SSZ' (ISO 8601 format). 'Z' denotes UTC time.
+ * 5. OWNERS/FOUNDERS
+ * ------------------
+ * Information about the store owners for the "About Us" section.
  */
-export const launchDate = '2025-07-24T18:30:00.000Z';
+export const OWNERS = [
+  {
+    name: 'Muskaan Sharma',
+    handle: 'Founder & Curator',
+    image: 'https://drive.google.com/file/d/11QYol0Vj2_4Q5YtF8b-m9E8rN7oP9jXb/view?usp=sharing',
+    link: 'https://www.instagram.com/thriftbymusk/',
+  }
+];
 
 
 /**
@@ -72,51 +77,66 @@ export const launchDate = '2025-07-24T18:30:00.000Z';
  * Images for the Gallery page. Add a new object with a unique `id` and the Google Drive share link.
  */
 export const GALLERY_ITEMS: GalleryItem[] = [
-  {
-    id: 'gallery-image-1',
-    url: 'https://drive.google.com/file/d/18DcWbQ8E27vmsNRvxLtXBGEViGXVzIiX/view?usp=drive_link',
-    caption: 'Styling the Chic Denim Jacket',
-  },
-  { 
-    id: 'gallery-image-2',
-    url: 'https://drive.google.com/file/d/1_3l5t3i32NbZktptdaUp0vLiORM613-G/view?usp=drive_link', 
-    caption: 'Thrifted Threads' 
-  },
-  { 
-    id: 'gallery-image-3',
-    url: 'https://drive.google.com/file/d/1VvoRYvHRvo9TDYzCvqo5xV-rvdnn9iQG/view?usp=sharing', 
-    caption: 'Retro Soul' 
-  },
-  { 
-    id: 'gallery-image-4',
-    url: 'https://drive.google.com/file/d/14EjIhXtkA-X4nszVsE_LaGVKGFF241q3/view?usp=sharing', 
-    caption: 'Sustainable Chic' 
-  },
+    {
+        id: 'gallery-1',
+        url: 'https://drive.google.com/file/d/1j-mDB0T4Raka-26aLh2g_EDg0cr2e7w2/view?usp=sharing',
+        caption: 'Bohemian Summer Look',
+    },
+    {
+        id: 'gallery-2',
+        url: 'https://drive.google.com/file/d/1xGq3K7X6pZ5eN8uJ1rO-vW9bC3lA8sD9/view?usp=sharing',
+        caption: 'City Chic Ensemble',
+    },
+    {
+        id: 'gallery-3',
+        url: 'https://drive.google.com/file/d/1p-R_gH5jK-l_A9cT8kY7o_S6jB5dF4eW/view?usp=sharing',
+        caption: 'Casual Weekend Vibes',
+    },
+    {
+        id: 'gallery-4',
+        url: 'https://drive.google.com/file/d/1X_tG_hJ7kY6o_R8iP9kL-a_W9bC8dD7e/view?usp=sharing',
+        caption: 'Vintage Denim Dreams',
+    },
+    {
+        id: 'gallery-5',
+        url: 'https://drive.google.com/file/d/1sO8P_tM3cR6aT-fG2kY9pB-l_KjA9sD1/view?usp=sharing',
+        caption: 'Elegant Evening Attire',
+    },
+    {
+        id: 'gallery-6',
+        url: 'https://drive.google.com/file/d/1wE7L2p5N_N-HwXyJ2K8qY7tQ8jZ9k5F4/view?usp=sharing',
+        caption: 'Cozy Autumn Layers',
+    },
 ];
 
 /**
  * INSTAGRAM FEED IMAGES
  * ---------------------
- * Images for the "Follow Our Feed" section.
- * Update these with your own Google Drive image links and links to your Instagram posts.
+ * Images for the Instagram feed section on the homepage.
  */
 export const INSTAGRAM_FEED_IMAGES = [
-  { imageUrl: 'https://drive.google.com/file/d/1_3l5t3i32NbZktptdaUp0vLiORM613-G/view?usp=drive_link', link: 'https://www.instagram.com/thriftbymusk/' },
-  { imageUrl: 'https://drive.google.com/file/d/18DcWbQ8E27vmsNRvxLtXBGEViGXVzIiX/view?usp=drive_link', link: 'https://www.instagram.com/thriftbymusk/' },
-  { imageUrl: 'https://drive.google.com/file/d/1VvoRYvHRvo9TDYzCvqo5xV-rvdnn9iQG/view?usp=sharing', link: 'https://www.instagram.com/thriftbymusk/' },
-  { imageUrl: 'https://drive.google.com/file/d/14EjIhXtkA-X4nszVsE_LaGVKGFF241q3/view?usp=sharing', link: 'https://www.instagram.com/thriftbymusk/' },
-  { imageUrl: 'https://drive.google.com/file/d/1L155sUH6LUapn_-sW0yzP99pFrdVdfLr/view?usp=drive_link', link: 'https://www.instagram.com/thriftbymusk/' },
-  { imageUrl: 'https://drive.google.com/file/d/1Lhf7i4_xso2U71b_8tBNPm-xbRX3lvP2/view?usp=drive_link', link: 'https://www.instagram.com/thriftbymusk/' },
-];
-
-/**
- * OWNER/FOUNDER INFORMATION
- * -------------------------
- * Details for the "About Us" section on the homepage.
- * Update with real names, Instagram links, and Google Drive image links.
- */
-export const OWNERS = [
-    { name: '@thatskinny.model', link: 'https://www.instagram.com/thatskinny.model/', image: 'https://drive.google.com/file/d/1rU85JO5KW0B3_I_N4_DnbWTa-qdRBKY7/view?usp=drive_link' },
-    { name: '@beinggauravbisht', link: 'https://www.instagram.com/beinggauravbisht/', image: 'https://drive.google.com/file/d/1Lhf7i4_xso2U71b_8tBNPm-xbRX3lvP2/view?usp=drive_link' },
-    { name: '@priyanka_bisht72200', link: 'https://www.instagram.com/priyanka_bisht72200/', image: 'https://drive.google.com/file/d/1L155sUH6LUapn_-sW0yzP99pFrdVdfLr/view?usp=drive_link' },
+    {
+        imageUrl: 'https://drive.google.com/file/d/1p-R_gH5jK-l_A9cT8kY7o_S6jB5dF4eW/view?usp=sharing',
+        link: 'https://www.instagram.com/thriftbymusk/',
+    },
+    {
+        imageUrl: 'https://drive.google.com/file/d/1sO8P_tM3cR6aT-fG2kY9pB-l_KjA9sD1/view?usp=sharing',
+        link: 'https://www.instagram.com/thriftbymusk/',
+    },
+    {
+        imageUrl: 'https://drive.google.com/file/d/1X_tG_hJ7kY6o_R8iP9kL-a_W9bC8dD7e/view?usp=sharing',
+        link: 'https://www.instagram.com/thriftbymusk/',
+    },
+    {
+        imageUrl: 'https://drive.google.com/file/d/1wE7L2p5N_N-HwXyJ2K8qY7tQ8jZ9k5F4/view?usp=sharing',
+        link: 'https://www.instagram.com/thriftbymusk/',
+    },
+    {
+        imageUrl: 'https://drive.google.com/file/d/1xGq3K7X6pZ5eN8uJ1rO-vW9bC3lA8sD9/view?usp=sharing',
+        link: 'https://www.instagram.com/thriftbymusk/',
+    },
+    {
+        imageUrl: 'https://drive.google.com/file/d/1j-mDB0T4Raka-26aLh2g_EDg0cr2e7w2/view?usp=sharing',
+        link: 'https://www.instagram.com/thriftbymusk/',
+    },
 ];
