@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import AnimatedSection from '../AnimatedSection.tsx';
-import { useDrop } from '../../DropContext.tsx';
+import { useProducts } from '../../ProductContext.tsx';
 
 /**
  * A custom hook to manage countdown logic to a specific target date.
@@ -10,11 +10,12 @@ const useCountdown = (targetDate: string) => {
   const [countDown, setCountDown] = React.useState(countDownDate - new Date().getTime());
 
   React.useEffect(() => {
+    if (!targetDate) return;
     const interval = setInterval(() => {
       setCountDown(countDownDate - new Date().getTime());
     }, 1000);
     return () => clearInterval(interval);
-  }, [countDownDate]);
+  }, [countDownDate, targetDate]);
 
   const getReturnValues = (countDown: number) => {
     if (countDown < 0) return [0, 0, 0, 0];
@@ -34,8 +35,12 @@ const useCountdown = (targetDate: string) => {
 const CountdownTimer: React.FC<{ targetDate: string }> = ({ targetDate }) => {
   const [days, hours, minutes, seconds] = useCountdown(targetDate);
 
-  if (days + hours + minutes + seconds <= 0) {
-    return <div className="text-2xl font-bold font-serif text-[var(--color-primary)] animate-fade-in">The drop is live!</div>;
+  if (!targetDate || (days + hours + minutes + seconds <= 0)) {
+    return (
+        <div className="text-2xl font-bold font-serif text-[var(--color-primary)] animate-fade-in">
+            New finds are live!
+        </div>
+    );
   }
   
   const TimeBox: React.FC<{value: number, label: string}> = ({value, label}) => (
@@ -56,12 +61,36 @@ const CountdownTimer: React.FC<{ targetDate: string }> = ({ targetDate }) => {
 };
 
 const ComingSoonSection: React.FC = () => {
-    const { launchDate } = useDrop();
+    const { products, isLoading } = useProducts();
+
+    const nextDropDate = useMemo(() => {
+        if (isLoading || !products.length) return '';
+
+        const now = new Date();
+        const futureProducts = products
+            .filter(p => p.dropDate && new Date(p.dropDate) > now)
+            .sort((a, b) => new Date(a.dropDate!).getTime() - new Date(b.dropDate!).getTime());
+            
+        return futureProducts[0]?.dropDate || '';
+
+    }, [products, isLoading]);
+
     return (
         <AnimatedSection id="coming-soon" className="container mx-auto px-6 text-center">
             <h2 className="text-3xl md:text-4xl font-serif font-bold mb-4">A Fresh Drop is on its Way...</h2>
-            <p className="text-lg text-[var(--color-text-secondary)] max-w-3xl mx-auto">...and it's everything your wardrobe's been waiting for. Pastels, prints & pretty details - each piece handpicked with love. The countdown has begun!</p>
-            <CountdownTimer targetDate={launchDate} />
+            <p className="text-lg text-[var(--color-text-secondary)] max-w-3xl mx-auto">...and it's everything your wardrobe's been waiting for. Pastels, prints & pretty details - each piece handpicked with love.</p>
+            
+            {isLoading ? (
+                <div className="h-24 flex items-center justify-center">
+                    <div className="h-10 w-48 bg-[var(--color-surface-alt)] rounded-lg animate-pulse"></div>
+                </div>
+            ) : nextDropDate ? (
+                <CountdownTimer targetDate={nextDropDate} />
+            ) : (
+                <div className="text-2xl font-bold font-serif text-[var(--color-primary)] animate-fade-in mt-6">
+                    Stay tuned for our next drop announcement!
+                </div>
+            )}
         </AnimatedSection>
     )
 }
