@@ -59,7 +59,7 @@ export const OWNERS = [
   {
     name: 'Muskaan Sharma',
     handle: 'Founder & Curator',
-    image: 'https://drive.google.com/file/d/11QYol0Vj2_4Q5YtF8b-m9E8rN7oP9jXb/view?usp=sharing',
+    image: 'https://drive.google.com/file/d/1DFdOO5mZ7P5DkQ6Bv8w6EwK7zLa7dl5M/view?usp=sharing',
     link: 'https://www.instagram.com/thriftbymusk/',
   }
 ];
