@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Print test — Thrift by Musk</title>
+  <link rel="stylesheet" href="/print.css" media="print" />
+  <style>
+    body{font-family:Inter,Arial,sans-serif;padding:20px}
+    header{background:#111;color:#fff;padding:12px;margin-bottom:10px}
+    .no-print{background:#f3f3f3;padding:8px;margin-bottom:12px}
+    .product-card{border:1px solid #ddd;padding:12px;margin-bottom:12px}
+  </style>
+</head>
+<body>
+  <header>Site header (should be hidden in print)</header>
+  <div class="no-print">
+    <button onclick="window.print()">Open Print Preview</button>
+  </div>
+
+  <main>
+    <article class="product-card">
+      <h1>Vintage Denim Jacket</h1>
+      <p>Classic piece, pre-loved, size M. A short description that should print nicely.</p>
+      <img src="/og-image.png" alt="product image" style="width:200px">
+    </article>
+
+    <article class="product-card page-break">
+      <h2>Product details</h2>
+      <table>
+        <thead><tr><th>Feature</th><th>Value</th></tr></thead>
+        <tbody>
+          <tr><td>Brand</td><td>Zara</td></tr>
+          <tr><td>Condition</td><td>Good</td></tr>
+        </tbody>
+      </table>
+    </article>
+  </main>
+
+  <footer class="site-footer">Footer (hidden in print)</footer>
+</body>
+</html>

@@ -1,6 +1,4 @@
-# For more information about the robots.txt protocol, see https://www.robotstxt.org/robotstxt.html
 User-agent: *
 Allow: /
 
-# Sitemap
-Sitemap: https://thriftbymusk.vercel/sitemap.xml
+Sitemap: https://thriftbymusk.vercel.app/sitemap.xml

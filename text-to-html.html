@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Text to HTML — Ratio Report</title>
+  <style>
+    :root{
+      --bg:#0f1724;
+      --card:#0b1220;
+      --muted:#98a0ad;
+      --accent:#16a34a; /* green */
+      --danger:#ef4444; /* red */
+      --glass: rgba(255,255,255,0.04);
+    }
+    body{
+      margin:0;
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background: linear-gradient(180deg,#071029 0%, #071a2a 100%);
+      color:#e6eef6;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:28px;
+    }
+    .card{
+      width:100%;
+      max-width:760px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:12px;
+      padding:26px;
+      box-shadow: 0 8px 30px rgba(2,6,23,0.7);
+      border: 1px solid rgba(255,255,255,0.03);
+    }
+    h1{ margin:0 0 6px 0; font-size:20px; letter-spacing:0.2px; }
+    p.lead{ margin:0 0 18px 0; color:var(--muted); font-size:14px; }
+
+    .metric{
+      display:flex;
+      align-items:baseline;
+      gap:14px;
+      margin-bottom:18px;
+    }
+    .value{
+      font-weight:700;
+      font-size:36px;
+      color: #dff7e6;
+      line-height:1;
+    }
+    .sub{ color:var(--muted); font-size:13px; }
+
+    .bar-wrap{ margin-bottom:18px; }
+    .bar{
+      height:18px;
+      background:var(--glass);
+      border-radius:999px;
+      overflow:hidden;
+      position:relative;
+      border:1px solid rgba(255,255,255,0.03);
+    }
+    .bar-current{
+      height:100%;
+      width:1.5%;
+      background: linear-gradient(90deg, var(--danger), #f97316);
+      box-shadow: 0 2px 8px rgba(249,115,22,0.12) inset;
+      transition: width 800ms ease;
+    }
+    .bar-ideal{
+      position:absolute;
+      height:100%;
+      left:25%;
+      right:25%;
+      border-radius:999px;
+      pointer-events:none;
+      box-shadow: 0 0 0 2px rgba(22,163,74,0.08) inset;
+      outline: 2px dashed rgba(22,163,74,0.12);
+    }
+
+    .legend{ display:flex; gap:14px; align-items:center; color:var(--muted); font-size:13px; }
+    .legend .sw{ width:12px; height:12px; border-radius:3px; display:inline-block; }
+    .sw-danger{ background: linear-gradient(90deg,var(--danger),#f97316); }
+    .sw-ideal{ background: linear-gradient(90deg, rgba(22,163,74,0.18), rgba(22,163,74,0.06)); border:1px solid rgba(22,163,74,0.06);}
+    .note{ margin-top:18px; color:var(--muted); font-size:13px; line-height:1.4; }
+
+    @media (max-width:520px){
+      .value{ font-size:28px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="card" role="region" aria-label="Text to HTML ratio report">
+    <h1>Text to HTML</h1>
+    <p class="lead">Current text-to-HTML ratio for your website.</p>
+
+    <div class="metric">
+      <div class="value">1.5%</div>
+      <div class="sub">of the page is plain text (recommended: <strong>25%–75%</strong>)</div>
+    </div>
+
+    <div class="bar-wrap" aria-hidden="true">
+      <div class="bar" title="Text to HTML bar">
+        <div class="bar-current" style="width:1.5%"></div>
+        <div class="bar-ideal" aria-hidden="true"></div>
+      </div>
+    </div>
+
+    <div class="legend" aria-hidden="true">
+      <div style="display:flex;gap:8px;align-items:center">
+        <span class="sw sw-danger"></span>
+        <span>Current: 1.5%</span>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center; margin-left:8px;">
+        <span class="sw sw-ideal"></span>
+        <span>Recommended range: 25% — 75%</span>
+      </div>
+    </div>
+
+    <p class="note">
+      Why it matters: A very low text-to-HTML ratio (like 1.5%) can indicate heavy use of markup, inline styles,
+      or little readable text content — which can hurt SEO and accessibility. Aim for clearer, semantic HTML and
+      more meaningful text content (headings, paragraphs, product descriptions) so search engines and users can
+      understand your pages.
+    </p>
+  </div>
+</body>
+</html>
