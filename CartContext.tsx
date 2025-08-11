@@ -30,6 +30,14 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, [notification]);
 
   /**
+   * Displays a short-lived notification message at the bottom of the screen.
+   * @param message The text to display in the notification.
+   */
+  const showNotification = (message: string) => {
+    setNotification({ message });
+  };
+
+  /**
    * Adds a product to the cart.
    * It checks if the product is not sold and not already in the cart before adding.
    * @param product The product object to add.
@@ -37,7 +45,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const addToCart = (product: Product) => {
     if (!product.sold && !cartItems.some(item => item.id === product.id)) {
       setCartItems(prevItems => [...prevItems, { ...product }]);
-      setNotification({ message: `${product.name} added to bag!` });
+      showNotification(`${product.name} added to bag!`);
     }
   };
 
@@ -118,7 +126,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   // The value object contains all the state and functions to be exposed by the context.
-  const contextValue = { cartItems, isCartOpen, notification, addToCart, removeFromCart, clearCart, toggleCart, isProductInCart, getWhatsAppMessage, getInstagramMessage };
+  const contextValue = { cartItems, isCartOpen, notification, addToCart, removeFromCart, clearCart, toggleCart, isProductInCart, getWhatsAppMessage, getInstagramMessage, showNotification };
 
   return (
     <CartContext.Provider value={contextValue}>
