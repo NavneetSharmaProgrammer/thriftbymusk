@@ -1,3 +1,4 @@
+
 import React, { Suspense } from 'react';
 import { HashRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { CartProvider } from './CartContext.tsx';
@@ -89,9 +90,9 @@ const App: React.FC = () => {
     <ErrorBoundary>
       {/* 2. Context Providers wrap the application to provide global state. */}
       <ThemeProvider>
-        <CartProvider>
+        <ProductProvider>
           <SavedProvider>
-            <ProductProvider>
+            <CartProvider>
               {/* 3. HashRouter is used for client-side routing. */}
               <HashRouter>
                 <ScrollToTop />
@@ -115,9 +116,9 @@ const App: React.FC = () => {
                   <Notification />
                 </div>
               </HashRouter>
-            </ProductProvider>
+            </CartProvider>
           </SavedProvider>
-        </CartProvider>
+        </ProductProvider>
       </ThemeProvider>
     </ErrorBoundary>
   );
