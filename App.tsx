@@ -92,31 +92,31 @@ const App: React.FC = () => {
       <ThemeProvider>
         <ProductProvider>
           <SavedProvider>
-            <CartProvider>
-              {/* 3. HashRouter is used for client-side routing. */}
-              <HashRouter>
-                <ScrollToTop />
-                <div className="flex flex-col min-h-screen text-[var(--color-text-primary)] selection:bg-[var(--color-primary)]/30">
-                  <Header />
-                  <SaleBanner />
-                  <main className="flex-grow">
-                    {/* 4. Suspense can be used for other async operations within pages. */}
-                    <Suspense fallback={<PageLoader />}>
-                      <Routes>
-                        <Route path="/" element={<HomePage />} />
-                        <Route path="/shop" element={<ShopPage />} />
-                        <Route path="/saved" element={<SavedItemsPage />} />
-                        <Route path="/gallery" element={<GalleryPage />} />
-                        <Route path="/product/:id" element={<ProductDetailPage />} />
-                      </Routes>
-                    </Suspense>
-                  </main>
-                  <Footer />
-                  <CartModal />
-                  <Notification />
-                </div>
-              </HashRouter>
-            </CartProvider>
+              <CartProvider>
+                {/* 3. HashRouter is used for client-side routing. */}
+                <HashRouter>
+                  <ScrollToTop />
+                  <div className="flex flex-col min-h-screen text-[var(--color-text-primary)] selection:bg-[var(--color-primary)]/30">
+                    <Header />
+                    <SaleBanner />
+                    <main className="flex-grow">
+                      {/* 4. Suspense can be used for other async operations within pages. */}
+                      <Suspense fallback={<PageLoader />}>
+                        <Routes>
+                          <Route path="/" element={<HomePage />} />
+                          <Route path="/shop" element={<ShopPage />} />
+                          <Route path="/saved" element={<SavedItemsPage />} />
+                          <Route path="/gallery" element={<GalleryPage />} />
+                          <Route path="/product/:id" element={<ProductDetailPage />} />
+                        </Routes>
+                      </Suspense>
+                    </main>
+                    <Footer />
+                    <CartModal />
+                    <Notification />
+                  </div>
+                </HashRouter>
+              </CartProvider>
           </SavedProvider>
         </ProductProvider>
       </ThemeProvider>
