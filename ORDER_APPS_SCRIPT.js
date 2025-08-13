@@ -1,4 +1,3 @@
-
 /**
  * =================================================================================
  *  Thrift by Musk - Google Apps Script for Automated Order Management
@@ -49,6 +48,7 @@ function doPost(e) {
     }
 
     // Parse the JSON data sent from the website's checkout form.
+    // The data is now sent as a plain text string in the request body.
     var orderData = JSON.parse(e.postData.contents);
     var customer = orderData.customerDetails;
     var items = orderData.cartItems;
@@ -82,6 +82,7 @@ function doPost(e) {
     sheet.appendRow(newRow);
 
     // Return a success response to the website.
+    // This response is mainly for debugging; the website will proceed on a successful request.
     return ContentService
       .createTextOutput(JSON.stringify({ 'result': 'success', 'data': JSON.stringify(orderData) }))
       .setMimeType(ContentService.MimeType.JSON);
