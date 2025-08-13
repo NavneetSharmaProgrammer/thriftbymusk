@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState, FormEvent } from 'react';
-import { useCart } from '../CartContext.tsx';
-import { CloseIcon, ShoppingBagIcon, CheckCircleIcon, WhatsAppIcon, InstagramIcon, LoadingIcon, ArrowLeftIcon } from './Icons.tsx';
-import { formatGoogleDriveLink } from '../utils.ts';
-import { CustomerDetails } from '../types.ts';
-import { GOOGLE_APPS_SCRIPT_URL } from '../constants.ts';
+import { useCart } from '../CartContext';
+import { CloseIcon, ShoppingBagIcon, CheckCircleIcon, WhatsAppIcon, InstagramIcon, LoadingIcon, ArrowLeftIcon } from './Icons';
+import { formatGoogleDriveLink } from '../utils';
+import { CustomerDetails } from '../types';
+import { GOOGLE_APPS_SCRIPT_URL } from '../constants';
 
 type SubmissionStatus = 'idle' | 'submitting' | 'error';
 

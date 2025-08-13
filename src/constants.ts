@@ -1,4 +1,4 @@
-import { GalleryItem } from './types.ts';
+import { GalleryItem } from './types';
 
 /**
  * =================================================================

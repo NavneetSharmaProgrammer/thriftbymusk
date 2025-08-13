@@ -1,6 +1,6 @@
 import React, { createContext, useState, useContext, ReactNode, useEffect, useMemo } from 'react';
-import { Product, SavedContextType } from './types.ts';
-import { useProducts } from './ProductContext.tsx';
+import { Product, SavedContextType } from './types';
+import { useProducts } from './ProductContext';
 
 const SavedContext = createContext<SavedContextType | undefined>(undefined);
 

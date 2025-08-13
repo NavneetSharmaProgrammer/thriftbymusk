@@ -2,18 +2,18 @@
 
 import React, { Suspense } from 'react';
 import { HashRouter, Routes, Route, useLocation } from 'react-router-dom';
-import { CartProvider } from './CartContext.tsx';
-import { ProductProvider } from './ProductContext.tsx';
-import { ThemeProvider } from './ThemeContext.tsx';
-import { SavedProvider } from './SavedContext.tsx';
+import { CartProvider } from './CartContext';
+import { ProductProvider } from './ProductContext';
+import { ThemeProvider } from './ThemeContext';
+import { SavedProvider } from './SavedContext';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import CartModal from './components/CartModal';
 import Notification from './components/Notification';
 import PageLoader from './components/PageLoader';
 import SaleBanner from './components/SaleBanner';
-import BackToTopButton from './components/BackToTopButton.tsx';
-import FollowInstagramButton from './components/FollowInstagramButton.tsx';
+import BackToTopButton from './components/BackToTopButton';
+import FollowInstagramButton from './components/FollowInstagramButton';
 
 // Statically import page components to ensure reliable module resolution.
 import HomePage from './components/HomePage';

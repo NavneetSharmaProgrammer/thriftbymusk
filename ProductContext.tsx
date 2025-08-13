@@ -1,6 +1,6 @@
 import React, { createContext, useState, useContext, useEffect, ReactNode, useCallback } from 'react';
-import { Product } from './types.ts';
-import { fetchProducts, NetworkErrorWithStaleData } from './services/productService.ts';
+import { Product } from './types';
+import { fetchProducts, NetworkErrorWithStaleData } from './services/productService';
 
 /**
  * Defines the shape of the data provided by the ProductContext.

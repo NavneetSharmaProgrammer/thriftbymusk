@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
-import { Theme, ThemeContextType } from './types.ts';
+import { Theme, ThemeContextType } from './types';
 
 /**
  * Creates a context for managing the application's theme.

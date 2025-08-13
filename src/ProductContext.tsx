@@ -1,6 +1,6 @@
 import React, { createContext, useState, useContext, useEffect, ReactNode, useCallback } from 'react';
-import { Product } from './types.ts';
-import { fetchProducts } from './services/productService.ts';
+import { Product } from './types';
+import { fetchProducts, NetworkErrorWithStaleData } from './services/productService';
 
 /**
  * Defines the shape of the data provided by the ProductContext.
@@ -41,9 +41,18 @@ export const ProductProvider: React.FC<{ children: ReactNode }> = ({ children })
          setProducts(fetchedProducts);
       }
     } catch (e) {
-      const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred while fetching products.';
-      setError(errorMessage);
-      console.error("Failed to load products:", e);
+      // If it's our custom error, we have stale data to show.
+      if (e instanceof NetworkErrorWithStaleData) {
+        setProducts(e.staleData);
+        const errorMessage = "Couldn't refresh product list. Showing last available data.";
+        setError(errorMessage); // Set a non-blocking warning
+        console.warn(e.message, e);
+      } else {
+        // For all other errors, it's a hard failure.
+        const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred while fetching products.';
+        setError(errorMessage);
+        console.error("Failed to load products:", e);
+      }
     } finally {
       setIsLoading(false);
     }

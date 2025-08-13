@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Product } from '../types.ts';
-import { useCart } from '../CartContext.tsx';
-import { useProducts } from '../ProductContext.tsx';
-import { ArrowLeftIcon, ShareIcon } from './Icons.tsx';
-import { formatGoogleDriveLink } from '../utils.ts';
-import ProductCard from './ProductCard.tsx';
-import ZoomableImage from './ZoomableImage.tsx';
+import { Product } from '../types';
+import { useCart } from '../CartContext';
+import { useProducts } from '../ProductContext';
+import { ArrowLeftIcon, ShareIcon } from './Icons';
+import { formatGoogleDriveLink } from '../utils';
+import ProductCard from './ProductCard';
+import ZoomableImage from './ZoomableImage';
 
 /**
  * The Product Detail Page, which displays all information for a single product.

@@ -1,5 +1,5 @@
-import { Product } from '../types.ts';
-import { GOOGLE_SHEET_CSV_URL } from '../constants.ts';
+import { Product } from '../types';
+import { GOOGLE_SHEET_CSV_URL } from '../constants';
 
 const CACHE_KEY = 'productDataCache';
 // Cache data for 15 minutes

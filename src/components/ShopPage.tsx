@@ -1,13 +1,13 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
-import ProductCard from './ProductCard.tsx';
+import ProductCard from './ProductCard';
 import { 
     SearchIcon, FilterIcon, CloseIcon, ChevronDownIcon, TagIcon, SparklesIcon,
     RulerIcon, ShieldCheckIcon, PriceTagIcon, ArrowsUpDownIcon, CheckCircleIcon
-} from './Icons.tsx';
-import { useProducts } from '../ProductContext.tsx';
-import { Product } from '../types.ts';
-import useDebounce from '../hooks/useDebounce.tsx';
+} from './Icons';
+import { useProducts } from '../ProductContext';
+import { Product } from '../types';
+import useDebounce from '../hooks/useDebounce';
 
 const ITEMS_PER_PAGE = 12;
 

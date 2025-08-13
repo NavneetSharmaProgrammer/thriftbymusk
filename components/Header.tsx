@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { useCart } from '../CartContext.tsx';
-import { useSaved } from '../SavedContext.tsx';
-import { MenuIcon, CloseIcon, ShoppingBagIcon, HeartIcon } from './Icons.tsx';
-import ThemeSwitcher from './ThemeSwitcher.tsx';
-import { LOGO_URL } from '../constants.ts';
-import { formatGoogleDriveLink } from '../utils.ts';
-import AnimatedSection from './AnimatedSection.tsx';
+import { useCart } from '../CartContext';
+import { useSaved } from '../SavedContext';
+import { MenuIcon, CloseIcon, ShoppingBagIcon, HeartIcon } from './Icons';
+import ThemeSwitcher from './ThemeSwitcher';
+import { LOGO_URL } from '../constants';
+import { formatGoogleDriveLink } from '../utils';
+import AnimatedSection from './AnimatedSection';
 
 /**
  * The Header component provides top-level navigation for the site.
