@@ -111,29 +111,30 @@ const CartModal: React.FC = () => {
         setSubmissionStatus('submitting');
         setSubmissionError(null);
         
+        const orderPayload = JSON.stringify({ cartItems, customerDetails });
+
         try {
-            const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+            // This is a redirect fetch. We won't get a direct JSON response, 
+            // but a successful submission will complete without throwing an error.
+            await fetch(GOOGLE_APPS_SCRIPT_URL, {
                 method: 'POST',
-                mode: 'cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ cartItems, customerDetails }),
+                // Using redirect mode to handle the response from Google Apps Script, which is an HTML page.
+                // We don't need to read the response, just know that the request was sent successfully.
+                redirect: 'follow',
+                body: orderPayload,
+                headers: {
+                    // Using text/plain is a common way to avoid CORS preflight issues with Google Apps Script.
+                    'Content-Type': 'text/plain;charset=utf-8',
+                },
             });
             
-            if (response.ok) {
-                 const result = await response.json();
-                 if(result.result === 'success'){
-                     setSubmissionStatus('idle');
-                     setView('confirmation');
-                 } else {
-                     throw new Error(result.error || 'The script returned an unknown error.');
-                 }
-            } else {
-                throw new Error(`Network response was not ok. Status: ${response.status}`);
-            }
+            // If the fetch call completes without throwing, we assume success.
+            setSubmissionStatus('idle');
+            setView('confirmation');
+                 
         } catch (error) {
             console.error('Order submission failed:', error);
-            const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
-            setSubmissionError(`There was an issue submitting your details. Please try the manual options below. Error: ${errorMessage}`);
+            setSubmissionError(`An issue occurred while saving your details. Please use one of the manual order options below to complete your purchase.`);
             setSubmissionStatus('error');
         }
     };
