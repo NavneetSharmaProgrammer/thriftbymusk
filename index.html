@@ -5,8 +5,6 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     
-    <link rel="stylesheet" href="/print.css" media="print" />
-
     <!-- Favicons -->
 <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -102,21 +100,40 @@
       }
 
       /* ==========================================================================
-         Base & Global Styles
+         Base & Fluid Typography System
          ========================================================================== */
       
       html {
         scroll-padding-top: 80px; /* Offset for sticky header */
         scroll-behavior: smooth;
       }
+      
+      /* Set base font-size on body with system font stack for optimal rendering. */
       body {
-        font-family: 'Inter', sans-serif;
+        font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
         background-color: var(--color-background);
         color: var(--color-text-primary);
         transition: background-color 0.3s ease, color 0.3s ease;
+        font-size: clamp(1rem, 0.95rem + 0.25vw, 1.125rem); /* Fluid size from 16px to 18px */
+        line-height: 1.65;
       }
+
+      /* Fluid heading scale using clamp() for responsiveness across all devices */
+      h1 { font-size: clamp(2.5rem, 1.95rem + 2.75vw, 4.5rem); text-wrap: balance; }   /* ~40px to 72px */
+      h2 { font-size: clamp(2rem, 1.6rem + 2vw, 3.5rem); text-wrap: balance; }      /* ~32px to 56px */
+      h3 { font-size: clamp(1.5rem, 1.25rem + 1.25vw, 2.5rem); }   /* ~24px to 40px */
+      h4 { font-size: clamp(1.125rem, 1rem + 0.625vw, 1.75rem); }  /* ~18px to 28px */
+      h5 { font-size: clamp(1.1rem, 0.975rem + 0.625vw, 1.5rem); }    /* ~17.6px to 24px */
+      h6 { font-size: clamp(1rem, 0.925rem + 0.375vw, 1.25rem); }      /* ~16px to 20px */
+      
+      h1, h2, h3, h4, h5, h6 {
+        font-family: 'Playfair Display', 'Georgia', 'Times New Roman', Times, serif;
+        font-weight: 700;
+        line-height: 1.2;
+      }
+      
       .font-serif {
-        font-family: 'Playfair Display', serif;
+        font-family: 'Playfair Display', 'Georgia', 'Times New Roman', Times, serif;
       }
 
        /* Button Styles */
@@ -214,24 +231,155 @@
         .product-card:hover .product-card-image:not(.back) {
             transform: scale(1.05);
         }
-        @keyframes fade-in {
-            from { opacity: 0; transform: translateY(10px); }
+        
+        /* ==========================================================================
+         Enhanced Animation System
+         ========================================================================== */
+        
+        /* Base state for all animated elements */
+        .animate-fadeInUp, .animate-fadeInScale, .animate-slideInLeft, .animate-slideInRight, .animate-page-fade, .animate-slide-in-bl {
+            opacity: 0;
+        }
+        
+        /* Keyframes for new animations */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        .animate-fade-in {
-            animation: fade-in 0.5s ease-out forwards;
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes page-fade {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes toast-in {
+            from { opacity: 0; transform: translate(-50%, 20px); }
+            to { opacity: 1; transform: translate(-50%, 0); }
+        }
+        @keyframes slideInBottomLeft {
+            from {
+                opacity: 0;
+                transform: translate(-100%, 10%);
+            }
+            to {
+                opacity: 1;
+                transform: translate(0, 0);
+            }
         }
 
-        /* Reveal on scroll animation */
-        .reveal {
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        /* Classes to trigger the animations (when 'visible' class is added or on load) */
+        .animate-fadeInUp.visible {
+            animation: fadeInUp 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
         }
-        .reveal.visible {
-            opacity: 1;
+        .animate-fadeInScale.visible {
+            animation: fadeInScale 0.6s ease-out forwards;
+        }
+        .animate-slideInLeft.visible {
+            animation: slideInLeft 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        .animate-slideInRight.visible {
+            animation: slideInRight 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        .animate-page-fade {
+            animation: page-fade 0.5s ease-in-out forwards;
+        }
+        .animate-toast-in {
+            animation: toast-in 0.4s ease-out forwards;
+        }
+        .animate-slide-in-bl {
+            animation: slideInBottomLeft 0.6s 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        /* Word by word text animation */
+        @keyframes reveal-word {
+           from { opacity: 0; transform: translateY(10px); }
+           to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-word-reveal > span {
+            display: inline-block;
+            opacity: 0;
+        }
+        .animate-word-reveal.visible > span {
+            animation: reveal-word 0.6s ease-out forwards;
+        }
+        
+        /* Animated Checkmark */
+        @keyframes draw-check {
+            to { stroke-dashoffset: 0; }
+        }
+        .animated-check {
+            stroke-dasharray: 50;
+            stroke-dashoffset: 50;
+        }
+        .animated-check.visible {
+            animation: draw-check 0.5s ease-out forwards;
+        }
+        
+        /* Hover Effects */
+        .nav-link-hover, .footer-link-hover {
+            position: relative;
+        }
+        .nav-link-hover::after, .footer-link-hover::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            width: 0;
+            height: 1px;
+            background-color: var(--color-primary);
+            transition: width 0.3s ease, left 0.3s ease;
+        }
+        .nav-link-hover:hover::after, .footer-link-hover:hover::after {
+            width: 100%;
+            left: 0;
+        }
+
+        .category-card-hover {
+            position: relative;
+        }
+        .category-card-hover .content-overlay {
+            transform: translateY(100%);
+            transition: transform 0.4s ease-in-out;
+        }
+        .category-card-hover:hover .content-overlay {
             transform: translateY(0);
         }
+        .category-card-hover:hover .bg-image {
+            transform: scale(1.05);
+        }
+        
+        .team-card-hover {
+            transition: transform 0.3s ease;
+        }
+        .team-card-hover:hover {
+             transform: perspective(1000px) rotateY(-3deg) rotateX(3deg) scale(1.05);
+        }
+        .team-card-hover:hover img {
+            transform: scale(1.05);
+        }
+        .team-card-hover img {
+            transition: transform 0.3s ease;
+        }
+
+        @keyframes heartbeat {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        .icon-heartbeat:hover {
+            animation: heartbeat 0.6s ease-in-out;
+        }
+
 
         /* Sold Out Ribbon */
         .sold-out-ribbon {
@@ -327,7 +475,7 @@
             position: fixed;
             bottom: 1.25rem;
             left: 50%;
-            transform: translateX(-50%);
+            /* transform: translateX(-50%); */ /* Handled by animation now */
             padding: 0.75rem 1.5rem;
             border-radius: 9999px;
             background-color: var(--color-text-primary);
@@ -383,7 +531,11 @@
             height: 100%;
         }
 
-        /* Sale Banner Styles */
+        /* Sale Banner Marquee Styles */
+        @keyframes glow-pulse {
+          0%, 100% { text-shadow: 0 0 5px var(--color-primary); }
+          50% { text-shadow: 0 0 15px var(--color-primary); }
+        }
         .sale-banner {
           position: sticky;
           top: 72px; 
@@ -392,38 +544,48 @@
           color: var(--color-background);
           display: flex;
           align-items: center;
-          justify-content: center;
-          padding: 0.5rem 1rem;
-          text-align: center;
-          transition: background-color 0.3s ease, color 0.3s ease;
+          padding: 0.75rem 0;
+          white-space: nowrap;
+          overflow: hidden;
+        }
+        .sale-banner__content-wrapper {
+          display: flex;
+          animation: marquee 30s linear infinite;
         }
         .sale-banner__content {
-          flex-grow: 1;
-          text-decoration: none;
-          color: inherit;
+          flex-shrink: 0;
+          padding: 0 2rem;
           font-weight: 500;
           font-size: 0.875rem;
           letter-spacing: 0.05em;
           text-transform: uppercase;
+          animation: glow-pulse 5s ease-in-out infinite;
+        }
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
         }
         .sale-banner__close {
           position: absolute;
           right: 1rem;
+          top: 50%;
+          transform: translateY(-50%);
           flex-shrink: 0;
-          background: transparent;
+          background: var(--color-text-primary);
           border: none;
           cursor: pointer;
           color: inherit;
           opacity: 0.7;
           transition: opacity 0.2s ease-in-out;
+          z-index: 2; /* To be above the scrolling content */
         }
         .sale-banner__close:hover {
           opacity: 1;
         }
 
+
         /* Custom Select for Sorting */
         .custom-select {
-            appearance: none;
             -webkit-appearance: none;
             -moz-appearance: none;
             appearance: none;
@@ -496,7 +658,6 @@
             left: 0;
             width: 100%;
             pointer-events: none;
-            appearance: none;
             -webkit-appearance: none;
             background-color: transparent;
         }
@@ -533,78 +694,15 @@
             background-color: var(--color-primary);
         }
 
-      /* ==========================================================================
-         Print-Specific Styles
-         ========================================================================== */
-      @media print {
-        /* General Resets */
-        body {
-          background-color: var(--color-white) !important;
-          color: var(--color-black) !important;
+        /* Footer Logo Animation */
+        @keyframes subtle-pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+            100% { transform: scale(1); }
         }
-
-        /* Hide non-essential UI elements */
-        header, 
-        footer, 
-        aside,
-        nav,
-        .btn, /* Hides all major action buttons */
-        .fixed, /* Hides mobile nav, AI stylist FAB, and sticky buttons */
-        .sale-banner,
-        .toast-notification,
-        #instagram-feed, /* Hides Instagram section on homepage */
-        .hero-shape, /* Hides decorative shapes */
-        .thumbnail-button, /* Hides thumbnails on product detail page */
-        .custom-select, /* Hides sorting dropdown on shop page */
-        .lg\\:col-span-1, /* Hides filter sidebar container */
-        .lg\\:hidden, /* Hides mobile-only elements like filter button */
-        [aria-label="Cycle through color themes"],
-        [aria-label*="Share"],
-        [aria-label*="Save"]
-        {
-          display: none !important;
+        .footer-logo-pulse {
+            animation: subtle-pulse 10s ease-in-out infinite;
         }
-
-        /* Hide "You Might Also Like" section on product detail page */
-        .mt-16.md\\:mt-24.pt-16.border-t {
-          display: none !important;
-        }
-
-        /* Content Adjustments */
-        main {
-          margin: 0 !important;
-          padding: 1cm !important;
-        }
-        
-        .container {
-          max-width: 100% !important;
-          padding: 0 !important;
-          margin: 0 !important;
-        }
-
-        /* Simplify product grid on Shop page for printing */
-        .lg\\:col-span-3 {
-          width: 100% !important;
-          grid-column: span 4 / span 4 !important;
-        }
-
-        .grid-cols-2, .md\\:grid-cols-3, .md\\:grid-cols-4 {
-          grid-template-columns: repeat(2, 1fr) !important;
-        }
-
-        /* Ensure product cards don't break across pages */
-        .product-card {
-          page-break-inside: avoid;
-        }
-
-        /* Reset all shadows and animations */
-        *, *::before, *::after {
-            transition: none !important;
-            animation: none !important;
-            box-shadow: none !important;
-            text-shadow: none !important;
-        }
-      }
 
     </style>
   <script type="importmap">
@@ -613,30 +711,13 @@
     "react/": "https://esm.sh/react@^19.1.0/",
     "react": "https://esm.sh/react@^19.1.0",
     "react-dom/": "https://esm.sh/react-dom@^19.1.0/",
-    "react-router-dom": "https://esm.sh/react-router-dom@^7.7.0",
-    "@google/genai": "https://esm.sh/@google/genai@^1.12.0"
+    "react-router-dom": "https://esm.sh/react-router-dom@^7.7.0"
   }
 }
 </script>
 </head>
   <body class="antialiased">
     <div id="root"></div>
-    <noscript>
-      <div style="font-family: 'Inter', sans-serif; line-height: 1.6; padding: 2rem; text-align: center; background-color: #ffebf0; color: #423f3e;">
-        <h1 style="font-family: 'Playfair Display', serif; font-size: 2.5rem; margin-bottom: 1rem;">
-          Welcome to Thrift by Musk
-        </h1>
-        <p style="font-size: 1.1rem; max-width: 600px; margin: 1rem auto;">
-          Shop curated vintage & pre-loved fashion from brands like Zara & Ralph Lauren at Thrift by Musk. We believe in sustainable, timeless style and offer new drops of handpicked luxe pieces, giving beautiful clothes a second story.
-        </p>
-        <p style="margin-top: 2rem; font-weight: bold;">
-          To explore our full interactive store, please enable JavaScript in your browser.
-        </p>
-        <a href="https://www.instagram.com/thriftbymusk/" style="display: inline-block; margin-top: 1rem; padding: 0.75rem 1.5rem; background-color: #f28e88; color: white; text-decoration: none; border-radius: 0.5rem; font-weight: 600;">
-          Visit us on Instagram
-        </a>
-      </div>
-    </noscript>
     <script type="module" src="/index.tsx"></script>
   </body>
 </html>

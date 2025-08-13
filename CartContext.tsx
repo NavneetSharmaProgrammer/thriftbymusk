@@ -82,45 +82,78 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   /**
    * Generates a detailed order summary string for all items in the cart.
-   * @returns An object containing the formatted list of items and the formatted total price.
+   * It now includes discount calculations.
+   * @returns An object containing the formatted list of items and various price components.
    */
   const getOrderSummary = () => {
     const itemsList = cartItems.map(item => {
         const itemPrice = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0 }).format(item.price);
         return `- Product: ${item.name}\n  ID: ${item.id}\n  Size: ${item.size}\n  Category: ${item.category}\n  Price: ${itemPrice}`;
-    }).join('\n\n'); // Use double newline to separate items clearly
+    }).join('\n\n');
 
-    const total = cartItems.reduce((sum, item) => sum + item.price, 0);
-    const formattedTotal = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0 }).format(total);
-    return { itemsList, formattedTotal };
+    const subtotal = cartItems.reduce((sum, item) => sum + item.price, 0);
+    const DISCOUNT_THRESHOLD = 499;
+    const DISCOUNT_PERCENTAGE = 0.20; // 20%
+
+    let discount = 0;
+    if (subtotal > DISCOUNT_THRESHOLD) {
+      discount = subtotal * DISCOUNT_PERCENTAGE;
+    }
+    const finalTotal = subtotal - discount;
+
+    const formatCurrency = (amount: number) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0 }).format(amount);
+
+    return { 
+        itemsList, 
+        subtotal,
+        discount,
+        finalTotal,
+        formattedSubtotal: formatCurrency(subtotal), 
+        formattedDiscount: formatCurrency(discount), 
+        formattedFinalTotal: formatCurrency(finalTotal),
+    };
   };
   
   /**
-   * Generates a pre-filled WhatsApp message with the cart contents and customer details.
+   * Generates a pre-filled WhatsApp message with the cart contents, discount, and customer details.
    * @returns An encoded URI component string for a WhatsApp link.
    */
-  const getWhatsAppMessage = (customerDetails: CustomerDetails) => {
-    const { itemsList, formattedTotal } = getOrderSummary();
-    const header = "Hello Thrift by Musk! I'd like to place the following order:\n\n*ORDER SUMMARY*\n\n";
+    const getWhatsAppMessage = (customerDetails: CustomerDetails) => {
+    const { itemsList, formattedSubtotal, formattedDiscount, formattedFinalTotal, discount } = getOrderSummary();
+    const header = "Hello Thrift by Musk! 👋 I'd like to place an order for the following items:\n\n*ORDER SUMMARY*\n\n";
     
-    const customerInfo = `\n\n*SHIPPING DETAILS*\nName: ${customerDetails.name}\nPhone: ${customerDetails.phone}\nAddress: ${customerDetails.address}, ${customerDetails.city}, ${customerDetails.state} - ${customerDetails.pincode}`;
+    const customerInfo = `\n\n*MY SHIPPING DETAILS*\nName: ${customerDetails.name}\nPhone: ${customerDetails.phone}\nAddress: ${customerDetails.address}, ${customerDetails.city}, ${customerDetails.state} - ${customerDetails.pincode}`;
 
-    const footer = `\n\n*Total:* ${formattedTotal}`;
-    return encodeURIComponent(header + itemsList + customerInfo + footer);
+    let pricingInfo = `\n\nSubtotal: ${formattedSubtotal}`;
+    if (discount > 0) {
+      pricingInfo += `\nDiscount (20% OFF): -${formattedDiscount} 🎉`;
+    }
+    pricingInfo += `\n*Total:* ${formattedFinalTotal}`;
+    
+    const footer = "\n\nPlease confirm my order and let me know the next steps for payment. Thank you! ✨";
+
+    return encodeURIComponent(header + itemsList + customerInfo + pricingInfo + footer);
   };
   
   /**
-   * Generates a pre-filled Instagram DM text with the cart contents and customer details.
+   * Generates a pre-filled Instagram DM text with the cart contents, discount, and customer details.
    * @returns An object with the link and the message body.
    */
   const getInstagramMessage = (customerDetails: CustomerDetails) => {
-    const { itemsList, formattedTotal } = getOrderSummary();
-    const header = `Hello! I'd like to place the following order:\n\nORDER SUMMARY\n\n`;
+    const { itemsList, formattedSubtotal, formattedDiscount, formattedFinalTotal, discount } = getOrderSummary();
+    const header = `Hello! 👋 I'd love to order these treasures:\n\nORDER SUMMARY\n\n`;
     
-    const customerInfo = `\n\nSHIPPING DETAILS\nName: ${customerDetails.name}\nPhone: ${customerDetails.phone}\nAddress: ${customerDetails.address}, ${customerDetails.city}, ${customerDetails.state} - ${customerDetails.pincode}`;
+    const customerInfo = `\n\nMY SHIPPING DETAILS\nName: ${customerDetails.name}\nPhone: ${customerDetails.phone}\nAddress: ${customerDetails.address}, ${customerDetails.city}, ${customerDetails.state} - ${customerDetails.pincode}`;
     
-    const footer = `\n\nTotal: ${formattedTotal}`;
-    const body = header + itemsList + customerInfo + footer;
+    let pricingInfo = `\n\nSubtotal: ${formattedSubtotal}`;
+    if (discount > 0) {
+      pricingInfo += `\nDiscount (20% OFF): -${formattedDiscount} 🎉`;
+    }
+    pricingInfo += `\nFinal Total: ${formattedFinalTotal}`;
+    
+    const footer = "\n\nPlease let me know the next steps for payment. Can't wait! ✨"
+
+    const body = header + itemsList + customerInfo + pricingInfo + footer;
     const link = `https://ig.me/m/${INSTAGRAM_HANDLE}`;
     return { link, body };
   };

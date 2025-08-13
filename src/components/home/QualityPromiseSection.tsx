@@ -1,18 +1,34 @@
 import React from 'react';
 import AnimatedSection from '../AnimatedSection.tsx';
-import { CheckCircleIcon } from '../Icons.tsx';
+import AnimatedCheckIcon from '../icons/AnimatedCheckIcon.tsx';
 
 const QualityPromiseSection: React.FC = () => {
+    const promises = [
+        "Thoroughly cleaned",
+        "Professionally inspected",
+        "Freshly steamed",
+        "Ready to wear & love"
+    ];
+
     return (
-        <AnimatedSection id="quality" className="py-16 bg-[var(--color-surface-alt)]">
+        <section id="quality" className="py-16 bg-[var(--color-surface-alt)]">
             <div className="container mx-auto px-6 text-center">
-                <h2 className="text-3xl md:text-4xl font-serif font-bold mb-4">Our Quality Promise</h2>
-                <div className="flex justify-center items-center gap-3 text-lg text-[var(--color-text-secondary)] max-w-3xl mx-auto">
-                    <CheckCircleIcon className="w-7 h-7 text-[var(--color-success)] flex-shrink-0" />
-                    <p>All items are lovingly cleaned, thoroughly inspected, and carefully steamed before being shipped to their new home.</p>
+                <AnimatedSection as="h2" className="mb-6">Our Promise to You</AnimatedSection>
+                <div className="flex flex-wrap justify-center items-center gap-x-6 gap-y-3 text-[var(--color-text-secondary)] max-w-4xl mx-auto">
+                    {promises.map((promise, index) => (
+                        <AnimatedSection
+                            key={index}
+                            as="div"
+                            className="flex items-center gap-2"
+                            style={{ transitionDelay: `${100 + index * 100}ms` }}
+                        >
+                           <AnimatedCheckIcon className="w-6 h-6 text-[var(--color-success)] flex-shrink-0" />
+                           <span>{promise}</span>
+                        </AnimatedSection>
+                    ))}
                 </div>
             </div>
-        </AnimatedSection>
+        </section>
     );
 };
 

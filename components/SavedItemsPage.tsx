@@ -11,8 +11,8 @@ const SavedItemsPage: React.FC = () => {
     <div className="animate-fade-in">
       <div className="container mx-auto px-4 md:px-6 py-12">
         <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-serif font-bold">Your Saved Items</h1>
-          <p className="text-lg text-[var(--color-text-secondary)] mt-2">
+          <h1>Your Saved Items</h1>
+          <p className="text-[var(--color-text-secondary)] mt-2">
             The treasures you've bookmarked. Don't let them get away!
           </p>
         </div>
@@ -26,7 +26,7 @@ const SavedItemsPage: React.FC = () => {
         ) : (
           <div className="text-center py-16 flex flex-col items-center justify-center h-full bg-[var(--color-surface)] rounded-lg border border-[var(--color-border)] p-6">
             <HeartIcon className="w-16 h-16 text-[var(--color-text-muted)] opacity-50 mb-4" />
-            <h2 className="text-2xl font-serif text-[var(--color-text-secondary)]">
+            <h2 className="text-[var(--color-text-secondary)]">
               Nothing Saved Yet
             </h2>
             <p className="text-[var(--color-text-secondary)] mt-2 max-w-xs">

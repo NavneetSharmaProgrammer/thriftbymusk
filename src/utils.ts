@@ -1,6 +1,4 @@
 
-
-
 /**
  * Extracts the unique file ID from a standard Google Drive shareable link.
  * Google Drive links come in various formats, but the file ID is the crucial part.
@@ -9,7 +7,7 @@
  * @param url The full Google Drive shareable link (e.g., "https://drive.google.com/file/d/1L155sUH6LUapn_-sW0yzP99pFrdVdfLr/view?usp=drive_link").
  * @returns The extracted file ID string, or null if the pattern is not found.
  */
-const getGoogleDriveFileId = (url: string): string | null => {
+export const getGoogleDriveFileId = (url: string): string | null => {
   if (!url) return null;
   // The regex captures the sequence of characters that are not a '/' following '/file/d/'.
   const match = url.match(/drive\.google\.com\/file\/d\/([^/]+)/);

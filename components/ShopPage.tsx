@@ -133,7 +133,7 @@ const FilterSidebarContent: React.FC<FilterSidebarContentProps> = ({
     return (
       <div className={`space-y-2 ${isMobile ? 'pb-24' : ''}`}> {/* Add padding bottom for mobile footer */}
         <div className="flex justify-between items-center p-2">
-          <h2 className="text-xl font-bold font-serif">Filters</h2>
+          <h2 className="font-serif">Filters</h2>
           {activeFilterCount > 0 && (
             <button onClick={clearAllFilters} className="text-sm text-[var(--color-primary)] hover:underline">Clear All</button>
           )}
@@ -432,8 +432,8 @@ const ShopPage: React.FC = () => {
     <div className="animate-fade-in">
         <div className="container mx-auto px-4 md:px-6 py-12">
             <div className="text-center mb-12">
-                <h1 className="text-4xl md:text-5xl font-serif font-bold">All Finds</h1>
-                <p className="text-lg text-[var(--color-text-secondary)] mt-2">Our curated collection of vintage and pre-loved treasures.</p>
+                <h1>All Finds</h1>
+                <p className="text-[var(--color-text-secondary)] mt-2">Our curated collection of vintage and pre-loved treasures.</p>
             </div>
             
             <div className="grid grid-cols-1 lg:grid-cols-4 lg:gap-12">
@@ -522,7 +522,7 @@ const ShopPage: React.FC = () => {
                   <ProductGridSkeleton />
                 ) : error ? (
                    <div className="text-center py-16 flex flex-col items-center justify-center h-full bg-[var(--color-surface)] rounded-lg border border-[var(--color-danger)]/30 p-6">
-                      <h2 className="text-2xl font-serif text-[var(--color-danger)]">Failed to Load Products</h2>
+                      <h2 className="text-[var(--color-danger)]">Failed to Load Products</h2>
                       <p className="text-[var(--color-text-secondary)] mt-2 mb-6 max-w-md">{error}</p>
                       <button onClick={refetch} className="btn btn-secondary">
                         Try Again
@@ -532,7 +532,7 @@ const ShopPage: React.FC = () => {
                     <>
                         {freshDropProducts.length > 0 && (
                             <div className="mb-12">
-                                <h2 className="text-2xl font-semibold font-serif my-4 text-center border-b border-t border-[var(--color-border)] py-3">— Fresh Drop —</h2>
+                                <h2 className="my-4 text-center border-b border-t border-[var(--color-border)] py-3">— Fresh Drop —</h2>
                                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8">
                                     {freshDropProducts.map(product => (
                                         <ProductCard key={product.id} product={product} isFreshDrop={true} />
@@ -559,7 +559,7 @@ const ShopPage: React.FC = () => {
                     </>
                 ) : (
                     <div className="text-center py-16 flex flex-col items-center justify-center h-full bg-[var(--color-surface)] rounded-lg border border-[var(--color-border)] p-6">
-                        <h2 className="text-2xl font-serif text-[var(--color-text-secondary)]">No Treasures Found</h2>
+                        <h2 className="text-[var(--color-text-secondary)]">No Treasures Found</h2>
                         <p className="text-[var(--color-text-secondary)] mt-2 max-w-xs">Try adjusting your search or filters to find your next favorite piece.</p>
                         <button onClick={clearAllFilters} className="btn btn-secondary mt-6">Clear All Filters</button>
                     </div>

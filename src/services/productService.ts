@@ -6,6 +6,20 @@ const CACHE_KEY = 'productDataCache';
 const CACHE_DURATION_MS = 15 * 60 * 1000;
 
 /**
+ * Custom error class to signal that a network fetch failed,
+ * but stale (cached) data is available to be used as a fallback.
+ */
+export class NetworkErrorWithStaleData extends Error {
+  staleData: Product[];
+
+  constructor(message: string, staleData: Product[]) {
+    super(message);
+    this.name = 'NetworkErrorWithStaleData';
+    this.staleData = staleData;
+  }
+}
+
+/**
  * A simple, lightweight CSV parser function.
  * This regex-based approach handles standard CSV formatting, including fields enclosed in
  * double quotes that may contain commas. It assumes fields do not contain newline characters.
@@ -90,13 +104,16 @@ const fetchAndProcessProducts = async (): Promise<Product[]> => {
         throw new Error("Google Sheet CSV URL is not configured.");
     }
 
-    const proxyUrl = `https://cors.eu.org/${csvUrl}`;
-    const response = await fetch(proxyUrl);
+    const response = await fetch(csvUrl, { cache: 'no-store' }); // Use no-store to bypass browser cache
     
     if (!response.ok) {
         throw new Error(`Failed to fetch Google Sheet: ${response.status} ${response.statusText}`);
     }
     const csvText = await response.text();
+    // If the response is an HTML page (like a Google error page), it's not a valid CSV.
+    if (csvText.trim().startsWith('<!DOCTYPE html>')) {
+        throw new Error("Received an HTML page instead of a CSV. Check the Google Sheet URL and permissions.");
+    }
     if (!csvText) {
         return [];
     }
@@ -110,32 +127,33 @@ const fetchAndProcessProducts = async (): Promise<Product[]> => {
 
 /**
  * The main service function to fetch and process product data.
- * It uses a caching layer to improve performance and resilience.
+ * It implements a "stale-while-revalidate" caching strategy.
  *
  * @returns A Promise that resolves to an array of `Product` objects.
  */
 export const fetchProducts = async (): Promise<Product[]> => {
-    // 1. Check cache first
+    let cachedData: { timestamp: number; products: Product[] } | null = null;
     try {
         const cachedItem = localStorage.getItem(CACHE_KEY);
         if (cachedItem) {
-            const { timestamp, products } = JSON.parse(cachedItem);
-            // If cache is fresh, return it immediately
-            if (Date.now() - timestamp < CACHE_DURATION_MS) {
-                console.log("Serving products from fresh cache.");
-                return products;
-            }
+            cachedData = JSON.parse(cachedItem);
         }
     } catch (e) {
         console.error("Failed to read from cache", e);
     }
-    
-    // 2. If cache is stale or missing, fetch from network
+
+    // If cache is fresh, return it immediately
+    if (cachedData && Date.now() - cachedData.timestamp < CACHE_DURATION_MS) {
+        console.log("Serving products from fresh cache.");
+        return cachedData.products;
+    }
+
+    // If cache is stale or missing, fetch from network
     try {
         console.log("Fetching products from network...");
         const networkProducts = await fetchAndProcessProducts();
         
-        // Save fresh data to cache
+        // Save fresh data to local storage
         try {
             localStorage.setItem(CACHE_KEY, JSON.stringify({ timestamp: Date.now(), products: networkProducts }));
             console.log("Product cache updated.");
@@ -144,22 +162,19 @@ export const fetchProducts = async (): Promise<Product[]> => {
         }
         
         return networkProducts;
-    } catch (error) {
-        console.error("Error fetching or processing product data:", error);
+    } catch (networkError) {
+        console.error("Network error fetching products:", networkError);
         
-        // 3. On network error, try to serve stale cache as a fallback
-        try {
-            const cachedItem = localStorage.getItem(CACHE_KEY);
-            if (cachedItem) {
-                const { products } = JSON.parse(cachedItem);
-                console.warn("Serving stale products from cache due to network error.");
-                return products;
-            }
-        } catch (e) {
-            console.error("Failed to read stale cache on network error", e);
+        // On network error, if we have ANY cached data (even stale), throw custom error with it.
+        if (cachedData) {
+            console.warn("Serving stale products from cache due to network error.");
+            throw new NetworkErrorWithStaleData(
+                `Network request failed, but stale data is available. Original error: ${networkError}`,
+                cachedData.products
+            );
         }
 
-        // 4. If network fails and no cache exists, re-throw the error
-        throw error;
+        // If network fails AND there is no cache at all, re-throw the original error.
+        throw networkError;
     }
 };

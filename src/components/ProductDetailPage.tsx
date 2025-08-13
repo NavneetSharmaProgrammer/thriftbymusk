@@ -127,7 +127,7 @@ const ProductDetailPage: React.FC = () => {
   if (!product) {
     return (
       <div className="text-center py-20 container mx-auto px-6 animate-fade-in">
-        <h2 className="text-2xl text-[var(--color-text-secondary)] font-serif">Oops! Treasure not found.</h2>
+        <h2 className="text-[var(--color-text-secondary)]">Oops! Treasure not found.</h2>
         <p className="mt-4 text-[var(--color-text-secondary)]">This piece might have been snapped up already or never existed.</p>
         <Link to="/shop" className="btn btn-primary mt-8">Back to Shop</Link>
       </div>
@@ -138,8 +138,8 @@ const ProductDetailPage: React.FC = () => {
   if (!isProductLive) {
     return (
       <div className="text-center py-20 container mx-auto px-6 animate-fade-in">
-        <h2 className="text-3xl font-serif text-[var(--color-primary)]">It's on the way!</h2>
-        <p className="mt-4 text-[var(--color-text-secondary)] text-lg max-w-md mx-auto">
+        <h2 className="text-[var(--color-primary)]">It's on the way!</h2>
+        <p className="mt-4 text-[var(--color-text-secondary)] max-w-md mx-auto">
           This exclusive piece is part of an upcoming drop. Keep an eye on the countdown on our homepage!
         </p>
         <Link to="/" className="btn btn-secondary mt-8">Back to Homepage</Link>
@@ -218,7 +218,7 @@ const ProductDetailPage: React.FC = () => {
               
               <div className="flex flex-col">
                   <p className="text-sm text-[var(--color-text-secondary)]">{product.category}</p>
-                  <h1 className="text-4xl md:text-5xl font-serif font-bold mt-1">{product.name}</h1>
+                  <h1 className="mt-1">{product.name}</h1>
                   
                   <div className="flex items-center justify-between my-4">
                       <p className="text-4xl font-serif text-[var(--color-primary)]">{formattedPrice}</p>
@@ -228,7 +228,7 @@ const ProductDetailPage: React.FC = () => {
                   </div>
                   
                   <div className="border-y border-[var(--color-border)] py-4 my-4">
-                      <h2 className="text-lg font-semibold mb-3">Specifications</h2>
+                      <h2 className="font-semibold mb-3">Specifications</h2>
                       <table className="w-full text-sm">
                           <tbody>
                               <tr className="border-b border-[var(--color-border)]"><td className="py-2 text-[var(--color-text-secondary)]">Brand</td><td className="py-2 font-medium text-right">{product.brand}</td></tr>
@@ -241,7 +241,7 @@ const ProductDetailPage: React.FC = () => {
                   </div>
                   
                   <div className="space-y-4">
-                      <h2 className="text-lg font-semibold">Description</h2>
+                      <h2 className="font-semibold">Description</h2>
                       <p className="text-[var(--color-text-secondary)]">{product.description}</p>
                   </div>
                   
@@ -260,7 +260,7 @@ const ProductDetailPage: React.FC = () => {
           {/* You Might Also Like Section */}
           {relatedProducts.length > 0 && (
             <div className="mt-16 md:mt-24 pt-16 border-t border-[var(--color-border)]">
-                <h2 className="text-3xl font-serif font-bold text-center mb-8">You Might Also Like</h2>
+                <h2 className="text-center mb-8">You Might Also Like</h2>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
                     {relatedProducts.map(relatedProduct => (
                         <ProductCard key={relatedProduct.id} product={relatedProduct} />

@@ -20,7 +20,7 @@ const Notification: React.FC = () => {
   // The CartContext handles clearing the notification after a few seconds.
   return (
     <div
-      className="toast-notification animate-fade-in"
+      className="toast-notification animate-toast-in"
       role="status" // Informs screen readers that this element's content may change.
       aria-live="polite" // Informs screen readers to announce changes politely without interrupting the user.
     >

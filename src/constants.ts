@@ -51,16 +51,38 @@ export const LOGO_URL = 'https://drive.google.com/file/d/1OZ-4vlBjZOwNplGd8crOui
 export const INSTAGRAM_HANDLE = 'thriftbymusk';
 
 /**
- * 5. OWNERS/FOUNDERS
+ * 5. TEAM MEMBERS
  * ------------------
- * Information about the store owners for the "About Us" section.
+ * Information about the store's team for the "Meet The Team" section.
  */
 export const OWNERS = [
   {
-    name: 'Muskaan Sharma',
-    handle: 'Founder & Curator',
-    image: 'https://drive.google.com/file/d/11QYol0Vj2_4Q5YtF8b-m9E8rN7oP9jXb/view?usp=sharing',
+    name: 'Priyanka Bisht',
+    handle: 'Co-Founder & Graphic Designer',
+    description: '🎨 The creative mind behind our brand’s visual identity, Priyanka turns ideas into designs that capture the spirit of Thrift by Musk.',
+    image: 'https://drive.google.com/file/d/1SivWPMfAqhJd23a4fvOFGgU32sOEnx0B/view?usp=drive_link',
     link: 'https://www.instagram.com/thriftbymusk/',
+  },
+  {
+    name: 'Muskaan Sharma',
+    handle: 'Co-Founder & Fashion Model',
+    description: '👗 The face of our brand and a style visionary, Muskaan curates looks that blend timeless elegance with modern thrift chic.',
+    image: 'https://drive.google.com/file/d/1DFdOO5mZ7P5DkQ6Bv8w6EwK7zLa7dl5M/view?usp=sharing',
+    link: 'https://www.instagram.com/thatskinny.model?utm_source=ig_web_button_share_sheet&igsh=MTY0MmtvaHg3Zjg0aQ==',
+  },
+  {
+    name: 'Gaurav Bisht',
+    handle: 'Athlete & Creative Partner',
+    description: '📸 With an athlete’s discipline and a storyteller’s vision, Gaurav captures the essence of Thrift by Musk—bringing our brand moments to life through striking photography and creative direction.',
+    image: 'https://drive.google.com/file/d/1X_tG_hJ7kY6o_R8iP9kL-a_W9bC8dD7e/view?usp=sharing', // Reusing a gallery image as placeholder
+    link: 'https://www.instagram.com/beinggauravbisht?utm_source=ig_web_button_share_sheet&igsh=cHBjNWh2N2dkM3Vz',
+  },
+  {
+    name: 'Navneet Sharma',
+    handle: 'Developer & Technical Lead',
+    description: '💻 The mind behind the scenes, Navneet ensures the Thrift by Musk experience is as smooth online as it is in person.',
+    image: 'https://drive.google.com/file/d/1j-mDB0T4Raka-26aLh2g_EDg0cr2e7w2/view?usp=sharing', // Reusing a gallery image as placeholder
+    link: 'https://www.instagram.com/navneet_sharma_12/?__pwa=1',
   }
 ];
 
@@ -70,6 +92,14 @@ export const OWNERS = [
  *  STATIC CONTENT (Managed via Google Drive)
  * =================================================================
  */
+
+/**
+ * PACKAGING VIDEO
+ * ----------------
+ * Video for the "Behind the Scenes" packaging section on the homepage.
+ */
+export const PACKAGING_VIDEO_URL = '/Video/Packaging_video.mp4';
+
 
 /**
  * GALLERY IMAGES
@@ -106,37 +136,5 @@ export const GALLERY_ITEMS: GalleryItem[] = [
         id: 'gallery-6',
         url: 'https://drive.google.com/file/d/1wE7L2p5N_N-HwXyJ2K8qY7tQ8jZ9k5F4/view?usp=sharing',
         caption: 'Cozy Autumn Layers',
-    },
-];
-
-/**
- * INSTAGRAM FEED IMAGES
- * ---------------------
- * Images for the Instagram feed section on the homepage.
- */
-export const INSTAGRAM_FEED_IMAGES = [
-    {
-        imageUrl: 'https://drive.google.com/file/d/1p-R_gH5jK-l_A9cT8kY7o_S6jB5dF4eW/view?usp=sharing',
-        link: 'https://www.instagram.com/thriftbymusk/',
-    },
-    {
-        imageUrl: 'https://drive.google.com/file/d/1sO8P_tM3cR6aT-fG2kY9pB-l_KjA9sD1/view?usp=sharing',
-        link: 'https://www.instagram.com/thriftbymusk/',
-    },
-    {
-        imageUrl: 'https://drive.google.com/file/d/1X_tG_hJ7kY6o_R8iP9kL-a_W9bC8dD7e/view?usp=sharing',
-        link: 'https://www.instagram.com/thriftbymusk/',
-    },
-    {
-        imageUrl: 'https://drive.google.com/file/d/1wE7L2p5N_N-HwXyJ2K8qY7tQ8jZ9k5F4/view?usp=sharing',
-        link: 'https://www.instagram.com/thriftbymusk/',
-    },
-    {
-        imageUrl: 'https://drive.google.com/file/d/1xGq3K7X6pZ5eN8uJ1rO-vW9bC3lA8sD9/view?usp=sharing',
-        link: 'https://www.instagram.com/thriftbymusk/',
-    },
-    {
-        imageUrl: 'https://drive.google.com/file/d/1j-mDB0T4Raka-26aLh2g_EDg0cr2e7w2/view?usp=sharing',
-        link: 'https://www.instagram.com/thriftbymusk/',
     },
 ];

@@ -6,6 +6,7 @@ import { MenuIcon, CloseIcon, ShoppingBagIcon, HeartIcon } from './Icons.tsx';
 import ThemeSwitcher from './ThemeSwitcher.tsx';
 import { LOGO_URL } from '../constants.ts';
 import { formatGoogleDriveLink } from '../utils.ts';
+import AnimatedSection from './AnimatedSection.tsx';
 
 /**
  * The Header component provides top-level navigation for the site.
@@ -84,7 +85,7 @@ const Header: React.FC = () => {
 
   // Function to determine the CSS classes for NavLink components based on their active state.
   const navLinkClasses = ({ isActive }: { isActive: boolean }) =>
-    `py-2 text-xl md:text-base transition-colors duration-300 ${isActive ? 'text-[var(--color-primary)] font-semibold' : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'}`;
+    `py-2 text-xl md:text-base transition-colors duration-300 nav-link-hover ${isActive ? 'text-[var(--color-primary)] font-semibold' : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'}`;
 
   // JSX for the navigation links, reused in both desktop and mobile menus.
   const navLinks = (
@@ -92,7 +93,7 @@ const Header: React.FC = () => {
       <NavLink to="/" className={navLinkClasses} onClick={closeMenu} end>Home</NavLink>
       <NavLink to="/shop" className={navLinkClasses} onClick={closeMenu}>Shop</NavLink>
       <NavLink to="/gallery" className={navLinkClasses} onClick={closeMenu}>Gallery</NavLink>
-      <Link to="/#about" onClick={(e) => handleNavClick(e, '#about')} className="text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] py-2 text-xl md:text-base transition-colors duration-300">About</Link>
+      <Link to="/#about" onClick={(e) => handleNavClick(e, '#about')} className={`py-2 text-xl md:text-base transition-colors duration-300 nav-link-hover text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]`}>About</Link>
     </>
   );
 
@@ -101,21 +102,21 @@ const Header: React.FC = () => {
       <header className="bg-[var(--color-surface)]/80 backdrop-blur-lg sticky top-0 z-40 shadow-sm border-b border-[var(--color-border)]">
         <div className="container mx-auto px-6 py-4">
           <div className="flex justify-between items-center">
-            <Link to="/" className="flex items-center gap-3 group">
+            <AnimatedSection as={Link} to="/" className="flex items-center gap-3 group" style={{transitionDelay: '100ms'}}>
               <img 
                 src={formatGoogleDriveLink(LOGO_URL, 'image', { width: 40 })} 
                 alt="Thrift by Musk Logo" 
                 className="h-10 w-auto transition-transform duration-300 group-hover:scale-105 no-theme-filter" 
               />
               <span className="hidden sm:block text-2xl font-serif font-bold text-[var(--color-text-primary)]">Thrift by Musk</span>
-            </Link>
+            </AnimatedSection>
             
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center space-x-8">
-              {navLinks}
+              <AnimatedSection as="div" className="flex items-center space-x-8" style={{transitionDelay: '200ms'}}>{navLinks}</AnimatedSection>
             </nav>
             
-            <div className="flex items-center space-x-4">
+            <AnimatedSection as="div" className="flex items-center space-x-4" style={{transitionDelay: '300ms'}}>
                {/* Theme Switcher */}
                <ThemeSwitcher />
             
@@ -162,7 +163,7 @@ const Header: React.FC = () => {
               >
                 <MenuIcon className="h-6 w-6" />
               </button>
-            </div>
+            </AnimatedSection>
           </div>
         </div>
       </header>

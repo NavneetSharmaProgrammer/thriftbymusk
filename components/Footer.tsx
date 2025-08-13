@@ -17,7 +17,7 @@ const Footer: React.FC = () => {
           
           {/* Column 1: Brand Information */}
           <div className="flex flex-col items-center md:items-start">
-            <div className="flex items-center gap-3 mb-3">
+            <div className="flex items-center gap-3 mb-3 footer-logo-pulse">
               <img src={formatGoogleDriveLink(LOGO_URL, 'image', { width: 32 })} alt="Thrift by Musk Logo" className="h-8 w-auto rounded-md no-theme-filter" />
               <span className="text-xl font-serif font-bold">Thrift by Musk</span>
             </div>
@@ -28,12 +28,12 @@ const Footer: React.FC = () => {
           <div className="flex flex-col items-center md:items-start">
             <h4 className="font-semibold text-lg mb-3">Navigate</h4>
             <div className="space-y-2 text-[var(--color-text-secondary)]">
-                <Link to="/shop" className="block hover:text-[var(--color-text-inverted)] transition-colors">Shop</Link>
-                <Link to="/saved" className="block hover:text-[var(--color-text-inverted)] transition-colors">Saved Items</Link>
-                <Link to="/gallery" className="block hover:text-[var(--color-text-inverted)] transition-colors">Styling Gallery</Link>
+                <Link to="/shop" className="block hover:text-[var(--color-text-inverted)] transition-colors footer-link-hover w-fit mx-auto md:mx-0">Shop</Link>
+                <Link to="/saved" className="block hover:text-[var(--color-text-inverted)] transition-colors footer-link-hover w-fit mx-auto md:mx-0">Saved Items</Link>
+                <Link to="/gallery" className="block hover:text-[var(--color-text-inverted)] transition-colors footer-link-hover w-fit mx-auto md:mx-0">Styling Gallery</Link>
                 {/* These links point to sections on the homepage. */}
-                <Link to="/#about" className="block hover:text-[var(--color-text-inverted)] transition-colors">About Us</Link>
-                <Link to="/#quality" className="block hover:text-[var(--color-text-inverted)] transition-colors">Our Promise</Link>
+                <Link to="/#about" className="block hover:text-[var(--color-text-inverted)] transition-colors footer-link-hover w-fit mx-auto md:mx-0">About Us</Link>
+                <Link to="/#quality" className="block hover:text-[var(--color-text-inverted)] transition-colors footer-link-hover w-fit mx-auto md:mx-0">Our Promise</Link>
             </div>
           </div>
 

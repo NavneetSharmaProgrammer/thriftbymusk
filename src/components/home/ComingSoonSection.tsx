@@ -37,7 +37,7 @@ const CountdownTimer: React.FC<{ targetDate: string }> = ({ targetDate }) => {
 
   if (!targetDate || (days + hours + minutes + seconds <= 0)) {
     return (
-        <div className="text-2xl font-bold font-serif text-[var(--color-primary)] animate-fade-in">
+        <div className="font-serif text-[var(--color-primary)] animate-fade-in">
             New finds are live!
         </div>
     );
@@ -77,8 +77,10 @@ const ComingSoonSection: React.FC = () => {
 
     return (
         <AnimatedSection id="coming-soon" className="container mx-auto px-6 text-center">
-            <h2 className="text-3xl md:text-4xl font-serif font-bold mb-4">A Fresh Drop is on its Way...</h2>
-            <p className="text-lg text-[var(--color-text-secondary)] max-w-3xl mx-auto">...and it's everything your wardrobe's been waiting for. Pastels, prints & pretty details - each piece handpicked with love.</p>
+            <h2>A Fresh Drop is Almost Here...</h2>
+            <p className="text-[var(--color-text-secondary)] max-w-3xl mx-auto mt-2">
+              This season, think <strong>dreamy pastels, delicate prints, and exquisite details</strong>—each garment lovingly curated for the modern, conscious wardrobe.
+            </p>
             
             {isLoading ? (
                 <div className="h-24 flex items-center justify-center">

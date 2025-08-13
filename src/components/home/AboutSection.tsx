@@ -2,30 +2,51 @@ import React from 'react';
 import AnimatedSection from '../AnimatedSection.tsx';
 import { OWNERS } from '../../constants.ts';
 import { formatGoogleDriveLink } from '../../utils.ts';
+import { InstagramIcon } from '../Icons.tsx';
 
 const AboutSection: React.FC = () => {
   return (
-    <AnimatedSection id="about" className="py-16 md:py-0 pb-16 md:pb-24">
+    <div id="about" className="py-16 md:pb-24 bg-[var(--color-surface)]">
       <div className="container mx-auto px-6">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-serif font-bold mb-4">About Us</h2>
-          <p className="text-lg text-[var(--color-text-secondary)] max-w-3xl mx-auto">Thrift by Musk is the passion project of Muskaan Sharma, a Delhi-based freelance fashion model. With a mantra of "Playing Dress-up for a living," Muskaan brings her professional eye for style and love for sustainable fashion to every handpicked piece. This store is a reflection of her mission: to give timeless clothing a second story and empower you to express your unique style, guilt-free.</p>
-        </div>
-        <div className="flex flex-wrap justify-center gap-8 md:gap-12">
-          {OWNERS.map(owner => (
-            <a href={owner.link} key={owner.name} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center group text-center">
+        <AnimatedSection as="div" className="text-center mb-12">
+          <h2 className="mb-4">Meet Our Co-Founders</h2>
+          <p className="text-[var(--color-text-secondary)] max-w-2xl mx-auto">The creative minds and driving forces behind every curated piece and styled look at Thrift by Musk.</p>
+        </AnimatedSection>
+        {/* Responsive grid for team members with staggered animation */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {OWNERS.map((owner, index) => (
+            <AnimatedSection
+              key={owner.name}
+              as="div"
+              className="flex flex-col bg-[var(--color-surface-alt)] p-6 rounded-lg shadow-sm hover:shadow-xl transition-all duration-300 team-card-hover"
+              animationClass={index % 2 === 0 ? 'animate-slideInLeft' : 'animate-slideInRight'}
+              style={{ transitionDelay: `${(index % 2) * 150}ms` }}
+            >
               <img 
-                src={formatGoogleDriveLink(owner.image, 'image', { width: 200 })} 
-                alt={owner.name} 
-                className="w-32 h-32 rounded-full object-cover shadow-lg mb-4 transition-transform duration-300 group-hover:scale-105 bg-[var(--color-surface-alt)]" 
+                src={formatGoogleDriveLink(owner.image, 'image', { width: 240 })} 
+                alt={`Profile of ${owner.name}`}
+                className="w-32 h-32 rounded-full object-cover shadow-lg mb-4 border-4 border-[var(--color-surface)] mx-auto" 
               />
-              <span className="font-semibold text-lg text-[var(--color-text-primary)] group-hover:text-[var(--color-primary)] transition-colors">{owner.name}</span>
-              <span className="text-sm text-[var(--color-text-secondary)]">{owner.handle}</span>
-            </a>
+              <div className="text-center flex-grow flex flex-col">
+                  <h3>{owner.name}</h3>
+                  <p className="text-sm font-medium text-[var(--color-primary)] mb-3">{owner.handle}</p>
+                  <p className="text-sm text-[var(--color-text-secondary)] flex-grow mb-4">{owner.description}</p>
+                  <a 
+                    href={owner.link} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="mt-auto inline-flex items-center justify-center gap-2 text-sm font-semibold text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] transition-colors icon-heartbeat"
+                    aria-label={`View ${owner.name}'s Instagram profile`}
+                  >
+                    <InstagramIcon className="w-5 h-5" />
+                    <span>Instagram</span>
+                  </a>
+              </div>
+            </AnimatedSection>
           ))}
         </div>
       </div>
-    </AnimatedSection>
+    </div>
   );
 };
 

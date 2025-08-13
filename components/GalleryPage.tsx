@@ -23,8 +23,8 @@ const GalleryPage: React.FC = () => {
 
         {/* Page header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-serif font-bold">Styled by You. Loved Forever.</h1>
-          <p className="text-lg text-[var(--color-text-secondary)] mt-2">Our community bringing thrifted treasures to life.</p>
+          <h1>Styled by You. Loved Forever.</h1>
+          <p className="text-[var(--color-text-secondary)] mt-2">Our community bringing thrifted treasures to life.</p>
         </div>
         
         {/* Responsive grid for the gallery images. */}
