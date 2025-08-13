@@ -1,6 +1,6 @@
 import React from 'react';
 import AnimatedSection from '../AnimatedSection.tsx';
-import AnimatedCheckIcon from '../AnimatedCheckIcon.tsx';
+import AnimatedCheckIcon from '../icons/AnimatedCheckIcon.tsx';
 
 const QualityPromiseSection: React.FC = () => {
     const promises = [
