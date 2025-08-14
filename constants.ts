@@ -57,13 +57,6 @@ export const INSTAGRAM_HANDLE = 'thriftbymusk';
  */
 export const OWNERS = [
   {
-    name: 'Priyanka Bisht',
-    handle: 'Co-Founder & Graphic Designer',
-    description: '🎨 The creative mind behind our brand’s visual identity, Priyanka turns ideas into designs that capture the spirit of Thrift by Musk.',
-    image: 'https://drive.google.com/file/d/1SivWPMfAqhJd23a4fvOFGgU32sOEnx0B/view?usp=drive_link',
-    link: 'https://www.instagram.com/thriftbymusk/',
-  },
-  {
     name: 'Muskaan Sharma',
     handle: 'Co-Founder & Fashion Model',
     description: '👗 The face of our brand and a style visionary, Muskaan curates looks that blend timeless elegance with modern thrift chic.',
@@ -73,15 +66,22 @@ export const OWNERS = [
   {
     name: 'Gaurav Bisht',
     handle: 'Athlete & Creative Partner',
-    description: '📸 With an athlete’s discipline and a storyteller’s vision, Gaurav captures the essence of Thrift by Musk—bringing our brand moments to life through striking photography and creative direction.',
-    image: 'https://drive.google.com/file/d/1X_tG_hJ7kY6o_R8iP9kL-a_W9bC8dD7e/view?usp=sharing', // Reusing a gallery image as placeholder
+    description: '📸 With an athlete’s discipline and a storyteller’s vision, Gaurav captures the essence of Thrift by Musk, bringing our brand moments to life through striking photography and creative direction.',
+    image: 'https://drive.google.com/file/d/1VInTuurune5knq2zEo0ttPf_MDN2N_Mq/view?usp=sharing', // Reusing a gallery image as placeholder
     link: 'https://www.instagram.com/beinggauravbisht?utm_source=ig_web_button_share_sheet&igsh=cHBjNWh2N2dkM3Vz',
+  },
+  {
+    name: 'Priyanka Bisht',
+    handle: 'Co-Founder & Graphic Designer',
+    description: '🎨 The creative mind behind our brand’s visual identity, Priyanka turns ideas into designs that capture the spirit of Thrift by Musk.',
+    image: 'https://drive.google.com/file/d/1i5QGzDNlWBdfVjJAqFXTgbOB2tSSY8Lo/view?usp=sharing',
+    link: 'https://www.instagram.com/thriftbymusk/',
   },
   {
     name: 'Navneet Sharma',
     handle: 'Developer & Technical Lead',
     description: '💻 The mind behind the scenes, Navneet ensures the Thrift by Musk experience is as smooth online as it is in person.',
-    image: 'https://drive.google.com/file/d/1j-mDB0T4Raka-26aLh2g_EDg0cr2e7w2/view?usp=sharing', // Reusing a gallery image as placeholder
+    image: 'https://drive.google.com/file/d/1TwU3wy-YDdMF34L1EKtgW89hx88RGkug/view?usp=sharing', // Reusing a gallery image as placeholder
     link: 'https://www.instagram.com/navneet_sharma_12/?__pwa=1',
   }
 ];
@@ -109,32 +109,32 @@ export const PACKAGING_VIDEO_URL = '/Video/Packaging_video.mp4';
 export const GALLERY_ITEMS: GalleryItem[] = [
     {
         id: 'gallery-1',
-        url: 'https://drive.google.com/file/d/1j-mDB0T4Raka-26aLh2g_EDg0cr2e7w2/view?usp=sharing',
+        url: 'https://drive.google.com/file/d/124I_qJBMTJPzgFDqEwrxHi64mHycLdWd/view?usp=sharing',
         caption: 'Bohemian Summer Look',
     },
     {
         id: 'gallery-2',
-        url: 'https://drive.google.com/file/d/1xGq3K7X6pZ5eN8uJ1rO-vW9bC3lA8sD9/view?usp=sharing',
+        url: 'https://drive.google.com/file/d/1-KzKhP49qe4Ho1xOV136PveEZoHA78Z2/view?usp=sharing',
         caption: 'City Chic Ensemble',
     },
     {
         id: 'gallery-3',
-        url: 'https://drive.google.com/file/d/1p-R_gH5jK-l_A9cT8kY7o_S6jB5dF4eW/view?usp=sharing',
+        url: 'https://drive.google.com/file/d/11x70KfJlRj2R5FH5c7TcXV-QPUTf4smI/view?usp=sharing',
         caption: 'Casual Weekend Vibes',
     },
     {
         id: 'gallery-4',
-        url: 'https://drive.google.com/file/d/1X_tG_hJ7kY6o_R8iP9kL-a_W9bC8dD7e/view?usp=sharing',
+        url: 'https://drive.google.com/file/d/12EZ5BX3iwv4dXE0X8aZZ-cvnZgNdtl1H/view?usp=sharing',
         caption: 'Vintage Denim Dreams',
     },
     {
         id: 'gallery-5',
-        url: 'https://drive.google.com/file/d/1sO8P_tM3cR6aT-fG2kY9pB-l_KjA9sD1/view?usp=sharing',
+        url: 'https://drive.google.com/file/d/11wQPCNYDRODDyWss_mXdr-mcWFFn8CSP/view?usp=sharing',
         caption: 'Elegant Evening Attire',
     },
     {
         id: 'gallery-6',
-        url: 'https://drive.google.com/file/d/1wE7L2p5N_N-HwXyJ2K8qY7tQ8jZ9k5F4/view?usp=sharing',
+        url: 'https://drive.google.com/file/d/1284JnH8WsMi-T_3pQhOneSK85ufFTepU/view?usp=sharing',
         caption: 'Cozy Autumn Layers',
     },
 ];

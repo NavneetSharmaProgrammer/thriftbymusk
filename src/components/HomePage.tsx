@@ -1,6 +1,7 @@
 
 
 
+
 import React from 'react';
 import HeroSection from './home/HeroSection.tsx';
 import ValuesSection from './home/ValuesSection.tsx';
@@ -11,6 +12,7 @@ import WhyThriftSection from './home/WhyThriftSection.tsx';
 import QualityPromiseSection from './home/QualityPromiseSection.tsx';
 import AboutSection from './home/AboutSection.tsx';
 import PackagingSection from './home/PackagingSection.tsx';
+import InstagramFeedSection from './home/InstagramFeedSection.tsx';
 
 /**
  * The main component for the homepage. 
@@ -30,6 +32,7 @@ const HomePage: React.FC = () => {
             <WhyThriftSection />
             <QualityPromiseSection />
             <AboutSection />
+            <InstagramFeedSection />
         </div>
     </div>
   );
