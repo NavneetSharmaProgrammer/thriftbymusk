@@ -1,11 +1,11 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import useIntersectionObserver from '../../hooks/useIntersectionObserver.tsx';
 import { PACKAGING_VIDEO_URL } from '../../constants.ts';
 import { SparklesIcon } from '../Icons.tsx';
 
 const PackagingSection: React.FC = () => {
     const videoRef = useRef<HTMLVideoElement>(null);
-    // Observer for the entire section to control video playback
+    const [isMuted, setIsMuted] = useState(true);
     const [sectionRef, isVisible] = useIntersectionObserver({ threshold: 0.3, triggerOnce: false });
 
     useEffect(() => {
@@ -23,6 +23,14 @@ const PackagingSection: React.FC = () => {
         }
     }, [isVisible]);
 
+    const handleUnmute = () => {
+        if (videoRef.current) {
+            videoRef.current.muted = false;
+            setIsMuted(false);
+            videoRef.current.play();
+        }
+    };
+
     return (
         <section
             ref={sectionRef}
@@ -36,7 +44,7 @@ const PackagingSection: React.FC = () => {
                             <video
                                 ref={videoRef}
                                 loop
-                                muted
+                                muted={isMuted}
                                 playsInline
                                 className="w-full h-full object-cover"
                                 preload="metadata"
@@ -44,6 +52,16 @@ const PackagingSection: React.FC = () => {
                                 <source src={PACKAGING_VIDEO_URL} type="video/mp4" />
                                 Your browser does not support the video tag.
                             </video>
+
+                            {/* Unmute Button */}
+                            {isMuted && (
+                                <button
+                                    onClick={handleUnmute}
+                                    className="absolute bottom-4 right-4 bg-black/70 text-white px-3 py-1 rounded text-sm hover:bg-black"
+                                >
+                                    🔊 Unmute
+                                </button>
+                            )}
                         </div>
                     </div>
                     <div className={`lg:order-1 text-center lg:text-left animate-slideInLeft ${isVisible ? 'visible' : ''}`}>
@@ -54,7 +72,7 @@ const PackagingSection: React.FC = () => {
                         <h2 className="mb-4">An Unboxing Worth Savoring</h2>
                         <p className="text-[var(--color-text-secondary)]">
                            From our distinctive packaging to the handwritten notes inside, we believe your purchase should feel as special as the clothes themselves.
-                           <br/><br/>
+                           <br /><br />
                            Because when you thrift with us, you’re not just buying clothes—you’re receiving a story, <strong>wrapped in love</strong>.
                         </p>
                     </div>
