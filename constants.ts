@@ -56,13 +56,8 @@ export const INSTAGRAM_HANDLE = 'thriftbymusk';
  * Information about the store's team for the "Meet The Team" section.
  */
 export const OWNERS = [
-  {
-    name: 'Priyanka Bisht',
-    handle: 'Co-Founder & Graphic Designer',
-    description: '🎨 The creative mind behind our brand’s visual identity, Priyanka turns ideas into designs that capture the spirit of Thrift by Musk.',
-    image: 'https://drive.google.com/file/d/1SivWPMfAqhJd23a4fvOFGgU32sOEnx0B/view?usp=drive_link',
-    link: 'https://www.instagram.com/thriftbymusk/',
-  },
+ export const OWNERS = [
+
   {
     name: 'Muskaan Sharma',
     handle: 'Co-Founder & Fashion Model',
@@ -76,6 +71,13 @@ export const OWNERS = [
     description: '📸 With an athlete’s discipline and a storyteller’s vision, Gaurav captures the essence of Thrift by Musk—bringing our brand moments to life through striking photography and creative direction.',
     image: 'https://drive.google.com/file/d/1X_tG_hJ7kY6o_R8iP9kL-a_W9bC8dD7e/view?usp=sharing', // Reusing a gallery image as placeholder
     link: 'https://www.instagram.com/beinggauravbisht?utm_source=ig_web_button_share_sheet&igsh=cHBjNWh2N2dkM3Vz',
+  },
+    {
+    name: 'Priyanka Bisht',
+    handle: 'Co-Founder & Graphic Designer',
+    description: '🎨 The creative mind behind our brand’s visual identity, Priyanka turns ideas into designs that capture the spirit of Thrift by Musk.',
+    image: 'https://drive.google.com/file/d/1SivWPMfAqhJd23a4fvOFGgU32sOEnx0B/view?usp=drive_link',
+    link: 'https://www.instagram.com/thriftbymusk/',
   },
   {
     name: 'Navneet Sharma',
