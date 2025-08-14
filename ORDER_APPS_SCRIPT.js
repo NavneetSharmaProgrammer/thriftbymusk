@@ -41,7 +41,7 @@ function doPost(e) {
       sheet = SpreadsheetApp.getActiveSpreadsheet().insertSheet('Orders');
       var headers = [
         'Timestamp', 'Customer Name', 'Phone', 'Address', 'City', 'State', 'Pincode',
-        'Items (ID)', 'Items (Name)', 'Items (Size)', 'Items (Price)', 'Total Amount'
+        'Items (ID)', 'Items (Name)', 'Items (Size)', 'Items (Price)', 'Subtotal', 'Discount', 'Final Total'
       ];
       sheet.appendRow(headers);
       sheet.getRange(1, 1, 1, headers.length).setFontWeight('bold');
@@ -59,8 +59,16 @@ function doPost(e) {
     var itemSizes = items.map(function(item) { return item.size; }).join(',\n');
     var itemPrices = items.map(function(item) { return item.price; }).join(',\n');
     
-    // Calculate the total price of the order.
-    var total = items.reduce(function(sum, item) { return sum + item.price; }, 0);
+    // Calculate subtotal, discount, and final total.
+    var subtotal = items.reduce(function(sum, item) { return sum + item.price; }, 0);
+    var DISCOUNT_THRESHOLD = 499;
+    var DISCOUNT_PERCENTAGE = 0.20; // 20%
+
+    var discount = 0;
+    if (subtotal > DISCOUNT_THRESHOLD) {
+      discount = subtotal * DISCOUNT_PERCENTAGE;
+    }
+    var finalTotal = subtotal - discount;
 
     // Create the new row to be appended to the sheet.
     var newRow = [
@@ -75,7 +83,9 @@ function doPost(e) {
       itemNames,
       itemSizes,
       itemPrices,
-      total
+      subtotal,
+      discount,
+      finalTotal
     ];
     
     // Append the new row to the "Orders" sheet.
