@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { Product } from '../types';
 import { useCart } from '../CartContext';
 import { useProducts } from '../ProductContext';
-import { ArrowLeftIcon, ShareIcon, CameraIcon } from './Icons';
+import { ArrowLeftIcon, ShareIcon, CameraIcon, TagIcon, SparklesIcon, ShieldCheckIcon, RulerIcon } from './Icons';
 import { formatGoogleDriveLink } from '../utils';
 import ProductCard from './ProductCard';
 import ZoomableImage from './ZoomableImage';
@@ -176,6 +176,12 @@ const ProductDetailPage: React.FC = () => {
                           loop
                           playsInline
                           key={activeMedia.url} // Force re-render on media change
+                          onError={(e) => {
+                            const videoElement = e.target as HTMLVideoElement;
+                            console.error(
+                              `Video Playback Error: Code ${videoElement.error?.code}. Message: ${videoElement.error?.message}. Source: ${videoElement.currentSrc}`
+                            );
+                          }}
                         />
                       ) : (
                         <ZoomableImage
@@ -231,16 +237,15 @@ const ProductDetailPage: React.FC = () => {
                   </div>
                   
                   <div className="border-y border-[var(--color-border)] py-4 my-4">
-                      <h2 className="font-semibold mb-3">Specifications</h2>
-                      <table className="w-full text-sm">
-                          <tbody>
-                              <tr className="border-b border-[var(--color-border)]"><td className="py-2 text-[var(--color-text-secondary)]">Brand</td><td className="py-2 font-medium text-right">{product.brand}</td></tr>
-                              <tr className="border-b border-[var(--color-border)]"><td className="py-2 text-[var(--color-text-secondary)]">Size</td><td className="py-2 font-medium text-right">{product.size}</td></tr>
-                              <tr className="border-b border-[var(--color-border)]"><td className="py-2 text-[var(--color-text-secondary)]">Condition</td><td className="py-2 font-medium text-right">{product.condition}</td></tr>
-                              <tr className="border-b border-[var(--color-border)]"><td className="py-2 text-[var(--color-text-secondary)]">Bust</td><td className="py-2 font-medium text-right">{product.measurements.bust}</td></tr>
-                              <tr><td className="py-2 text-[var(--color-text-secondary)]">Length</td><td className="py-2 font-medium text-right">{product.measurements.length}</td></tr>
-                          </tbody>
-                      </table>
+                      <h2 className="font-semibold mb-4">Details</h2>
+                      <div className="space-y-3 text-sm">
+                          <div className="flex items-center justify-between"><span className="flex items-center gap-2 text-[var(--color-text-secondary)]"><TagIcon className="w-5 h-5"/> Category</span><span className="font-medium">{product.category}</span></div>
+                          <div className="flex items-center justify-between"><span className="flex items-center gap-2 text-[var(--color-text-secondary)]"><SparklesIcon className="w-5 h-5"/> Brand</span><span className="font-medium">{product.brand}</span></div>
+                          <div className="flex items-center justify-between"><span className="flex items-center gap-2 text-[var(--color-text-secondary)]"><ShieldCheckIcon className="w-5 h-5"/> Condition</span><span className="font-medium">{product.condition}</span></div>
+                          <div className="flex items-center justify-between"><span className="flex items-center gap-2 text-[var(--color-text-secondary)]"><RulerIcon className="w-5 h-5"/> Size</span><span className="font-medium">{product.size}</span></div>
+                          <div className="flex items-center justify-between"><span className="flex items-center gap-2 text-[var(--color-text-secondary)]"><RulerIcon className="w-5 h-5"/> Bust</span><span className="font-medium">{product.measurements.bust}</span></div>
+                          <div className="flex items-center justify-between"><span className="flex items-center gap-2 text-[var(--color-text-secondary)]"><RulerIcon className="w-5 h-5"/> Length</span><span className="font-medium">{product.measurements.length}</span></div>
+                      </div>
                   </div>
                   
                   <div className="space-y-4">
