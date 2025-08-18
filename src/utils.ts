@@ -48,9 +48,9 @@ export const formatGoogleDriveLink = (url:string, type: 'image' | 'video', optio
   }
 
   if (type === 'video') {
-    // This format attempts to get a direct media link, similar to how images are served.
-    // This is often more reliable for direct embedding in <video> tags than the /uc endpoint.
-    return `https://lh3.googleusercontent.com/d/${fileId}`;
+    // This format is for viewing/embedding and is more reliable for the <video> tag's src attribute,
+    // as it's less likely to trigger a download prompt or an interstitial page.
+    return `https://drive.google.com/uc?export=view&id=${fileId}`;
   }
   
   // Fallback to the original URL if the type is unrecognized.
