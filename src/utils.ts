@@ -49,9 +49,8 @@ export const formatGoogleDriveLink = (url:string, type: 'image' | 'video', optio
   }
 
   if (type === 'video') {
-    // This format provides a 'preview' version of the video, which is suitable for embedding in an `<iframe>`.
-    // It includes the Google Drive player controls.
-    return `https://drive.google.com/file/d/${fileId}/preview`;
+    // This format attempts to get a direct viewable link for the video file, suitable for a <video> tag.
+    return `https://drive.google.com/uc?export=view&id=${fileId}`;
   }
   
   // Fallback to the original URL if the type is unrecognized.
