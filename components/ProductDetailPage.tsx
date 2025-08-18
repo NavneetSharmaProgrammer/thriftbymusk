@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Product } from '../types';
 import { useCart } from '../CartContext';
 import { useProducts } from '../ProductContext';
-import { ArrowLeftIcon, ShareIcon, PlayIcon } from './Icons';
+import { ArrowLeftIcon, ShareIcon } from './Icons';
 import { formatGoogleDriveLink } from '../utils';
 import ProductCard from './ProductCard';
 import ZoomableImage from './ZoomableImage';
@@ -19,8 +19,6 @@ const ProductDetailPage: React.FC = () => {
   const [activeMedia, setActiveMedia] = useState<{ type: 'image' | 'video', url: string }>({ type: 'image', url: '' });
   const { addToCart, isProductInCart, showNotification } = useCart();
   const { products, isLoading } = useProducts();
-  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
 
   // Effect to set the current product from the global products list
   useEffect(() => {
@@ -99,22 +97,6 @@ const ProductDetailPage: React.FC = () => {
         showNotification('Link copied to clipboard!');
     }
   };
-  
-  const toggleVideoPlay = () => {
-    const video = videoRef.current;
-    if (!video) return;
-    if (video.paused) {
-      video.play().catch(e => console.error("Error playing video:", e));
-    } else {
-      video.pause();
-    }
-  };
-
-  useEffect(() => {
-    if (activeMedia.type !== 'video') {
-      setIsVideoPlaying(false);
-    }
-  }, [activeMedia]);
 
 
   if (isLoading) {
@@ -188,25 +170,13 @@ const ProductDetailPage: React.FC = () => {
                       {activeMedia.type === 'image' ? (
                          <ZoomableImage src={formatGoogleDriveLink(activeMedia.url, 'image', { width: 800 })} alt={product.name} />
                       ) : (
-                         <div className="relative w-full h-full cursor-pointer bg-black" onClick={toggleVideoPlay}>
-                            <video
-                                ref={videoRef}
-                                className="w-full h-full object-contain"
-                                src={formatGoogleDriveLink(activeMedia.url, 'video')}
-                                title={`Video for ${product.name}`}
-                                loop
-                                muted
-                                playsInline
-                                onPlay={() => setIsVideoPlaying(true)}
-                                onPause={() => setIsVideoPlaying(false)}
-                              >
-                            </video>
-                            {!isVideoPlaying && (
-                                 <div className="absolute inset-0 bg-black/40 flex items-center justify-center pointer-events-none transition-opacity duration-300">
-                                    <PlayIcon className="w-16 h-16 text-white"/>
-                                </div>
-                            )}
-                        </div>
+                         <iframe
+                            className="w-full h-full"
+                            src={formatGoogleDriveLink(activeMedia.url, 'video')}
+                            title={`Video for ${product.name}`}
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                          ></iframe>
                       )}
                        {product.sold && (
                           <div className="sold-out-ribbon rounded-lg">
