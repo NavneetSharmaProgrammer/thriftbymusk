@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { Product } from '../types';
 import { useCart } from '../CartContext';
 import { useProducts } from '../ProductContext';
-import { ArrowLeftIcon, ShareIcon } from './Icons';
+import { ArrowLeftIcon, ShareIcon, CameraIcon } from './Icons';
 import { formatGoogleDriveLink } from '../utils';
 import ProductCard from './ProductCard';
 import ZoomableImage from './ZoomableImage';
@@ -167,21 +167,22 @@ const ProductDetailPage: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
               <div className="space-y-4">
                   <div className="main-image-container shadow-lg">
-                      {activeMedia.type === 'image' ? (
-   <ZoomableImage
-      src={formatGoogleDriveLink(activeMedia.url, 'image', { width: 800 })}
-      alt={product.name}
-   />
-) : (
-   <video
-      className="w-full h-full"
-      src={formatGoogleDriveLink(activeMedia.url, 'video')}
-      autoPlay
-      muted
-      loop
-      playsInline
-    />
-)}
+                      {activeMedia.type === 'video' ? (
+                        <video
+                          className="w-full h-full object-cover"
+                          src={formatGoogleDriveLink(activeMedia.url, 'video')}
+                          autoPlay
+                          muted
+                          loop
+                          playsInline
+                          key={activeMedia.url} // Force re-render on media change
+                        />
+                      ) : (
+                        <ZoomableImage
+                          src={formatGoogleDriveLink(activeMedia.url, 'image', { width: 800 })}
+                          alt={product.name}
+                        />
+                      )}
                        {product.sold && (
                           <div className="sold-out-ribbon rounded-lg">
                               <span>Sold Out</span>
@@ -202,17 +203,15 @@ const ProductDetailPage: React.FC = () => {
                           </button>
                       ))}
                       {product.videoUrl && (
-                          <button 
+                          <button
                             key="video"
                             onClick={() => setActiveMedia({ type: 'video', url: product.videoUrl as string })}
                              className={`thumbnail-button relative ${activeMedia.type === 'video' ? 'active' : ''}`}
-                             aria-label="Play video"
+                             aria-label="View video"
                           >
                             <img src={formatGoogleDriveLink(product.imageUrls[0], 'image', { width: 100 })} alt="video thumbnail" />
                             <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
-                                </svg>
+                                <CameraIcon className="h-8 w-8 text-white" />
                             </div>
                           </button>
                       )}
