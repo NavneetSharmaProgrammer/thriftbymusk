@@ -1,6 +1,3 @@
-
-
-
 /**
  * Extracts the unique file ID from a standard Google Drive shareable link.
  * Google Drive links come in various formats, but the file ID is the crucial part.
@@ -18,7 +15,7 @@ const getGoogleDriveFileId = (url: string): string | null => {
 };
 
 /**
- * Formats a Google Drive shareable link into a URL suitable for direct embedding in `<img>` or `<iframe>` tags.
+ * Formats a Google Drive shareable link into a URL suitable for direct embedding in `<img>` or `<video>` tags.
  * Standard share links do not work for direct embedding.
  *
  * @param url The original Google Drive shareable link.
@@ -51,9 +48,9 @@ export const formatGoogleDriveLink = (url:string, type: 'image' | 'video', optio
   }
 
   if (type === 'video') {
-    // This format provides a 'preview' version of the video, which is suitable for embedding in an `<iframe>`.
-    // It includes the Google Drive player controls.
-    return `https://drive.google.com/file/d/${fileId}/preview`;
+    // This format attempts to get a direct media link, similar to how images are served.
+    // This is often more reliable for direct embedding in <video> tags than the /uc endpoint.
+    return `https://lh3.googleusercontent.com/d/${fileId}`;
   }
   
   // Fallback to the original URL if the type is unrecognized.
