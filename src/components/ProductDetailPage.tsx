@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { Product } from '../types';
 import { useCart } from '../CartContext';
 import { useProducts } from '../ProductContext';
-import { ArrowLeftIcon, ShareIcon, CameraIcon, TagIcon, SparklesIcon, ShieldCheckIcon, RulerIcon } from './Icons';
+import { ArrowLeftIcon, ShareIcon } from './Icons';
 import { formatGoogleDriveLink } from '../utils';
 import ProductCard from './ProductCard';
 import ZoomableImage from './ZoomableImage';
@@ -167,27 +167,16 @@ const ProductDetailPage: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
               <div className="space-y-4">
                   <div className="main-image-container shadow-lg">
-                      {activeMedia.type === 'video' ? (
-                        <video
-                          className="w-full h-full object-cover"
-                          src={formatGoogleDriveLink(activeMedia.url, 'video')}
-                          autoPlay
-                          muted
-                          loop
-                          playsInline
-                          key={activeMedia.url} // Force re-render on media change
-                          onError={(e) => {
-                            const videoElement = e.target as HTMLVideoElement;
-                            console.error(
-                              `Video Playback Error: Code ${videoElement.error?.code}. Message: ${videoElement.error?.message}. Source: ${videoElement.currentSrc}`
-                            );
-                          }}
-                        />
+                      {activeMedia.type === 'image' ? (
+                         <ZoomableImage src={formatGoogleDriveLink(activeMedia.url, 'image', { width: 800 })} alt={product.name} />
                       ) : (
-                        <ZoomableImage
-                          src={formatGoogleDriveLink(activeMedia.url, 'image', { width: 800 })}
-                          alt={product.name}
-                        />
+                         <iframe
+                            className="w-full h-full"
+                            src={formatGoogleDriveLink(activeMedia.url, 'video')}
+                            title={`Video for ${product.name}`}
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                          ></iframe>
                       )}
                        {product.sold && (
                           <div className="sold-out-ribbon rounded-lg">
@@ -209,15 +198,17 @@ const ProductDetailPage: React.FC = () => {
                           </button>
                       ))}
                       {product.videoUrl && (
-                          <button
+                          <button 
                             key="video"
                             onClick={() => setActiveMedia({ type: 'video', url: product.videoUrl as string })}
                              className={`thumbnail-button relative ${activeMedia.type === 'video' ? 'active' : ''}`}
-                             aria-label="View video"
+                             aria-label="Play video"
                           >
                             <img src={formatGoogleDriveLink(product.imageUrls[0], 'image', { width: 100 })} alt="video thumbnail" />
                             <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                                <CameraIcon className="h-8 w-8 text-white" />
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+                                </svg>
                             </div>
                           </button>
                       )}
@@ -237,15 +228,16 @@ const ProductDetailPage: React.FC = () => {
                   </div>
                   
                   <div className="border-y border-[var(--color-border)] py-4 my-4">
-                      <h2 className="font-semibold mb-4">Details</h2>
-                      <div className="space-y-3 text-sm">
-                          <div className="flex items-center justify-between"><span className="flex items-center gap-2 text-[var(--color-text-secondary)]"><TagIcon className="w-5 h-5"/> Category</span><span className="font-medium">{product.category}</span></div>
-                          <div className="flex items-center justify-between"><span className="flex items-center gap-2 text-[var(--color-text-secondary)]"><SparklesIcon className="w-5 h-5"/> Brand</span><span className="font-medium">{product.brand}</span></div>
-                          <div className="flex items-center justify-between"><span className="flex items-center gap-2 text-[var(--color-text-secondary)]"><ShieldCheckIcon className="w-5 h-5"/> Condition</span><span className="font-medium">{product.condition}</span></div>
-                          <div className="flex items-center justify-between"><span className="flex items-center gap-2 text-[var(--color-text-secondary)]"><RulerIcon className="w-5 h-5"/> Size</span><span className="font-medium">{product.size}</span></div>
-                          <div className="flex items-center justify-between"><span className="flex items-center gap-2 text-[var(--color-text-secondary)]"><RulerIcon className="w-5 h-5"/> Bust</span><span className="font-medium">{product.measurements.bust}</span></div>
-                          <div className="flex items-center justify-between"><span className="flex items-center gap-2 text-[var(--color-text-secondary)]"><RulerIcon className="w-5 h-5"/> Length</span><span className="font-medium">{product.measurements.length}</span></div>
-                      </div>
+                      <h2 className="font-semibold mb-3">Specifications</h2>
+                      <table className="w-full text-sm">
+                          <tbody>
+                              <tr className="border-b border-[var(--color-border)]"><td className="py-2 text-[var(--color-text-secondary)]">Brand</td><td className="py-2 font-medium text-right">{product.brand}</td></tr>
+                              <tr className="border-b border-[var(--color-border)]"><td className="py-2 text-[var(--color-text-secondary)]">Size</td><td className="py-2 font-medium text-right">{product.size}</td></tr>
+                              <tr className="border-b border-[var(--color-border)]"><td className="py-2 text-[var(--color-text-secondary)]">Condition</td><td className="py-2 font-medium text-right">{product.condition}</td></tr>
+                              <tr className="border-b border-[var(--color-border)]"><td className="py-2 text-[var(--color-text-secondary)]">Bust</td><td className="py-2 font-medium text-right">{product.measurements.bust}</td></tr>
+                              <tr><td className="py-2 text-[var(--color-text-secondary)]">Length</td><td className="py-2 font-medium text-right">{product.measurements.length}</td></tr>
+                          </tbody>
+                      </table>
                   </div>
                   
                   <div className="space-y-4">
