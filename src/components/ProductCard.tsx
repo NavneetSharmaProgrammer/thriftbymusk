@@ -76,23 +76,23 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, isFreshDrop }) => {
         )}
       </Link>
       
-      <div className="p-4 md:p-6 text-center flex flex-col flex-grow">
+      <div className="p-6 text-center flex flex-col flex-grow">
         <div className="flex justify-center items-baseline gap-2 text-sm text-[var(--color-text-secondary)] mb-2">
             <span>{product.size}</span>
             <span className="text-[var(--color-border)]">&middot;</span>
             <span>{product.brand}</span>
         </div>
         <Link to={`/product/${product.id}`} className="flex-grow">
-            <h3 className="font-semibold text-base md:text-lg leading-tight mb-2 text-[var(--color-text-primary)] hover:text-[var(--color-primary)] transition-colors">{product.name}</h3>
+            <h3 className="font-semibold text-lg mb-2 text-[var(--color-text-primary)] hover:text-[var(--color-primary)] transition-colors">{product.name}</h3>
         </Link>
         <p className="text-xs text-[var(--color-text-muted)] mb-3">{product.condition}</p>
-        <p className="font-serif text-lg md:text-xl text-[var(--color-primary)] mb-4 mt-auto">{formattedPrice}</p>
+        <p className="font-serif text-xl text-[var(--color-primary)] mb-4 mt-auto">{formattedPrice}</p>
         
         <div className="mt-auto">
           <button
             onClick={() => addToCart(product)}
             disabled={product.sold || isInCart}
-            className="btn btn-primary w-full py-2 text-sm md:py-3 md:text-base"
+            className="btn btn-primary w-full"
           >
             {product.sold ? 'Sold Out' : isInCart ? 'In Cart' : 'Add to Cart'}
           </button>
