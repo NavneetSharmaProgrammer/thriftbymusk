@@ -3,22 +3,46 @@ import { CloseIcon } from './Icons.tsx';
 
 /**
  * A dismissible, scrolling marquee sales banner.
- * It displays key promotions in an infinite loop.
+ * It displays key promotions in an infinite loop and dynamically adjusts page layout.
  */
 const SaleBanner: React.FC = () => {
     const [isVisible, setIsVisible] = useState(false);
-    const localStorageKey = 'saleBannerDismissed_v4'; // Increment version to show new banner
+    // Increment version number in the key to force re-display of the banner for all users after an update.
+    const localStorageKey = 'saleBannerDismissed_v5'; 
 
     useEffect(() => {
+        // Check if the user has previously dismissed this version of the banner.
         if (localStorage.getItem(localStorageKey) !== 'true') {
             setIsVisible(true);
         }
-    }, []);
+    }, [localStorageKey]);
+
+    /**
+     * This effect manages a CSS custom property on the root element.
+     * This allows other components (like the sticky sidebar on the Shop page)
+     * to dynamically adjust their layout based on the banner's visibility without prop drilling.
+     */
+    useEffect(() => {
+        if (isVisible) {
+            document.documentElement.style.setProperty('--sale-banner-height', '41px');
+        } else {
+            document.documentElement.style.removeProperty('--sale-banner-height');
+        }
+
+        // Cleanup function to remove the property when the component unmounts.
+        return () => {
+            document.documentElement.style.removeProperty('--sale-banner-height');
+        };
+    }, [isVisible]);
 
     const handleClose = (e: React.MouseEvent) => {
         e.preventDefault();
         setIsVisible(false);
-        localStorage.setItem(localStorageKey, 'true');
+        try {
+            localStorage.setItem(localStorageKey, 'true');
+        } catch (error) {
+            console.error("Could not write to localStorage", error);
+        }
     };
 
     if (!isVisible) {

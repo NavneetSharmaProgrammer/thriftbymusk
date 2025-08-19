@@ -7,6 +7,7 @@ import { ArrowLeftIcon, ShareIcon } from './Icons';
 import { formatGoogleDriveLink } from '../utils';
 import ProductCard from './ProductCard';
 import ZoomableImage from './ZoomableImage';
+import StarRating from './StarRating';
 
 /**
  * The Product Detail Page, which displays all information for a single product.
@@ -75,6 +76,12 @@ const ProductDetailPage: React.FC = () => {
       (!p.dropDate || new Date(p.dropDate) <= now) // Must be live
     ).slice(0, 4); // Show up to 4 related products
   }, [product, products]);
+
+  const averageRating = useMemo(() => {
+    if (!product?.reviews || product.reviews.length === 0) return 0;
+    const total = product.reviews.reduce((acc, review) => acc + review.rating, 0);
+    return total / product.reviews.length;
+  }, [product]);
 
   const handleShare = async () => {
     if (!product) return;
@@ -148,6 +155,7 @@ const ProductDetailPage: React.FC = () => {
   }
   
   const isInCart = isProductInCart(product.id);
+  const hasReviews = product.reviews && product.reviews.length > 0;
 
   const formattedPrice = new Intl.NumberFormat('en-IN', {
     style: 'currency',
@@ -255,6 +263,54 @@ const ProductDetailPage: React.FC = () => {
                       </button>
                   </div>
               </div>
+          </div>
+          
+          {/* Customer Reviews Section */}
+          <div id="reviews" className="mt-16 md:mt-24 pt-16 border-t border-[var(--color-border)]">
+              <div className="text-center">
+                  <h2 className="mb-2">Customer Reviews</h2>
+                  <p className="text-[var(--color-text-secondary)] max-w-2xl mx-auto">
+                      See what others are saying. All reviews are curated from customer feedback provided via direct message.
+                  </p>
+              </div>
+
+              {hasReviews ? (
+                  <>
+                      <div className="flex flex-col sm:flex-row justify-center items-center gap-2 sm:gap-4 my-8 p-4 bg-[var(--color-surface-alt)] rounded-lg">
+                          <StarRating rating={averageRating} />
+                          <span className="text-[var(--color-text-secondary)] font-medium">
+                              {averageRating.toFixed(1)} out of 5 stars
+                          </span>
+                          <span className="text-[var(--color-text-muted)] hidden sm:block">&middot;</span>
+                          <span className="text-[var(--color-text-muted)]">
+                              Based on {product.reviews!.length} review{product.reviews!.length > 1 ? 's' : ''}
+                          </span>
+                      </div>
+                      <div className="max-w-3xl mx-auto space-y-8">
+                          {product.reviews!.map((review, index) => (
+                              <div key={index} className="p-6 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg shadow-sm">
+                                  <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                                      <div className="flex items-center gap-3">
+                                          <span className="font-semibold">{review.author}</span>
+                                          <StarRating rating={review.rating} />
+                                      </div>
+                                      <span className="text-sm text-[var(--color-text-muted)]">
+                                          {new Date(review.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                                      </span>
+                                  </div>
+                                  <p className="text-[var(--color-text-secondary)] italic">"{review.comment}"</p>
+                              </div>
+                          ))}
+                      </div>
+                  </>
+              ) : (
+                  <div className="text-center py-12 px-6 bg-[var(--color-surface-alt)] rounded-lg mt-8 max-w-2xl mx-auto">
+                      <p className="font-semibold text-[var(--color-text-secondary)]">No reviews for this item yet.</p>
+                      <p className="text-sm text-[var(--color-text-muted)] mt-2">
+                          Be the first to own it and share your feedback!
+                      </p>
+                  </div>
+              )}
           </div>
 
           {/* You Might Also Like Section */}

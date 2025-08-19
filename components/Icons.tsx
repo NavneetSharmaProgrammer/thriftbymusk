@@ -149,6 +149,11 @@ export const SparklesIcon: React.FC<{ className?: string }> = ({ className }) =>
     </svg>
 );
 
+export const StarIcon: React.FC<{ className?: string }> = ({ className }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className={className}>
+    <path fillRule="evenodd" d="M10.868 2.884c.321-.662 1.215-.662 1.536 0l1.681 3.468 3.821.556c.734.107 1.028.997.494 1.503l-2.764 2.694.653 3.805c.124.722-.638 1.283-1.296.952L10 15.49l-3.415 1.795c-.658.33-1.42-.23-1.296-.952l.653-3.805-2.764-2.694c-.534-.506-.24-1.396.494-1.503l3.821-.556 1.681-3.468z" clipRule="evenodd" />
+  </svg>
+);
 
 // --- Social & Contact Icons ---
 

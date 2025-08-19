@@ -4,18 +4,19 @@ import { Product } from '../types';
 import { useCart } from '../CartContext';
 import { useSaved } from '../SavedContext';
 import { formatGoogleDriveLink } from '../utils';
-import { HeartIcon } from './Icons';
+import { HeartIcon, EyeIcon } from './Icons';
 
 interface ProductCardProps {
   product: Product;
   isFreshDrop?: boolean;
+  onQuickView?: (product: Product) => void;
 }
 
 /**
  * A reusable component that displays a single product in a card format.
  * It now requests optimized images and uses theme variables for styling.
  */
-const ProductCard: React.FC<ProductCardProps> = ({ product, isFreshDrop }) => {
+const ProductCard: React.FC<ProductCardProps> = ({ product, isFreshDrop, onQuickView }) => {
   const { addToCart, isProductInCart } = useCart();
   const { saveItem, unsaveItem, isItemSaved } = useSaved();
 
@@ -33,6 +34,12 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, isFreshDrop }) => {
     e.stopPropagation(); // Stop event bubbling
     isSaved ? unsaveItem(product.id) : saveItem(product.id);
   };
+  
+  const handleQuickViewClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onQuickView?.(product);
+  }
 
   return (
     <div className="product-card bg-[var(--color-surface)] rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden group flex flex-col">
@@ -64,6 +71,18 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, isFreshDrop }) => {
         >
           <HeartIcon className={`w-5 h-5 ${isSaved ? 'text-[var(--color-danger)] fill-current' : 'fill-transparent'}`} />
         </button>
+        
+        {onQuickView && (
+            <div 
+                onClick={handleQuickViewClick}
+                className="absolute bottom-0 left-0 right-0 z-10 bg-gradient-to-t from-black/60 to-transparent p-4 text-center cursor-pointer opacity-100 transition-opacity duration-300 md:opacity-0 group-hover:opacity-100"
+                aria-label={`Quick view ${product.name}`}
+            >
+                <span className="inline-flex items-center gap-2 bg-[var(--color-surface)]/90 text-[var(--color-text-primary)] px-4 py-2 rounded-full font-semibold text-sm">
+                    <EyeIcon className="w-5 h-5"/> Quick View
+                </span>
+            </div>
+        )}
         
         {product.sold ? (
           <div className="sold-out-ribbon">

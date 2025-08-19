@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useCart } from '../CartContext';
 import { useSaved } from '../SavedContext';
@@ -22,6 +22,11 @@ const Header: React.FC = () => {
   // Hooks from react-router-dom to interact with the URL.
   const location = useLocation();
   const navigate = useNavigate();
+  
+  // State for cart icon animation
+  const [isCartAnimating, setIsCartAnimating] = useState(false);
+  const prevCartLength = useRef(cartItems.length);
+
 
   // A helper function to ensure the mobile menu is closed.
   const closeMenu = () => setIsMenuOpen(false);
@@ -82,6 +87,20 @@ const Header: React.FC = () => {
     }
   }, [location.hash]); // Reruns when the hash part of the URL changes.
 
+  /**
+   * Effect to trigger the cart icon animation when an item is added.
+   */
+  useEffect(() => {
+    // Trigger animation only when an item is ADDED
+    if (cartItems.length > prevCartLength.current) {
+        setIsCartAnimating(true);
+        const timer = setTimeout(() => setIsCartAnimating(false), 600); // Must match animation duration
+        return () => clearTimeout(timer);
+    }
+    // Update the ref to the current length for the next comparison
+    prevCartLength.current = cartItems.length;
+  }, [cartItems.length]);
+
 
   // Function to determine the CSS classes for NavLink components based on their active state.
   const navLinkClasses = ({ isActive }: { isActive: boolean }) =>
@@ -137,7 +156,7 @@ const Header: React.FC = () => {
                {/* Shopping Bag Button */}
                <button 
                   onClick={toggleCart} 
-                  className="relative text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] transition-colors" 
+                  className={`relative text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] transition-colors ${isCartAnimating ? 'animate-shake' : ''}`}
                   aria-label="Open Shopping Bag"
                   aria-haspopup="dialog"
                   aria-expanded={isCartOpen}

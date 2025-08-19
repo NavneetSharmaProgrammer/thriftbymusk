@@ -1,4 +1,4 @@
-import { Product } from '../types';
+import { Product, Review } from '../types';
 import { GOOGLE_SHEET_CSV_URL } from '../constants';
 
 const CACHE_KEY = 'productDataCache';
@@ -69,6 +69,17 @@ const mapRowToProduct = (row: Record<string, string>): Product | null => {
     // Validate dropDate - should be a valid ISO string or undefined
     const dropDate = row.dropDate && !isNaN(new Date(row.dropDate).getTime()) ? new Date(row.dropDate).toISOString() : undefined;
 
+    const reviewsJSON = row.reviewsJSON || '[]';
+    let reviews: Review[] = [];
+    try {
+        const parsedReviews = JSON.parse(reviewsJSON);
+        if (Array.isArray(parsedReviews)) {
+            reviews = parsedReviews.filter(r => r.author && r.rating && r.comment && r.createdAt);
+        }
+    } catch (e) {
+        console.warn('Could not parse reviews JSON for product ID:', row.id, e);
+    }
+
     return {
       id: row.id,
       name: row.name,
@@ -85,6 +96,7 @@ const mapRowToProduct = (row: Record<string, string>): Product | null => {
       isUpcoming: ['true', 'false', 'not'].includes(isUpcomingStatus) ? isUpcomingStatus : 'false',
       createdAt: row.createdAt || new Date(0).toISOString(),
       dropDate: dropDate,
+      reviews: reviews.length > 0 ? reviews : undefined,
     };
   } catch (error) {
     console.error('Failed to parse a product row. Skipping row.', { row, error });

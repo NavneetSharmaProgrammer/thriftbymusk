@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import ProductCard from './ProductCard';
 import { 
     SearchIcon, FilterIcon, CloseIcon, ChevronDownIcon, TagIcon, SparklesIcon,
@@ -8,6 +8,7 @@ import {
 import { useProducts } from '../ProductContext';
 import { Product } from '../types';
 import useDebounce from '../hooks/useDebounce';
+import QuickViewModal from './QuickViewModal';
 
 const ITEMS_PER_PAGE = 12;
 
@@ -217,6 +218,9 @@ const ShopPage: React.FC = () => {
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 5000]);
   const [sortOption, setSortOption] = useState('Featured');
   
+  // State for Quick View Modal
+  const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
+
   // Temporary filter state for mobile modal
   const [tempFilters, setTempFilters] = useState({
     searchQuery: '',
@@ -258,19 +262,24 @@ const ShopPage: React.FC = () => {
   }, [location.search, categories]);
 
   useEffect(() => {
-    if (isFilterOpen) {
+    if (isFilterOpen || quickViewProduct) {
       document.body.style.overflow = 'hidden';
-      // Sync main filters to temp filters upon opening
-      setTempFilters({
-        searchQuery, statusFilter, selectedBrands, selectedSizes, 
-        selectedConditions, selectedCategories, priceRange, sortOption
-      });
     } else {
       document.body.style.overflow = '';
     }
     return () => {
       document.body.style.overflow = '';
     };
+  }, [isFilterOpen, quickViewProduct]);
+
+  useEffect(() => {
+    if (isFilterOpen) {
+      // Sync main filters to temp filters upon opening
+      setTempFilters({
+        searchQuery, statusFilter, selectedBrands, selectedSizes, 
+        selectedConditions, selectedCategories, priceRange, sortOption
+      });
+    }
   }, [isFilterOpen, searchQuery, statusFilter, selectedBrands, selectedSizes, selectedConditions, selectedCategories, priceRange, sortOption]);
   
   const brands = useMemo(() => [...Array.from(new Set(liveProducts.map(p => p.brand)))].sort(), [liveProducts]);
@@ -411,6 +420,14 @@ const ShopPage: React.FC = () => {
     });
   };
 
+  const handleOpenQuickView = useCallback((product: Product) => {
+    setQuickViewProduct(product);
+  }, []);
+
+  const handleCloseQuickView = useCallback(() => {
+    setQuickViewProduct(null);
+  }, []);
+
   const ProductGridSkeleton: React.FC = () => (
     <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8">
       {Array.from({ length: 8 }).map((_, index) => (
@@ -437,7 +454,7 @@ const ShopPage: React.FC = () => {
             </div>
             
             <div className="grid grid-cols-1 lg:grid-cols-4 lg:gap-12">
-              <aside className="hidden lg:block lg:col-span-1 lg:sticky lg:top-[calc(72px+41px)] max-h-[calc(100vh-8rem-41px)] overflow-y-auto bg-[var(--color-surface)]/60 backdrop-blur-sm p-4 rounded-lg border border-[var(--color-border)]">
+              <aside className="hidden lg:block lg:col-span-1 lg:sticky lg:top-[calc(72px+var(--sale-banner-height,0px))] max-h-[calc(100vh-8rem-var(--sale-banner-height,0px))] overflow-y-auto bg-[var(--color-surface)]/60 backdrop-blur-sm p-4 rounded-lg border border-[var(--color-border)] transition-all duration-300">
                 <FilterSidebarContent
                   searchQuery={searchQuery}
                   statusFilter={statusFilter}
@@ -535,7 +552,7 @@ const ShopPage: React.FC = () => {
                                 <h2 className="my-4 text-center border-b border-t border-[var(--color-border)] py-3">— Fresh Drop —</h2>
                                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8">
                                     {freshDropProducts.map(product => (
-                                        <ProductCard key={product.id} product={product} isFreshDrop={true} />
+                                        <ProductCard key={product.id} product={product} isFreshDrop={true} onQuickView={handleOpenQuickView} />
                                     ))}
                                 </div>
                             </div>
@@ -544,7 +561,7 @@ const ShopPage: React.FC = () => {
                           <div className="space-y-8">
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8">
                                 {paginatedOtherProducts.map(product => (
-                                    <ProductCard key={product.id} product={product} isFreshDrop={false} />
+                                    <ProductCard key={product.id} product={product} isFreshDrop={false} onQuickView={handleOpenQuickView} />
                                 ))}
                             </div>
                             {sortedOtherProducts.length > visibleItemsCount && (
@@ -567,6 +584,7 @@ const ShopPage: React.FC = () => {
               </main>
             </div>
         </div>
+        <QuickViewModal product={quickViewProduct} onClose={handleCloseQuickView} />
     </div>
   );
 };

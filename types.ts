@@ -1,4 +1,14 @@
 /**
+ * Represents a single product review.
+ */
+export interface Review {
+  author: string;
+  rating: number; // A number from 1 to 5
+  comment: string;
+  createdAt: string; // ISO date string
+}
+
+/**
  * Represents a single product in the store.
  * This interface defines the complete data structure for a product item.
  */
@@ -21,6 +31,7 @@ export interface Product {
   isUpcoming: string; // 'true' for upcoming drop, 'false' for live, 'not' for hidden.
   createdAt: string; // The date the product was added, for "Fresh Drop" sorting
   dropDate?: string; // The specific date and time this product is scheduled to go live.
+  reviews?: Review[]; // An optional array of customer reviews for the product
 }
 
 /**
