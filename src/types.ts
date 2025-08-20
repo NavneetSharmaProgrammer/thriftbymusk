@@ -53,6 +53,19 @@ export interface CustomerDetails {
 }
 
 /**
+ * Defines the shape of the calculated order summary.
+ */
+export interface OrderSummary {
+    subtotal: number;
+    discount: number;
+    finalTotal: number;
+    formattedSubtotal: string;
+    formattedDiscount: string;
+    formattedFinalTotal: string;
+    itemsList: string;
+}
+
+/**
  * Defines the shape of the context provided by CartProvider.
  * This includes the cart's state and the functions to interact with it.
  */
@@ -68,6 +81,7 @@ export interface CartContextType {
   getWhatsAppMessage: (customerDetails: CustomerDetails) => string; // Generates a pre-filled WhatsApp message
   getInstagramMessage: (customerDetails: CustomerDetails) => { link: string; body: string; }; // Generates a pre-filled Instagram DM
   showNotification: (message: string) => void; // Function to display a temporary notification
+  getOrderSummary: () => OrderSummary; // Generates a detailed summary of the cart.
 }
 
 /**
@@ -78,6 +92,14 @@ export interface SavedContextType {
   saveItem: (productId: string) => void;
   unsaveItem: (productId: string) => void;
   isItemSaved: (productId: string) => boolean;
+}
+
+/**
+ * Defines the shape of the context for the "Recently Viewed" feature.
+ */
+export interface RecentlyViewedContextType {
+  recentlyViewedProducts: Product[];
+  addRecentlyViewed: (productId: string) => void;
 }
 
 

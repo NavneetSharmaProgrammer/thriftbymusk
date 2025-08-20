@@ -1,46 +1,18 @@
-import React, { useEffect, useRef, useState, FormEvent } from 'react';
+import React, { useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { useCart } from '../CartContext';
-import { CloseIcon, ShoppingBagIcon, CheckCircleIcon, WhatsAppIcon, InstagramIcon, LoadingIcon, ArrowLeftIcon } from './Icons';
+import { CloseIcon, ShoppingBagIcon } from './Icons';
 import { formatGoogleDriveLink } from '../utils';
-import { CustomerDetails } from '../types';
-import { GOOGLE_APPS_SCRIPT_URL } from '../constants';
-
-type SubmissionStatus = 'idle' | 'submitting' | 'error';
 
 /**
  * A modal component that displays the shopping cart.
- * It now features an integrated, multi-step checkout process and is fully theme-aware.
+ * It allows users to view their selected items and proceed to a dedicated checkout page.
  * This component includes important accessibility features like focus trapping.
  */
 const CartModal: React.FC = () => {
-    const { 
-        isCartOpen, toggleCart, cartItems, removeFromCart, clearCart,
-        getWhatsAppMessage, getInstagramMessage, showNotification
-    } = useCart();
+    const { isCartOpen, toggleCart, cartItems, removeFromCart, getOrderSummary } = useCart();
     
-    // State to manage the view within the modal ('cart', 'form', 'confirmation')
-    const [view, setView] = useState('cart');
-    // State for the customer details form
-    const [customerDetails, setCustomerDetails] = useState<CustomerDetails>({
-        name: '', phone: '', address: '', city: '', state: '', pincode: ''
-    });
-    // State to manage the automated form submission process.
-    const [submissionStatus, setSubmissionStatus] = useState<SubmissionStatus>('idle');
-    const [submissionError, setSubmissionError] = useState<string | null>(null);
-    const [isCopied, setIsCopied] = useState(false);
-
     const modalRef = useRef<HTMLDivElement>(null);
-    const formRef = useRef<HTMLFormElement>(null);
-
-    // Reset view and submission status whenever the modal is opened
-    useEffect(() => {
-        if (isCartOpen) {
-            setView('cart');
-            setSubmissionStatus('idle');
-            setSubmissionError(null);
-            setIsCopied(false);
-        }
-    }, [isCartOpen]);
 
     // Handle accessibility (focus trapping, Escape key)
     useEffect(() => {
@@ -71,90 +43,15 @@ const CartModal: React.FC = () => {
             modalNode.removeEventListener('keydown', handleKeyDown);
             previouslyFocusedElement?.focus();
         };
-    }, [isCartOpen, toggleCart, view, submissionStatus]);
+    }, [isCartOpen, toggleCart]);
 
     if (!isCartOpen) return null;
 
-    // --- Discount & Total Calculations ---
-    const subtotal = cartItems.reduce((acc, item) => acc + item.price, 0);
-    const DISCOUNT_THRESHOLD = 499;
-    const DISCOUNT_PERCENTAGE = 0.20;
+    // --- Totals sourced from context ---
+    const { subtotal, formattedSubtotal, formattedDiscount, formattedFinalTotal } = getOrderSummary();
     
-    let discount = 0;
-    if (subtotal > DISCOUNT_THRESHOLD) {
-        discount = subtotal * DISCOUNT_PERCENTAGE;
-    }
-    const finalTotal = subtotal - discount;
-
-    const formatCurrency = (amount: number) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0 }).format(amount);
-    
-    const formattedSubtotal = formatCurrency(subtotal);
-    const formattedDiscount = formatCurrency(discount);
-    const formattedFinalTotal = formatCurrency(finalTotal);
-
     const FREE_SHIPPING_THRESHOLD = 999;
     const amountNeededForFreeShipping = FREE_SHIPPING_THRESHOLD - subtotal;
-
-    // --- Event Handlers ---
-    const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setCustomerDetails({ ...customerDetails, [e.target.name]: e.target.value });
-    };
-    
-    const handleFormSubmit = async (e: FormEvent) => {
-        e.preventDefault();
-        
-        if (!GOOGLE_APPS_SCRIPT_URL) {
-            setView('confirmation');
-            return;
-        }
-
-        setSubmissionStatus('submitting');
-        setSubmissionError(null);
-        
-        const orderPayload = JSON.stringify({ cartItems, customerDetails });
-
-        try {
-            // This is a redirect fetch. We won't get a direct JSON response, 
-            // but a successful submission will complete without throwing an error.
-            await fetch(GOOGLE_APPS_SCRIPT_URL, {
-                method: 'POST',
-                // Using redirect mode to handle the response from Google Apps Script, which is an HTML page.
-                // We don't need to read the response, just know that the request was sent successfully.
-                redirect: 'follow',
-                body: orderPayload,
-                headers: {
-                    // Using text/plain is a common way to avoid CORS preflight issues with Google Apps Script.
-                    'Content-Type': 'text/plain;charset=utf-8',
-                },
-            });
-            
-            // If the fetch call completes without throwing, we assume success.
-            setSubmissionStatus('idle');
-            setView('confirmation');
-                 
-        } catch (error) {
-            console.error('Order submission failed:', error);
-            setSubmissionError(`An issue occurred while saving your details. Please use one of the manual order options below to complete your purchase.`);
-            setSubmissionStatus('error');
-        }
-    };
-
-
-    const handleWhatsAppConfirm = () => {
-        const message = getWhatsAppMessage(customerDetails);
-        window.open(`https://wa.me/919760427922?text=${message}`, '_blank');
-        clearCart();
-        toggleCart();
-        showNotification("Thank you! Please send the pre-filled message to confirm.");
-    }
-    
-    const handleInstagramConfirm = () => {
-        const { link, body } = getInstagramMessage(customerDetails);
-        navigator.clipboard.writeText(body);
-        setIsCopied(true);
-        window.open(link, '_blank');
-        showNotification("Order details copied! Paste them in your Instagram DM.");
-    };
 
     // --- Reusable UI Components ---
     const ModalHeader: React.FC<{title: string}> = ({title}) => (
@@ -168,190 +65,75 @@ const CartModal: React.FC = () => {
             </button>
         </div>
     );
-    
-    const OrderSummary: React.FC = () => (
-      <>
-        <div className="flex justify-between items-center">
-            <span className="font-medium">Subtotal</span>
-            <span className="font-serif">{formattedSubtotal}</span>
-        </div>
-        {discount > 0 && (
-            <div className="flex justify-between items-center text-[var(--color-success)]">
-                <span className="font-medium">Discount (20%)</span>
-                <span className="font-serif">- {formattedDiscount}</span>
-            </div>
-        )}
-        <div className="flex justify-between items-center mt-2 pt-2 border-t border-[var(--color-border)]">
-            <span className="font-semibold">Total</span>
-            <span className="text-2xl font-serif text-[var(--color-primary)]">{formattedFinalTotal}</span>
-        </div>
-      </>
-    );
 
-    // --- Main View Renderers ---
-    const renderCartView = () => (
-        <>
-            <ModalHeader title="Your Bag" />
-            {cartItems.length > 0 ? (
-                <div className="flex-grow overflow-y-auto p-6 space-y-4">
-                    {cartItems.map(item => (
-                        <div key={item.id} className="flex gap-4 animate-fade-in" style={{animationDuration: '0.5s'}}>
-                            <img src={formatGoogleDriveLink(item.imageUrls[0], 'image', { width: 100 })} alt={item.name} className="w-24 h-28 object-cover rounded-md bg-[var(--color-surface-alt)]" />
-                            <div className="flex-grow flex flex-col">
-                                <h3 className="font-semibold">{item.name}</h3>
-                                <p className="text-sm text-[var(--color-text-secondary)]">{item.brand} / {item.size}</p>
-                                <p className="font-serif text-[var(--color-primary)] mt-1">{formatCurrency(item.price)}</p>
-                                <button onClick={() => removeFromCart(item.id)} className="text-xs text-[var(--color-danger)] hover:underline mt-auto text-left w-fit">Remove</button>
-                            </div>
-                        </div>
-                    ))}
-                </div>
+    const FreeShippingProgress: React.FC = () => (
+        <div className="p-4 text-center text-sm bg-[var(--color-surface-alt)]">
+            {amountNeededForFreeShipping > 0 ? (
+                <p>Add <strong>{new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0 }).format(amountNeededForFreeShipping)}</strong> more to get <strong>FREE SHIPPING!</strong></p>
             ) : (
-                <div className="flex-grow flex flex-col justify-center items-center text-center p-6">
-                    <ShoppingBagIcon className="w-16 h-16 text-[var(--color-text-muted)] opacity-50 mb-4" />
-                    <h3 className="font-semibold">Your bag is empty</h3>
-                    <p className="text-[var(--color-text-secondary)] mt-2">Find a treasure worth collecting!</p>
-                </div>
+                <p>🎉 You've unlocked <strong>FREE SHIPPING!</strong></p>
             )}
-            {cartItems.length > 0 && (
-                <div className="p-6 border-t border-[var(--color-border)] bg-[var(--color-surface-alt)] space-y-4">
-                    {subtotal > 0 && subtotal < FREE_SHIPPING_THRESHOLD && (
-                        <div className="text-center text-sm text-[var(--color-text-secondary)] p-3 bg-[var(--color-surface)] rounded-md">
-                            You're just <span className="font-bold text-[var(--color-primary)]">{formatCurrency(amountNeededForFreeShipping)}</span> away from free shipping!
-                        </div>
-                    )}
-                    {subtotal >= FREE_SHIPPING_THRESHOLD && (
-                        <div className="text-center text-sm font-semibold text-[var(--color-success)] p-3 bg-green-100/50 rounded-md flex items-center justify-center gap-2">
-                            <CheckCircleIcon className="w-5 h-5"/>
-                            Congratulations! You've qualified for free shipping.
-                        </div>
-                    )}
-                    <OrderSummary />
-                    <button onClick={() => setView('form')} className="btn btn-primary w-full">Proceed to Checkout</button>
-                </div>
-            )}
-        </>
-    );
-
-    const renderFormView = () => (
-        <>
-            <ModalHeader title="Checkout" />
-            <form ref={formRef} onSubmit={handleFormSubmit} className="flex-grow flex flex-col">
-                <div className="overflow-y-auto p-6 space-y-4">
-                    <button onClick={() => setView('cart')} type="button" className="flex items-center gap-2 text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] mb-4">
-                        <ArrowLeftIcon className="w-4 h-4" /> Back to Cart
-                    </button>
-                    <h3 className="font-semibold">Shipping Information</h3>
-                    <div className="grid grid-cols-1 gap-4">
-                        <input type="text" name="name" placeholder="Full Name" value={customerDetails.name} onChange={handleFormChange} required className="w-full p-2 border border-[var(--color-border)] rounded-md bg-[var(--color-surface)]" />
-                        <input type="tel" name="phone" placeholder="Phone Number" value={customerDetails.phone} onChange={handleFormChange} required className="w-full p-2 border border-[var(--color-border)] rounded-md bg-[var(--color-surface)]" />
-                        <input type="text" name="address" placeholder="Address (House No, Street)" value={customerDetails.address} onChange={handleFormChange} required className="w-full p-2 border border-[var(--color-border)] rounded-md bg-[var(--color-surface)]" />
-                        <div className="grid grid-cols-2 gap-4">
-                           <input type="text" name="city" placeholder="City" value={customerDetails.city} onChange={handleFormChange} required className="w-full p-2 border border-[var(--color-border)] rounded-md bg-[var(--color-surface)]" />
-                           <input type="text" name="state" placeholder="State" value={customerDetails.state} onChange={handleFormChange} required className="w-full p-2 border border-[var(--color-border)] rounded-md bg-[var(--color-surface)]" />
-                        </div>
-                        <input type="text" name="pincode" placeholder="Pincode" value={customerDetails.pincode} onChange={handleFormChange} required className="w-full p-2 border border-[var(--color-border)] rounded-md bg-[var(--color-surface)]" />
-                    </div>
-                </div>
-                <div className="p-6 border-t border-[var(--color-border)] bg-[var(--color-surface-alt)] mt-auto space-y-4">
-                    <OrderSummary />
-                    <button type="submit" className="btn btn-primary w-full" disabled={submissionStatus === 'submitting'}>
-                        {submissionStatus === 'submitting' ? (
-                            <span className="flex items-center justify-center gap-2"><LoadingIcon className="w-5 h-5"/> Saving Details...</span>
-                        ) : 'Confirm & Proceed to Order'}
-                    </button>
-                    <p className="text-xs text-[var(--color-text-muted)] text-center">Your details will be saved, then you can confirm via DM. Shipping calculated upon confirmation. Payment via UPI/Bank Transfer.</p>
-                </div>
-            </form>
-        </>
-    );
-    
-    const renderConfirmationView = () => (
-        <>
-            <ModalHeader title="Confirm Order" />
-            <div className="flex-grow flex flex-col p-6">
-                <button onClick={() => setView('form')} type="button" className="flex items-center gap-2 text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] mb-4">
-                    <ArrowLeftIcon className="w-4 h-4" /> Edit Details
-                </button>
-                <div className="text-center flex-grow flex flex-col justify-center">
-                    <CheckCircleIcon className="w-12 h-12 text-[var(--color-success)] mx-auto mb-3"/>
-                    <h3 className="font-semibold">Details Saved!</h3>
-                    <p className="text-[var(--color-text-secondary)] mt-1">Almost there! Just send your order on WhatsApp or Instagram to finalize.</p>
-                </div>
-
-                <div className="pt-6 space-y-4">
-                    <button onClick={handleWhatsAppConfirm} className="btn w-full flex items-center justify-center gap-2" style={{backgroundColor: '#25D366', color: 'white', borderColor: '#25D366'}}>
-                        <WhatsAppIcon className="w-5 h-5"/> Order via WhatsApp
-                    </button>
-                    <div className="text-center">
-                        <button 
-                            onClick={handleInstagramConfirm} 
-                            className="btn w-full flex items-center justify-center gap-2" 
-                            style={{background: 'linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%)', color: 'white', borderColor: 'transparent'}}
-                        >
-                           <InstagramIcon className="w-5 h-5" />
-                           {isCopied ? 'Order Copied!' : 'Order via Instagram DM'}
-                        </button>
-                        <p className="text-xs text-[var(--color-text-muted)] mt-2">
-                            {isCopied 
-                                ? "We've copied your order. Paste it in your Instagram DM to confirm!" 
-                                : "We'll copy your full order & open Instagram for you to paste."
-                            }
-                        </p>
-                    </div>
-                </div>
+            <div className="w-full bg-[var(--color-border)] rounded-full h-2.5 mt-2">
+                <div className="bg-[var(--color-primary)] h-2.5 rounded-full" style={{ width: `${Math.min(100, (subtotal / FREE_SHIPPING_THRESHOLD) * 100)}%` }}></div>
             </div>
-        </>
+        </div>
     );
-    
-    const renderSubmissionStatus = () => {
-        if (submissionStatus === 'error') {
-            return (
-                <div className="flex flex-col items-center justify-center text-center p-6 h-full animate-fade-in">
-                     <h3 className="font-serif font-bold text-[var(--color-danger)] mb-4">Order Submission Failed</h3>
-                     <p className="text-[var(--color-text-secondary)] mt-2 mb-6">{submissionError}</p>
-                     <div className="space-y-3 w-full max-w-xs">
-                        <button onClick={handleFormSubmit} className="btn btn-primary w-full">Try Again</button>
-                        <button onClick={() => setView('confirmation')} className="btn btn-secondary w-full">Order Manually Instead</button>
-                     </div>
-                </div>
-            );
-        }
-        // While submitting
-        return (
-            <div className="flex flex-col items-center justify-center text-center p-6 h-full animate-fade-in">
-                <LoadingIcon className="w-16 h-16 text-[var(--color-primary)] mb-4" />
-                <h3 className="font-semibold">Submitting Your Order...</h3>
-                <p className="text-[var(--color-text-secondary)]">Please wait a moment.</p>
-            </div>
-        );
-    }
-
-    const renderContent = () => {
-        if (submissionStatus === 'submitting' || submissionStatus === 'error') {
-            return (
-                <>
-                    <ModalHeader title={submissionStatus === 'error' ? 'Error' : 'Processing'} />
-                    {renderSubmissionStatus()}
-                </>
-            );
-        }
-        switch (view) {
-            case 'form': return renderFormView();
-            case 'confirmation': return renderConfirmationView();
-            case 'cart':
-            default:
-                return renderCartView();
-        }
-    };
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-end" onClick={toggleCart} role="dialog" aria-modal="true" aria-labelledby="cart-heading">
-            <div ref={modalRef} className="w-full max-w-md bg-[var(--color-surface)] h-full flex flex-col shadow-2xl" style={{ animation: 'slideIn 0.3s ease-out' }} onClick={(e) => e.stopPropagation()}>
-                <style>{`@keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }`}</style>
-                {renderContent()}
+        <div className="fixed inset-0 bg-black/60 z-50 animate-page-fade" role="dialog" aria-modal="true" aria-labelledby="cart-heading">
+            <div ref={modalRef} className="absolute inset-y-0 right-0 w-full max-w-md bg-[var(--color-surface)] shadow-2xl flex flex-col" style={{animation: 'slideInRight 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)'}}>
+                <ModalHeader title="Your Shopping Bag" />
+                {cartItems.length > 0 ? (
+                    <>
+                        <FreeShippingProgress />
+                        <div className="flex-grow overflow-y-auto p-6">
+                            <ul className="space-y-4">
+                                {cartItems.map(item => (
+                                    <li key={item.id} className="flex items-start gap-4">
+                                        <img src={formatGoogleDriveLink(item.imageUrls[0], 'image', { width: 96 })} alt={item.name} className="w-24 h-24 object-cover rounded-md border border-[var(--color-border)]" />
+                                        <div className="flex-grow">
+                                            <h3 className="font-semibold">{item.name}</h3>
+                                            <p className="text-sm text-[var(--color-text-secondary)]">{item.size} / {item.brand}</p>
+                                            <p className="font-serif text-lg mt-1">{new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0 }).format(item.price)}</p>
+                                        </div>
+                                        <button onClick={() => removeFromCart(item.id)} className="p-1 text-[var(--color-text-muted)] hover:text-[var(--color-danger)] transition-colors" aria-label={`Remove ${item.name} from cart`}>
+                                            <CloseIcon className="w-5 h-5" />
+                                        </button>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                        <div className="p-6 border-t border-[var(--color-border)] bg-[var(--color-surface)] space-y-4">
+                            <div className="space-y-2 text-sm">
+                                <div className="flex justify-between">
+                                    <span className="text-[var(--color-text-secondary)]">Subtotal</span>
+                                    <span>{formattedSubtotal}</span>
+                                </div>
+                                <div className="flex justify-between text-[var(--color-success)]">
+                                    <span>Site-Wide 20% Sale Applied!</span>
+                                    <span>-{formattedDiscount}</span>
+                                </div>
+                                <div className="flex justify-between font-bold text-lg pt-2 border-t border-dashed border-[var(--color-border)]">
+                                    <span>Total</span>
+                                    <span>{formattedFinalTotal}</span>
+                                </div>
+                            </div>
+                            <Link to="/checkout" className="btn btn-primary w-full text-center" onClick={toggleCart}>
+                                Proceed to Checkout
+                            </Link>
+                        </div>
+                    </>
+                ) : (
+                    <div className="flex-grow flex flex-col items-center justify-center text-center p-6">
+                        <ShoppingBagIcon className="w-20 h-20 text-[var(--color-border)] mb-4" />
+                        <h3 className="font-serif text-xl">Your bag is empty</h3>
+                        <p className="text-[var(--color-text-secondary)] mt-2">Looks like you haven't found your treasure yet.</p>
+                        <Link to="/shop" className="btn btn-primary mt-6" onClick={toggleCart}>Start Shopping</Link>
+                    </div>
+                )}
             </div>
         </div>
     );
 };
+
 export default CartModal;

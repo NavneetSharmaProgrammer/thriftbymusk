@@ -2,13 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { CloseIcon } from './Icons.tsx';
 
 /**
- * A dismissible, scrolling marquee sales banner.
- * It displays key promotions in an infinite loop and dynamically adjusts page layout.
+ * A dismissible sales banner with a smooth marquee effect.
+ * It aligns with the site's theme and dynamically adjusts page layout when visible.
  */
 const SaleBanner: React.FC = () => {
     const [isVisible, setIsVisible] = useState(false);
     // Increment version number in the key to force re-display of the banner for all users after an update.
-    const localStorageKey = 'saleBannerDismissed_v5'; 
+    const localStorageKey = 'saleBannerDismissed_v6'; 
 
     useEffect(() => {
         // Check if the user has previously dismissed this version of the banner.
@@ -49,15 +49,12 @@ const SaleBanner: React.FC = () => {
         return null;
     }
 
-    const bannerText = "✨ 20% OFF on orders above ₹499 • Complimentary Shipping on orders above ₹999 ✨";
+    const bannerText = "SITE-WIDE 20% SALE NOW LIVE! • FREE SHIPPING ON ORDERS OVER ₹999";
 
     return (
         <div className="sale-banner">
             <div className="sale-banner__content-wrapper">
-                {/* Repeat content to create a seamless loop */}
                 <span className="sale-banner__content">{bannerText}</span>
-                <span className="sale-banner__content">{bannerText}</span>
-                <span className="sale-banner__content" aria-hidden="true">{bannerText}</span>
                 <span className="sale-banner__content" aria-hidden="true">{bannerText}</span>
             </div>
             <button onClick={handleClose} className="sale-banner__close" aria-label="Dismiss this announcement">

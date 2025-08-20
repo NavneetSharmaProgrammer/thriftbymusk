@@ -35,9 +35,9 @@ const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, onClose }) => 
     if (!product) return null;
     
     const isInCart = isProductInCart(product.id);
-    const formattedPrice = new Intl.NumberFormat('en-IN', {
-        style: 'currency', currency: 'INR', minimumFractionDigits: 0
-    }).format(product.price);
+    const salePrice = product.price * 0.8;
+    const formattedPrice = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0 }).format(product.price);
+    const formattedSalePrice = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0 }).format(salePrice);
 
     return (
         <div 
@@ -61,6 +61,9 @@ const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, onClose }) => 
                             alt={product.name} 
                             className="w-full h-full object-cover"
                          />
+                         {!product.sold && (
+                            <div className="absolute top-3 left-3 bg-[var(--color-danger)] text-[var(--color-white)] text-xs font-bold px-3 py-1 rounded-full shadow-md z-10">20% OFF</div>
+                         )}
                     </div>
                     <div className="grid grid-cols-5 gap-2">
                         {product.imageUrls.slice(0, 5).map((img, index) => (
@@ -88,7 +91,10 @@ const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, onClose }) => 
                         </button>
                     </div>
 
-                    <p className="text-3xl font-serif text-[var(--color-primary)] my-4">{formattedPrice}</p>
+                    <div className="flex items-baseline gap-3 my-4">
+                        <p className="text-2xl font-serif text-[var(--color-text-muted)] line-through">{formattedPrice}</p>
+                        <p className="text-3xl font-serif text-[var(--color-primary)]">{formattedSalePrice}</p>
+                    </div>
                     
                     <p className="text-[var(--color-text-secondary)] text-sm leading-relaxed">
                         {product.description.substring(0, 150)}{product.description.length > 150 ? '...' : ''}

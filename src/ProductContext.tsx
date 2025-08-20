@@ -18,7 +18,6 @@ const ProductContext = createContext<ProductContextType | undefined>(undefined);
 /**
  * The ProductProvider component is a crucial part of the application's state management.
  * It is responsible for fetching, storing, and providing product data to the entire application.
- * It now integrates the AI description generation logic.
  */
 export const ProductProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -27,7 +26,7 @@ export const ProductProvider: React.FC<{ children: ReactNode }> = ({ children })
 
   /**
    * The core data fetching logic, wrapped in `useCallback` for stability.
-   * This function now handles the entire pipeline: fetch, parse, and AI-enhance.
+   * This function handles fetching and parsing the product data from the configured source.
    */
   const loadProducts = useCallback(async () => {
     try {

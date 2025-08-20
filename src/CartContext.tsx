@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
-import { Product, CartItem, CartContextType, CustomerDetails } from './types';
+import { Product, CartItem, CartContextType, CustomerDetails, OrderSummary } from './types';
 import { INSTAGRAM_HANDLE } from './constants';
 
 // Create a React Context for the shopping cart.
@@ -82,23 +82,19 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   /**
    * Generates a detailed order summary string for all items in the cart.
-   * It now includes discount calculations.
+   * It now includes an unconditional 20% discount.
    * @returns An object containing the formatted list of items and various price components.
    */
-  const getOrderSummary = () => {
+  const getOrderSummary = (): OrderSummary => {
     const itemsList = cartItems.map(item => {
         const itemPrice = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0 }).format(item.price);
         return `- Product: ${item.name}\n  ID: ${item.id}\n  Size: ${item.size}\n  Category: ${item.category}\n  Price: ${itemPrice}`;
     }).join('\n\n');
 
     const subtotal = cartItems.reduce((sum, item) => sum + item.price, 0);
-    const DISCOUNT_THRESHOLD = 499;
-    const DISCOUNT_PERCENTAGE = 0.20; // 20%
+    const DISCOUNT_PERCENTAGE = 0.20; // 20% site-wide sale
 
-    let discount = 0;
-    if (subtotal > DISCOUNT_THRESHOLD) {
-      discount = subtotal * DISCOUNT_PERCENTAGE;
-    }
+    const discount = subtotal * DISCOUNT_PERCENTAGE;
     const finalTotal = subtotal - discount;
 
     const formatCurrency = (amount: number) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0 }).format(amount);
@@ -119,16 +115,12 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
    * @returns An encoded URI component string for a WhatsApp link.
    */
     const getWhatsAppMessage = (customerDetails: CustomerDetails) => {
-    const { itemsList, formattedSubtotal, formattedDiscount, formattedFinalTotal, discount } = getOrderSummary();
+    const { itemsList, formattedSubtotal, formattedDiscount, formattedFinalTotal } = getOrderSummary();
     const header = "Hello Thrift by Musk! 👋 I'd like to place an order for the following items:\n\n*ORDER SUMMARY*\n\n";
     
     const customerInfo = `\n\n*MY SHIPPING DETAILS*\nName: ${customerDetails.name}\nPhone: ${customerDetails.phone}\nAddress: ${customerDetails.address}, ${customerDetails.city}, ${customerDetails.state} - ${customerDetails.pincode}`;
 
-    let pricingInfo = `\n\nSubtotal: ${formattedSubtotal}`;
-    if (discount > 0) {
-      pricingInfo += `\nDiscount (20% OFF): -${formattedDiscount} 🎉`;
-    }
-    pricingInfo += `\n*Total:* ${formattedFinalTotal}`;
+    const pricingInfo = `\n\nSubtotal: ${formattedSubtotal}\nDiscount (20% OFF): -${formattedDiscount} 🎉\n*Total:* ${formattedFinalTotal}`;
     
     const footer = "\n\nPlease confirm my order and let me know the next steps for payment. Thank you! ✨";
 
@@ -140,16 +132,12 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
    * @returns An object with the link and the message body.
    */
   const getInstagramMessage = (customerDetails: CustomerDetails) => {
-    const { itemsList, formattedSubtotal, formattedDiscount, formattedFinalTotal, discount } = getOrderSummary();
+    const { itemsList, formattedSubtotal, formattedDiscount, formattedFinalTotal } = getOrderSummary();
     const header = `Hello! 👋 I'd love to order these treasures:\n\nORDER SUMMARY\n\n`;
     
     const customerInfo = `\n\nMY SHIPPING DETAILS\nName: ${customerDetails.name}\nPhone: ${customerDetails.phone}\nAddress: ${customerDetails.address}, ${customerDetails.city}, ${customerDetails.state} - ${customerDetails.pincode}`;
     
-    let pricingInfo = `\n\nSubtotal: ${formattedSubtotal}`;
-    if (discount > 0) {
-      pricingInfo += `\nDiscount (20% OFF): -${formattedDiscount} 🎉`;
-    }
-    pricingInfo += `\nFinal Total: ${formattedFinalTotal}`;
+    const pricingInfo = `\n\nSubtotal: ${formattedSubtotal}\nDiscount (20% OFF): -${formattedDiscount} 🎉\nFinal Total: ${formattedFinalTotal}`;
     
     const footer = "\n\nPlease let me know the next steps for payment. Can't wait! ✨"
 
@@ -159,7 +147,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   // The value object contains all the state and functions to be exposed by the context.
-  const contextValue = { cartItems, isCartOpen, notification, addToCart, removeFromCart, clearCart, toggleCart, isProductInCart, getWhatsAppMessage, getInstagramMessage, showNotification };
+  const contextValue = { cartItems, isCartOpen, notification, addToCart, removeFromCart, clearCart, toggleCart, isProductInCart, getWhatsAppMessage, getInstagramMessage, showNotification, getOrderSummary };
 
   return (
     <CartContext.Provider value={contextValue}>

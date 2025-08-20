@@ -6,6 +6,7 @@ import { CartProvider } from './CartContext';
 import { ProductProvider } from './ProductContext';
 import { ThemeProvider } from './ThemeContext';
 import { SavedProvider } from './SavedContext';
+import { RecentlyViewedProvider } from './RecentlyViewedContext';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import CartModal from './components/CartModal';
@@ -21,6 +22,7 @@ import ShopPage from './components/ShopPage';
 import GalleryPage from './components/GalleryPage';
 import ProductDetailPage from './components/ProductDetailPage';
 import SavedItemsPage from './components/SavedItemsPage';
+import CheckoutPage from './components/CheckoutPage';
 
 
 /**
@@ -94,35 +96,38 @@ const App: React.FC = () => {
       {/* 2. Context Providers wrap the application to provide global state. */}
       <ThemeProvider>
         <ProductProvider>
-          <SavedProvider>
-            <CartProvider>
-              {/* 3. HashRouter is used for client-side routing. */}
-              <HashRouter>
-                <ScrollToTop />
-                <div className="flex flex-col min-h-screen text-[var(--color-text-primary)] selection:bg-[var(--color-primary)]/30">
-                  <Header />
-                  <SaleBanner />
-                  <main className="flex-grow">
-                    {/* 4. Suspense can be used for other async operations within pages. */}
-                    <Suspense fallback={<PageLoader />}>
-                      <Routes>
-                        <Route path="/" element={<HomePage />} />
-                        <Route path="/shop" element={<ShopPage />} />
-                        <Route path="/saved" element={<SavedItemsPage />} />
-                        <Route path="/gallery" element={<GalleryPage />} />
-                        <Route path="/product/:id" element={<ProductDetailPage />} />
-                      </Routes>
-                    </Suspense>
-                  </main>
-                  <Footer />
-                  <CartModal />
-                  <Notification />
-                  <BackToTopButton />
-                  <FollowInstagramButton />
-                </div>
-              </HashRouter>
-            </CartProvider>
-          </SavedProvider>
+          <RecentlyViewedProvider>
+            <SavedProvider>
+              <CartProvider>
+                {/* 3. HashRouter is used for client-side routing. */}
+                <HashRouter>
+                  <ScrollToTop />
+                  <div className="flex flex-col min-h-screen text-[var(--color-text-primary)] selection:bg-[var(--color-primary)]/30">
+                    <Header />
+                    <SaleBanner />
+                    <main className="flex-grow">
+                      {/* 4. Suspense can be used for other async operations within pages. */}
+                      <Suspense fallback={<PageLoader />}>
+                        <Routes>
+                          <Route path="/" element={<HomePage />} />
+                          <Route path="/shop" element={<ShopPage />} />
+                          <Route path="/saved" element={<SavedItemsPage />} />
+                          <Route path="/gallery" element={<GalleryPage />} />
+                          <Route path="/product/:id" element={<ProductDetailPage />} />
+                          <Route path="/checkout" element={<CheckoutPage />} />
+                        </Routes>
+                      </Suspense>
+                    </main>
+                    <Footer />
+                    <CartModal />
+                    <Notification />
+                    <BackToTopButton />
+                    <FollowInstagramButton />
+                  </div>
+                </HashRouter>
+              </CartProvider>
+            </SavedProvider>
+          </RecentlyViewedProvider>
         </ProductProvider>
       </ThemeProvider>
     </ErrorBoundary>

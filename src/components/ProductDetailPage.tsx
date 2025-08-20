@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { Product } from '../types';
 import { useCart } from '../CartContext';
 import { useProducts } from '../ProductContext';
+import { useRecentlyViewed } from '../RecentlyViewedContext';
 import { ArrowLeftIcon, ShareIcon } from './Icons';
 import { formatGoogleDriveLink } from '../utils';
 import ProductCard from './ProductCard';
@@ -20,17 +21,21 @@ const ProductDetailPage: React.FC = () => {
   const [activeMedia, setActiveMedia] = useState<{ type: 'image' | 'video', url: string }>({ type: 'image', url: '' });
   const { addToCart, isProductInCart, showNotification } = useCart();
   const { products, isLoading } = useProducts();
+  const { addRecentlyViewed } = useRecentlyViewed();
 
-  // Effect to set the current product from the global products list
+  // Effect to set the current product from the global products list and track view
   useEffect(() => {
     if (products.length > 0 && id) {
         const foundProduct = products.find(p => p.id === id);
         setProduct(foundProduct);
-        if (foundProduct?.imageUrls?.length) {
-          setActiveMedia({ type: 'image', url: foundProduct.imageUrls[0] });
+        if (foundProduct) {
+            addRecentlyViewed(foundProduct.id);
+            if (foundProduct.imageUrls?.length) {
+                setActiveMedia({ type: 'image', url: foundProduct.imageUrls[0] });
+            }
         }
     }
-  }, [id, products]);
+  }, [id, products, addRecentlyViewed]);
 
   // Effect to update document metadata for SEO and social sharing
   useEffect(() => {
@@ -156,12 +161,10 @@ const ProductDetailPage: React.FC = () => {
   
   const isInCart = isProductInCart(product.id);
   const hasReviews = product.reviews && product.reviews.length > 0;
-
-  const formattedPrice = new Intl.NumberFormat('en-IN', {
-    style: 'currency',
-    currency: 'INR',
-    minimumFractionDigits: 0,
-  }).format(product.price);
+  
+  const salePrice = product.price * 0.8;
+  const formattedPrice = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0 }).format(product.price);
+  const formattedSalePrice = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0 }).format(salePrice);
 
   return (
     <>
@@ -186,6 +189,9 @@ const ProductDetailPage: React.FC = () => {
                             allowFullScreen
                           ></iframe>
                       )}
+                       {!product.sold && (
+                            <div className="absolute top-4 left-4 sale-badge px-4 py-2 z-10">20% OFF</div>
+                        )}
                        {product.sold && (
                           <div className="sold-out-ribbon rounded-lg">
                               <span>Sold Out</span>
@@ -229,7 +235,10 @@ const ProductDetailPage: React.FC = () => {
                   <h1 className="mt-1">{product.name}</h1>
                   
                   <div className="flex items-center justify-between my-4">
-                      <p className="text-4xl font-serif text-[var(--color-primary)]">{formattedPrice}</p>
+                      <div className="flex items-baseline gap-3">
+                        <p className="text-2xl font-serif text-[var(--color-text-muted)] line-through">{formattedPrice}</p>
+                        <p className="text-4xl font-serif text-[var(--color-primary)]">{formattedSalePrice}</p>
+                      </div>
                       <button onClick={handleShare} className="p-3 rounded-full bg-[var(--color-surface-alt)] text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] hover:bg-[var(--color-border)] transition-colors" aria-label="Share this product">
                           <ShareIcon className="w-6 h-6" />
                       </button>

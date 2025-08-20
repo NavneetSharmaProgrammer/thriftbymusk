@@ -43,7 +43,18 @@ export const GOOGLE_APPS_SCRIPT_URL: string = 'https://script.google.com/macros/
 export const LOGO_URL = 'https://drive.google.com/file/d/1OZ-4vlBjZOwNplGd8crOuiqAW7o2N3gA/view?usp=sharing'; // <-- PASTE YOUR LOGO URL HERE (This is an example link)
 
 /**
- * 4. INSTAGRAM HANDLE
+ * 4. 3D LOGO (.glb/.gltf format)
+ * -----------------------------
+ * The 3D model for your website's hero section.
+ * HOW TO SET UP:
+ * 1.  Create a folder named `assets` in the main project directory.
+ * 2.  Place your `Thriftbymusk1.glb` file inside the `assets` folder.
+ * 3.  The path below is now configured to load it automatically.
+ */
+export const LOGO_3D_URL = '/3d/Thriftbymusk1.glb'; // <-- POINTING TO YOUR LOCAL .GLB FILE
+
+/**
+ * 5. INSTAGRAM HANDLE
  * -------------------
  * Your store's Instagram handle, used for "Order via DM" links.
  * Do not include the '@' symbol.
@@ -51,7 +62,7 @@ export const LOGO_URL = 'https://drive.google.com/file/d/1OZ-4vlBjZOwNplGd8crOui
 export const INSTAGRAM_HANDLE = 'thriftbymusk';
 
 /**
- * 5. TEAM MEMBERS
+ * 6. TEAM MEMBERS
  * ------------------
  * Information about the store's team for the "Meet The Team" section.
  */

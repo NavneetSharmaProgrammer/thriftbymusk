@@ -22,12 +22,17 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, isFreshDrop, onQuick
 
   const isInCart = isProductInCart(product.id);
   const isSaved = isItemSaved(product.id);
+  
+  const salePrice = product.price * 0.8;
 
   const formattedPrice = new Intl.NumberFormat('en-IN', {
-    style: 'currency',
-    currency: 'INR',
-    minimumFractionDigits: 0,
+    style: 'currency', currency: 'INR', minimumFractionDigits: 0,
   }).format(product.price);
+  
+  const formattedSalePrice = new Intl.NumberFormat('en-IN', {
+    style: 'currency', currency: 'INR', minimumFractionDigits: 0,
+  }).format(salePrice);
+
 
   const handleSaveClick = (e: React.MouseEvent) => {
     e.preventDefault(); // Prevent navigating to product page
@@ -88,10 +93,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, isFreshDrop, onQuick
           <div className="sold-out-ribbon">
             <span>Sold Out</span>
           </div>
-        ) : isFreshDrop ? (
-          <div className="absolute top-3 left-3 bg-[var(--color-primary)] text-[var(--color-text-inverted)] text-xs font-semibold px-3 py-1 rounded-full shadow-sm animate-fade-in">🆕 Fresh Drop</div>
         ) : (
-          !isInCart && <div className="absolute top-3 left-3 bg-[var(--color-surface)]/90 text-[var(--color-primary)] text-xs font-semibold px-3 py-1 rounded-full shadow-sm">Only 1 Available</div>
+           <div className="absolute top-3 left-3 sale-badge text-xs px-3 py-1">20% OFF</div>
         )}
       </Link>
       
@@ -105,7 +108,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, isFreshDrop, onQuick
             <h3 className="font-semibold text-lg mb-2 text-[var(--color-text-primary)] hover:text-[var(--color-primary)] transition-colors">{product.name}</h3>
         </Link>
         <p className="text-xs text-[var(--color-text-muted)] mb-3">{product.condition}</p>
-        <p className="font-serif text-xl text-[var(--color-primary)] mb-4 mt-auto">{formattedPrice}</p>
+        
+        <div className="flex justify-center items-baseline gap-2 mb-4 mt-auto">
+            <p className="font-serif text-lg text-[var(--color-text-muted)] line-through">{formattedPrice}</p>
+            <p className="font-serif text-xl text-[var(--color-primary)]">{formattedSalePrice}</p>
+        </div>
         
         <div className="mt-auto">
           <button
