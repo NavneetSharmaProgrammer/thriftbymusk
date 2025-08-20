@@ -13,6 +13,8 @@ declare global {
         'disable-zoom'?: boolean;
         'environment-image'?: string;
         'shadow-intensity'?: string;
+        loading?: 'auto' | 'lazy' | 'eager';
+        reveal?: 'auto' | 'interaction' | 'manual';
       }, HTMLElement>;
     }
   }

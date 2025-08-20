@@ -16,6 +16,8 @@ const HeroSection: React.FC = () => {
             disable-zoom
             environment-image="neutral"
             shadow-intensity="1"
+            loading="eager"
+            reveal="auto"
             style={{
                 position: 'absolute',
                 top: '50%',
