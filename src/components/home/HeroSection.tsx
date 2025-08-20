@@ -3,15 +3,6 @@ import { Link } from 'react-router-dom';
 import AnimatedSection from '../AnimatedSection';
 import { LOGO_3D_URL } from '../../constants';
 
-// Let TypeScript know about the <model-viewer> custom element.
-declare global {
-  namespace JSX {
-    interface IntrinsicElements {
-      'model-viewer': any;
-    }
-  }
-}
-
 const HeroSection: React.FC = () => {
   return (
     <AnimatedSection as="div" id="home" className="h-[80vh] flex items-center justify-center text-center relative overflow-hidden bg-[var(--color-surface-alt)]">

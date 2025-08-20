@@ -43,18 +43,19 @@ export const GOOGLE_APPS_SCRIPT_URL: string = 'https://script.google.com/macros/
 export const LOGO_URL = 'https://drive.google.com/file/d/1OZ-4vlBjZOwNplGd8crOuiqAW7o2N3gA/view?usp=sharing'; // <-- PASTE YOUR LOGO URL HERE (This is an example link)
 
 /**
- * 4. 3D LOGO (.glb/.gltf format)
- * -----------------------------
- * The 3D model for your website's hero section.
+ * 3.1 3D LOGO (Optional)
+ * -------------------
+ * A 3D model (.glb format) for the hero section background.
  * HOW TO SET UP:
- * 1.  Create a folder named `assets` in the main project directory.
- * 2.  Place your `Thriftbymusk1.glb` file inside the `assets` folder.
- * 3.  The path below is now configured to load it automatically.
+ * 1.  Upload your .glb file to a public host (like GitHub, Vercel, or a CDN) that allows direct file access.
+ * 2.  Paste the direct, raw link to the file below.
+ * Note: Google Drive links do not work for 3D models. This example uses a placeholder to ensure the site works.
+ * For local files (like '/3d/your-model.glb'), ensure the file is in a `public` directory at your project's root.
  */
-export const LOGO_3D_URL = '/3d/Thriftbymusk1.glb'; // <-- POINTING TO YOUR LOCAL .GLB FILE
+export const LOGO_3D_URL = 'https://modelviewer.dev/shared-assets/models/gem.glb'; // <-- PASTE YOUR 3D MODEL URL HERE
 
 /**
- * 5. INSTAGRAM HANDLE
+ * 4. INSTAGRAM HANDLE
  * -------------------
  * Your store's Instagram handle, used for "Order via DM" links.
  * Do not include the '@' symbol.
@@ -62,7 +63,7 @@ export const LOGO_3D_URL = '/3d/Thriftbymusk1.glb'; // <-- POINTING TO YOUR LOCA
 export const INSTAGRAM_HANDLE = 'thriftbymusk';
 
 /**
- * 6. TEAM MEMBERS
+ * 5. TEAM MEMBERS
  * ------------------
  * Information about the store's team for the "Meet The Team" section.
  */
