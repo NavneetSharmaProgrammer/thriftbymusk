@@ -24,7 +24,9 @@
     "noUncheckedSideEffectImports": true,
 
     "paths": {
-      "@/*" :  ["./*"]
+      "@/*": ["./*"]
     }
-  }
+  },
+  "include": ["src"],        // 👈 this ensures global.d.ts is picked up
+  "exclude": ["node_modules"]
 }
