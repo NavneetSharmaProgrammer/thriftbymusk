@@ -43,18 +43,6 @@ export const GOOGLE_APPS_SCRIPT_URL: string = 'https://script.google.com/macros/
 export const LOGO_URL = 'https://drive.google.com/file/d/1OZ-4vlBjZOwNplGd8crOuiqAW7o2N3gA/view?usp=sharing'; // <-- PASTE YOUR LOGO URL HERE (This is an example link)
 
 /**
- * 3.1 3D LOGO (Optional)
- * -------------------
- * A 3D model (.glb format) for the hero section background.
- * HOW TO SET UP:
- * 1.  Upload your .glb file to a public host (like GitHub, Vercel, or a CDN) that allows direct file access.
- * 2.  Paste the direct, raw link to the file below.
- * Note: Google Drive links do not work for 3D models. This example uses a placeholder to ensure the site works.
- * For local files (like '/3d/your-model.glb'), ensure the file is in a `public` directory at your project's root.
- */
-export const LOGO_3D_URL = 'https://modelviewer.dev/shared-assets/models/gem.glb'; // <-- PASTE YOUR 3D MODEL URL HERE
-
-/**
  * 4. INSTAGRAM HANDLE
  * -------------------
  * Your store's Instagram handle, used for "Order via DM" links.
@@ -104,6 +92,13 @@ export const OWNERS = [
  *  STATIC CONTENT (Managed via Google Drive)
  * =================================================================
  */
+
+/**
+ * HERO VIDEO
+ * ----------------
+ * Main video for the hero section on the homepage.
+ */
+export const HERO_VIDEO_URL = '/Video/hero-video-1.mp4';
 
 /**
  * PACKAGING VIDEO
